@@ -12,7 +12,7 @@ function Categorias() {
 
   // Mapeo de colores por categoría (nombres EXACTOS de la BD)
   const colorMap = {
-    "Introduccion fisica": {
+    "Introducción a la física": {
       bg: "bg-green-500",
       hover: "hover:bg-green-600",
       border: "border-green-600",
@@ -28,7 +28,7 @@ function Categorias() {
       text: "text-red-900",
       lightBg: "bg-red-50",
     },
-    "Fisica contemporanea": {
+    "Física contemporánea": {
       bg: "bg-blue-500",
       hover: "hover:bg-blue-600",
       border: "border-blue-600",
@@ -36,7 +36,7 @@ function Categorias() {
       text: "text-blue-900",
       lightBg: "bg-blue-50",
     },
-    "Formulacion de proyectos": {
+    "Formulación de proyectos": {
       bg: "bg-yellow-500",
       hover: "hover:bg-yellow-600",
       border: "border-yellow-600",
@@ -44,7 +44,7 @@ function Categorias() {
       text: "text-yellow-900",
       lightBg: "bg-yellow-50",
     },
-    Mecanica: {
+    Mecánica: {
       bg: "bg-orange-500",
       hover: "hover:bg-orange-600",
       border: "border-orange-600",
