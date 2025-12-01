@@ -216,7 +216,7 @@ function RegistroLogin() {
                 htmlFor="vienePorAlguien"
                 className="text-sm text-gray-700"
               >
-                ¿Viene por un estudiante/proyecto en específico?
+                ¿Viene por un estudiante?
               </label>
             </div>
 

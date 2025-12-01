@@ -15,7 +15,7 @@ function Navbar() {
       <nav className="container mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
           <Link
-            to="/"
+            
             className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent hover:from-emerald-300 hover:to-cyan-300 transition-all duration-300"
           >
             Feria de ciencias
