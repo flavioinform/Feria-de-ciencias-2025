@@ -1,6 +1,54 @@
 import { useState } from "react";
 import { supabase } from "../../lib/supabase";
 
+// ---------- Helpers de RUT ----------
+
+// normaliza el RUT para guardar/consultar en BD (sin puntos ni guion, DV en mayúscula)
+const normalizarRut = (rut) =>
+  rut.replace(/[.\-]/g, "").toUpperCase();
+
+// valida formato + módulo 11 + evita RUTs imposibles
+const validarRut = (rut) => {
+  if (!rut) return false;
+
+  const rutLimpio = normalizarRut(rut);
+
+  // mínimo: 2 caracteres (cuerpo + DV)
+  if (rutLimpio.length < 2) return false;
+
+  // debe ser solo números + DV (número o K)
+  if (!/^[0-9]+[0-9K]$/.test(rutLimpio)) return false;
+
+  const cuerpo = rutLimpio.slice(0, -1);
+  const dv = rutLimpio.slice(-1);
+
+  // ❌ evitar RUTs con todos los dígitos iguales (11111111, 22222222, etc.)
+  if (/^(\d)\1+$/.test(cuerpo)) return false;
+
+  // ❌ limitar a un rango razonable de RUTs de personas naturales
+  const num = parseInt(cuerpo, 10);
+  if (num < 1000000 || num > 27000000) return false;
+
+  // ✅ cálculo módulo 11
+  let suma = 0;
+  let factor = 2;
+
+  for (let i = cuerpo.length - 1; i >= 0; i--) {
+    suma += parseInt(cuerpo[i], 10) * factor;
+    factor = factor === 7 ? 2 : factor + 1;
+  }
+
+  const resto = suma % 11;
+  const calculadoNum = 11 - resto;
+
+  let dvEsperado;
+  if (calculadoNum === 11) dvEsperado = "0";
+  else if (calculadoNum === 10) dvEsperado = "K";
+  else dvEsperado = calculadoNum.toString();
+
+  return dv === dvEsperado;
+};
+
 function RegistroLogin() {
   const [form, setForm] = useState({
     nombre: "",
@@ -34,11 +82,26 @@ function RegistroLogin() {
     setCargando(true);
 
     try {
-      // 1. revisar si el RUT ya existe
+      const rutIngresado = form.rut.trim();
+
+      // 0) Validar RUT antes de cualquier cosa
+      if (!validarRut(rutIngresado)) {
+        setMensaje(
+          "RUT inválido. Verifica el número, el dígito verificador y que sea un RUT real."
+        );
+        setTipo("error");
+        setCargando(false);
+        return;
+      }
+
+      // usamos el RUT normalizado para BD
+      const rutNormalizado = normalizarRut(rutIngresado);
+
+      // 1) revisar si el RUT ya existe
       const { data: existente, error: errorBusqueda } = await supabase
         .from("usuarios")
         .select("id")
-        .eq("rut", form.rut)
+        .eq("rut", rutNormalizado)
         .maybeSingle();
 
       if (errorBusqueda) {
@@ -54,13 +117,13 @@ function RegistroLogin() {
         return;
       }
 
-      // 2. generar PIN
+      // 2) generar PIN
       const nuevoPin = generarPin();
 
-      // 3. insertar usuario visitante
+      // 3) insertar usuario visitante
       const { error: errorInsert } = await supabase.from("usuarios").insert({
         nombre: form.nombre,
-        rut: form.rut,
+        rut: rutNormalizado, // se guarda normalizado
         viene_por_alguien: form.vienePorAlguien,
         por_quien_vino: form.vienePorAlguien ? form.por_quien_vino : null,
         pin_hash: nuevoPin,
@@ -133,6 +196,7 @@ function RegistroLogin() {
                 name="rut"
                 value={form.rut}
                 onChange={handleChange}
+                placeholder="12.345.678-9"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none bg-gray-50 text-black"
                 required
               />
