@@ -243,7 +243,7 @@ function EvaluarProyecto() {
                 Evaluación de la presentación
               </h2>
               <p className="text-sm text-slate-500">
-                Evalúa cada criterio del 1 al 4
+                Evalúa cada criterio del 1 al 4, donde 4 corresponde a un desempeño muy bueno y 1 a un desempeño deficiente.
               </p>
             </div>
 
@@ -317,7 +317,7 @@ function EvaluarProyecto() {
             <button
               type="submit"
               disabled={enviando}
-              className="w-full bg-indigo-600 text-white font-semibold py-3 rounded-lg hover:bg-indigo-700 transition-all shadow-md hover:shadow-lg disabled:opacity-60 disabled:cursor-not-allowed"
+              className="w-full bg-black text-white font-semibold py-3 rounded-lg hover:bg-indigo-700 transition-all shadow-md hover:shadow-lg disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {enviando ? (
                 <span className="flex items-center justify-center gap-2">

@@ -103,11 +103,14 @@ function ProyectosPorCategoria() {
 
         {/* Lista de proyectos */}
         {!loading && !error && proyectos.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6"    >
             {proyectos.map((proyecto) => (
               <div
                 key={proyecto.id}
                 className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 border border-slate-100 overflow-hidden"
+                  onClick={() =>
+                        navigate(`/evaluar/${proyecto.id}`)
+                      }
               >
                 {/* Imagen - Ahora se ve completa */}
                 {proyecto.image && (
@@ -120,7 +123,10 @@ function ProyectosPorCategoria() {
                   </div>
                 )}
 
-                <div className="p-5">
+                <div className="p-5"  onClick={() =>
+                        navigate(`/evaluar/${proyecto.id}`)
+                      }>
+                    
                   {/* Stand */}
                   {proyecto.stand_num && (
                     <span className="inline-block text-xs font-semibold bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full mb-3">

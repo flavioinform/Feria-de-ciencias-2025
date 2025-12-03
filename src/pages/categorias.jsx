@@ -10,9 +10,26 @@ function Categorias() {
 
   const navigate = useNavigate();
 
-  // Mapeo de colores por categoría (nombres EXACTOS de la BD)
+  // 🔧 Normalizar nombre (para evitar problemas de tildes, mayúsculas y espacios)
+  const normalizeName = (s = "") =>
+    s
+      .normalize("NFD") // separa letra + tilde
+      .replace(/[\u0300-\u036f]/g, "") // quita tildes
+      .toLowerCase()
+      .trim();
+
+  // ORDEN FIJO usando nombres NORMALIZADOS
+  const ordenCategorias = [
+    normalizeName("Introducción a la física"),   // verde
+    normalizeName("Formulación de proyectos"),   // amarillo
+    normalizeName("Mecánica"),                   // naranjo
+    normalizeName("Electromagnetismo"),          // rojo
+    normalizeName("Física contemporánea"),       // azul
+  ];
+
+  // Mapeo de colores usando claves NORMALIZADAS
   const colorMap = {
-    "Introducción a la física": {
+    [normalizeName("Introducción a la física")]: {
       bg: "bg-green-500",
       hover: "hover:bg-green-600",
       border: "border-green-600",
@@ -20,23 +37,7 @@ function Categorias() {
       text: "text-green-900",
       lightBg: "bg-green-50",
     },
-    Electromagnetismo: {
-      bg: "bg-red-500",
-      hover: "hover:bg-red-600",
-      border: "border-red-600",
-      selected: "bg-red-700",
-      text: "text-red-900",
-      lightBg: "bg-red-50",
-    },
-    "Física contemporánea": {
-      bg: "bg-blue-500",
-      hover: "hover:bg-blue-600",
-      border: "border-blue-600",
-      selected: "bg-blue-700",
-      text: "text-blue-900",
-      lightBg: "bg-blue-50",
-    },
-    "Formulación de proyectos": {
+    [normalizeName("Formulación de proyectos")]: {
       bg: "bg-yellow-500",
       hover: "hover:bg-yellow-600",
       border: "border-yellow-600",
@@ -44,7 +45,7 @@ function Categorias() {
       text: "text-yellow-900",
       lightBg: "bg-yellow-50",
     },
-    Mecánica: {
+    [normalizeName("Mecánica")]: {
       bg: "bg-orange-500",
       hover: "hover:bg-orange-600",
       border: "border-orange-600",
@@ -52,12 +53,29 @@ function Categorias() {
       text: "text-orange-900",
       lightBg: "bg-orange-50",
     },
+    [normalizeName("Electromagnetismo")]: {
+      bg: "bg-red-500",
+      hover: "hover:bg-red-600",
+      border: "border-red-600",
+      selected: "bg-red-700",
+      text: "text-red-900",
+      lightBg: "bg-red-50",
+    },
+    [normalizeName("Física contemporánea")]: {
+      bg: "bg-blue-500",
+      hover: "hover:bg-blue-600",
+      border: "border-blue-600",
+      selected: "bg-blue-700",
+      text: "text-blue-900",
+      lightBg: "bg-blue-50",
+    },
   };
 
   // Colores por defecto si no está en el mapa
   const getColors = (nombre) => {
+    const key = normalizeName(nombre);
     return (
-      colorMap[nombre] || {
+      colorMap[key] || {
         bg: "bg-red-500",
         hover: "hover:bg-red-600",
         border: "border-red-600",
@@ -75,15 +93,32 @@ function Categorias() {
 
       const { data, error } = await supabase
         .from("categorias")
-        .select("id, nombre")
-        .order("nombre", { ascending: true });
+        .select("id, nombre");
 
       if (error) {
         console.error("Error al obtener las categorías:", error);
         setError("No se pudieron cargar las categorías.");
       } else {
-        console.log("Categorías obtenidas:", data);
-        setCategorias(data);
+        console.log(
+          "Categorías obtenidas:",
+          data.map((c) => JSON.stringify(c.nombre))
+        );
+
+        // Ordenar según nuestro arreglo ordenCategorias (usando nombres normalizados)
+        const ordenadas = [...data].sort((a, b) => {
+          const keyA = normalizeName(a.nombre);
+          const keyB = normalizeName(b.nombre);
+
+          const idxA = ordenCategorias.indexOf(keyA);
+          const idxB = ordenCategorias.indexOf(keyB);
+
+          const posA = idxA === -1 ? 999 : idxA;
+          const posB = idxB === -1 ? 999 : idxB;
+
+          return posA - posB;
+        });
+
+        setCategorias(ordenadas);
       }
 
       setLoading(false);
