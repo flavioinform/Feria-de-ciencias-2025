@@ -133,7 +133,7 @@ function Categorias() {
         {/* Título */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-800 mb-3">
-            Categorías de Física
+            Categorías
           </h1>
           <p className="text-gray-600">
             Selecciona una categoría para explorar los proyectos

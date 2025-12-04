@@ -262,7 +262,7 @@ function EvaluarProyecto() {
                     { label: "Muy bueno", value: 4 },
                     { label: "Bueno", value: 3 },
                     { label: "Regular", value: 2 },
-                    { label: "Malo", value: 1 },
+                    { label: "Deficiente", value: 1 },
                   ].map((opt) => (
                     <label
                       key={opt.value}
