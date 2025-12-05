@@ -88,101 +88,127 @@ function EvaluarProyecto() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setMensaje("");
-    setTipoMensaje("");
-    setEnviando(true);
+  e.preventDefault();
+  setMensaje("");
+  setTipoMensaje("");
+  setEnviando(true);
 
-    // Validar que estén todos los criterios respondidos
-    const faltan = criterios.some((c) => !valores[c.id]);
-    if (faltan) {
-      setMensaje("Debes evaluar todos los criterios.");
+  // Validar que estén todos los criterios respondidos
+  const faltan = criterios.some((c) => !valores[c.id]);
+  if (faltan) {
+    setMensaje("Debes evaluar todos los criterios.");
+    setTipoMensaje("error");
+    setEnviando(false);
+    return;
+  }
+
+  // Validar que haya un usuario logueado
+  if (!user || !user.id) {
+    setMensaje("Debes iniciar sesión para evaluar.");
+    setTipoMensaje("error");
+    setEnviando(false);
+    return;
+  }
+
+  try {
+    const visitanteId = user.id;
+
+    // 0) Revisar si ya existe evaluación para este proyecto y este usuario
+    const { data: evalExistente, error: evalExistError } = await supabase
+      .from("evaluaciones")
+      .select("id")
+      .eq("proyecto_id", proyectoId)
+      .eq("visitante_id", visitanteId)
+      .maybeSingle();
+
+    if (evalExistError) {
+      console.error("Error al buscar evaluación previa:", evalExistError);
+      setMensaje("Ocurrió un error al verificar tu evaluación previa.");
       setTipoMensaje("error");
-      setEnviando(false);
       return;
     }
 
-    // Validar que haya un usuario logueado
-    if (!user || !user.id) {
-      setMensaje("Debes iniciar sesión para evaluar.");
+    // Si ya había evaluación, mostramos mensaje y redirigimos igual
+    if (evalExistente) {
+      setMensaje("Ya habías evaluado este proyecto.");
       setTipoMensaje("error");
-      setEnviando(false);
-      return;
-    }
 
-    try {
-      // 1) Calcular nota final (promedio ponderado)
-      const sumPesos = criterios.reduce((acc, c) => acc + c.peso, 0);
-      const sumPonderado = criterios.reduce(
-        (acc, c) => acc + (valores[c.id] || 0) * c.peso,
-        0
-      );
-      const notaFinal = sumPesos > 0 ? sumPonderado / sumPesos : null;
-
-      const visitanteId = user.id;
-
-      // 2) Insertar en tabla evaluaciones
-      const { data: evalInsert, error: evalError } = await supabase
-        .from("evaluaciones")
-        .insert({
-          proyecto_id: proyectoId,
-          visitante_id: visitanteId,
-          nota_final: notaFinal,
-          observacion_general: observacion || null,
-        })
-        .select("id")
-        .single();
-
-      if (evalError) {
-        console.error("Error al insertar evaluación:", evalError);
-        setMensaje(`Error al guardar la evaluación: ${evalError.message}`);
-        setTipoMensaje("error");
-        setEnviando(false);
-        return;
-      }
-
-      const evaluacionId = evalInsert.id;
-
-      // 3) Insertar detalle por criterio
-      const detalles = criterios.map((c) => ({
-        evaluacion_id: evaluacionId,
-        criterio_id: c.id,
-        puntaje: valores[c.id],
-        comentario: null,
-      }));
-
-      const { error: detError } = await supabase
-        .from("evaluacion_detalle")
-        .insert(detalles);
-
-      if (detError) {
-        console.error("Error al insertar detalle:", detError);
-        setMensaje(`Error al guardar el detalle: ${detError.message}`);
-        setTipoMensaje("error");
-        setEnviando(false);
-        return;
-      }
-
-      setMensaje("¡Evaluación registrada correctamente! ");
-      setTipoMensaje("success");
-      
-      // Limpiar formulario
-      setValores({});
-      setObservacion("");
-      
-      // Redirigir después de 2 segundos
       setTimeout(() => {
         navigate(-1);
-      }, 2000);
-      
-    } catch (err) {
-      console.error("Error inesperado:", err);
-      setMensaje(`Error inesperado: ${err.message}`);
-      setTipoMensaje("error");
-    } finally {
-      setEnviando(false);
+      }, 1000);
+
+      return;
     }
-  };
+
+    // 1) Calcular nota final (promedio ponderado)
+    const sumPesos = criterios.reduce((acc, c) => acc + c.peso, 0);
+    const sumPonderado = criterios.reduce(
+      (acc, c) => acc + (valores[c.id] || 0) * c.peso,
+      0
+    );
+    const notaFinal = sumPesos > 0 ? sumPonderado / sumPesos : null;
+
+    // 2) Insertar en tabla evaluaciones
+    const { data: evalInsert, error: evalError } = await supabase
+      .from("evaluaciones")
+      .insert({
+        proyecto_id: proyectoId,
+        visitante_id: visitanteId,
+        nota_final: notaFinal,
+        observacion_general: observacion || null,
+      })
+      .select("id")
+      .single();
+
+    if (evalError) {
+      console.error("Error al insertar evaluación:", evalError);
+      setMensaje(`Error al guardar la evaluación: ${evalError.message}`);
+      setTipoMensaje("error");
+      return;
+    }
+
+    const evaluacionId = evalInsert.id;
+
+    // 3) Insertar detalle por criterio
+    const detalles = criterios.map((c) => ({
+      evaluacion_id: evaluacionId,
+      criterio_id: c.id,
+      puntaje: valores[c.id],
+      comentario: null,
+    }));
+
+    const { error: detError } = await supabase
+      .from("evaluacion_detalle")
+      .insert(detalles);
+
+    if (detError) {
+      console.error("Error al insertar detalle:", detError);
+      setMensaje(`Error al guardar el detalle: ${detError.message}`);
+      setTipoMensaje("error");
+      return;
+    }
+
+    // Si todo salió bien
+    setMensaje("¡Evaluación registrada correctamente!");
+    setTipoMensaje("success");
+
+    // Limpiar formulario (opcional, porque igual vamos a navegar)
+    setValores({});
+    setObservacion("");
+
+    // Redirigir después de 1 segundo
+    setTimeout(() => {
+      navigate(-1);
+    }, 1000);
+  } catch (err) {
+    console.error("Error inesperado:", err);
+    setMensaje(`Error inesperado: ${err.message}`);
+    setTipoMensaje("error");
+  } finally {
+    setEnviando(false);
+  }
+};
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-10 px-4">

@@ -1,6 +1,5 @@
 // import banner from "../assets/img/bannerpr.png";
 import banner2 from  "../assets/img/banneruta.jpg";
-import logo from "../assets/img/uta.png";
 import { Link} from "react-router-dom";
 
 

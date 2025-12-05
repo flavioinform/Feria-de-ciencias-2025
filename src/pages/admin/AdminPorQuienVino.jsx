@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../../lib/supabase";
 
+
 function AdminPorQuienVino() {
   const [datos, setDatos] = useState([]);
   const [loading, setLoading] = useState(true);

@@ -1,7 +1,7 @@
 // src/pages/admin/AdminResultadosJurado.jsx
 import { useEffect, useState } from "react";
 import { supabase } from "../../lib/supabase";
-
+import BotonDescargarExcel from "../../components/boton";
 function AdminResultadosJurado() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -61,6 +61,7 @@ function AdminResultadosJurado() {
       <h1 className="text-2xl font-bold mb-4 text-black">
         Resultados – Evaluaciones de jurado
       </h1>
+      <BotonDescargarExcel items={items} className="bg-green-800" />
 
       {loading && <p>Cargando...</p>}
       {mensaje && <p className="text-red-600">{mensaje}</p>}

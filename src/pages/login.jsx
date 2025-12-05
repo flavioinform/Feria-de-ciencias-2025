@@ -73,7 +73,7 @@ function Login() {
               </label>
               <input
                 type="text"
-                placeholder="12.345.678-9"
+                placeholder="ingresa rut sin puntos y sin guion "
                 value={rut}
                 onChange={(e) => setRut(e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition bg-gray-50 text-gray-800 placeholder-gray-400"
