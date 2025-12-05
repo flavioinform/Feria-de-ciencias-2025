@@ -108,9 +108,7 @@ function ProyectosPorCategoria() {
               <div
                 key={proyecto.id}
                 className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 border border-slate-100 overflow-hidden"
-                  onClick={() =>
-                        navigate(`/evaluar/${proyecto.id}`)
-                      }
+               
               >
                 {/* Imagen - Ahora se ve completa */}
                 {proyecto.image && (
@@ -123,9 +121,7 @@ function ProyectosPorCategoria() {
                   </div>
                 )}
 
-                <div className="p-5"  onClick={() =>
-                        navigate(`/evaluar/${proyecto.id}`)
-                      }>
+                <div className="p-5"  >
                     
                   {/* Stand */}
                   {proyecto.stand_num && (
@@ -158,9 +154,7 @@ function ProyectosPorCategoria() {
                   <div className="flex justify-end mt-4">
                     <button
                       className="px-4 py-2 text-sm font-semibold bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-sm hover:shadow-md"
-                      onClick={() =>
-                        navigate(`/evaluar/${proyecto.id}`)
-                      }
+                    
                     >
                       Evaluar proyecto →
                     </button>
