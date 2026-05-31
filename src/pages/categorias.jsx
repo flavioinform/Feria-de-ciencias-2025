@@ -27,61 +27,54 @@ function Categorias() {
     normalizeName("Física contemporánea"),       // azul
   ];
 
-  // Mapeo de colores usando claves NORMALIZADAS
+  // Mapeo de colores usando claves NORMALIZADAS para acentos sutiles tecnológicos
   const colorMap = {
     [normalizeName("Introducción a la física")]: {
-      bg: "bg-green-500",
-      hover: "hover:bg-green-600",
-      border: "border-green-600",
-      selected: "bg-green-700",
-      text: "text-green-900",
-      lightBg: "bg-green-50",
+      accent: "text-emerald-400",
+      bg: "from-emerald-950/20 to-slate-900/60",
+      border: "border-emerald-500/20 group-hover:border-emerald-500/60",
+      glow: "shadow-emerald-500/5 hover:shadow-emerald-500/10",
+      badge: "bg-emerald-500/10 text-emerald-400 border border-emerald-500/30",
     },
     [normalizeName("Formulación de proyectos")]: {
-      bg: "bg-yellow-500",
-      hover: "hover:bg-yellow-600",
-      border: "border-yellow-600",
-      selected: "bg-yellow-700",
-      text: "text-yellow-900",
-      lightBg: "bg-yellow-50",
+      accent: "text-amber-400",
+      bg: "from-amber-950/20 to-slate-900/60",
+      border: "border-amber-500/20 group-hover:border-amber-500/60",
+      glow: "shadow-amber-500/5 hover:shadow-amber-500/10",
+      badge: "bg-amber-500/10 text-amber-400 border border-amber-500/30",
     },
     [normalizeName("Mecánica")]: {
-      bg: "bg-orange-500",
-      hover: "hover:bg-orange-600",
-      border: "border-orange-600",
-      selected: "bg-orange-700",
-      text: "text-orange-900",
-      lightBg: "bg-orange-50",
+      accent: "text-orange-400",
+      bg: "from-orange-950/20 to-slate-900/60",
+      border: "border-orange-500/20 group-hover:border-orange-500/60",
+      glow: "shadow-orange-500/5 hover:shadow-orange-500/10",
+      badge: "bg-orange-500/10 text-orange-400 border border-orange-500/30",
     },
     [normalizeName("Electromagnetismo")]: {
-      bg: "bg-red-500",
-      hover: "hover:bg-red-600",
-      border: "border-red-600",
-      selected: "bg-red-700",
-      text: "text-red-900",
-      lightBg: "bg-red-50",
+      accent: "text-rose-400",
+      bg: "from-rose-950/20 to-slate-900/60",
+      border: "border-rose-500/20 group-hover:border-rose-500/60",
+      glow: "shadow-rose-500/5 hover:shadow-rose-500/10",
+      badge: "bg-rose-500/10 text-rose-400 border border-rose-500/30",
     },
     [normalizeName("Física contemporánea")]: {
-      bg: "bg-blue-500",
-      hover: "hover:bg-blue-600",
-      border: "border-blue-600",
-      selected: "bg-blue-700",
-      text: "text-blue-900",
-      lightBg: "bg-blue-50",
+      accent: "text-cyan-400",
+      bg: "from-cyan-950/20 to-slate-900/60",
+      border: "border-cyan-500/20 group-hover:border-cyan-500/60",
+      glow: "shadow-cyan-500/5 hover:shadow-cyan-500/10",
+      badge: "bg-cyan-500/10 text-cyan-400 border border-cyan-500/30",
     },
   };
 
-  // Colores por defecto si no está en el mapa
   const getColors = (nombre) => {
     const key = normalizeName(nombre);
     return (
       colorMap[key] || {
-        bg: "bg-red-500",
-        hover: "hover:bg-red-600",
-        border: "border-red-600",
-        selected: "bg-red-700",
-        text: "text-red-900",
-        lightBg: "bg-red-50",
+        accent: "text-cyan-400",
+        bg: "from-cyan-950/20 to-slate-900/60",
+        border: "border-cyan-500/20 group-hover:border-cyan-500/60",
+        glow: "shadow-cyan-500/5 hover:shadow-cyan-500/10",
+        badge: "bg-cyan-500/10 text-cyan-400 border border-cyan-500/30",
       }
     );
   };
@@ -99,12 +92,6 @@ function Categorias() {
         console.error("Error al obtener las categorías:", error);
         setError("No se pudieron cargar las categorías.");
       } else {
-        console.log(
-          "Categorías obtenidas:",
-          data.map((c) => JSON.stringify(c.nombre))
-        );
-
-        // Ordenar según nuestro arreglo ordenCategorias (usando nombres normalizados)
         const ordenadas = [...data].sort((a, b) => {
           const keyA = normalizeName(a.nombre);
           const keyB = normalizeName(b.nombre);
@@ -128,32 +115,39 @@ function Categorias() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4">
-      <div className="mx-auto max-w-6xl">
+    <div className="min-h-screen bg-slate-950 py-16 px-4 relative overflow-hidden">
+      {/* Glows decorativos */}
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-cyan-500/5 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-teal-500/5 rounded-full blur-[140px] pointer-events-none" />
+
+      <div className="mx-auto max-w-6xl relative z-10">
         {/* Título */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-800 mb-3">
-            Categorías
+        <div className="text-center mb-16">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-400/25 text-cyan-400 text-xs font-bold uppercase tracking-wider mb-3">
+            Explorar Ciencia
+          </span>
+          <h1 className="text-4xl font-extrabold bg-gradient-to-r from-white to-slate-350 bg-clip-text text-transparent tracking-tight">
+            Categorías Científicas
           </h1>
-          <p className="text-gray-600">
-            Selecciona una categoría para explorar los proyectos
+          <p className="text-slate-400 mt-2 text-sm max-w-md mx-auto">
+            Selecciona una área científica para explorar y visualizar los proyectos presentados por los alumnos.
           </p>
         </div>
 
         {/* Loading */}
         {loading && (
           <div className="flex justify-center items-center py-20">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-500"></div>
           </div>
         )}
 
         {/* Error */}
         {error && (
           <div className="max-w-md mx-auto">
-            <div className="bg-red-50 border-2 border-red-300 text-red-700 p-4 rounded-xl shadow-md">
+            <div className="bg-rose-950/20 border-2 border-rose-500/30 text-rose-350 p-4 rounded-2xl shadow-md">
               <div className="flex items-center gap-2">
                 <svg
-                  className="w-6 h-6"
+                  className="w-6 h-6 text-rose-450"
                   fill="currentColor"
                   viewBox="0 0 20 20"
                 >
@@ -163,7 +157,7 @@ function Categorias() {
                     clipRule="evenodd"
                   />
                 </svg>
-                <p className="font-medium">{error}</p>
+                <p className="font-semibold">{error}</p>
               </div>
             </div>
           </div>
@@ -171,7 +165,7 @@ function Categorias() {
 
         {/* Grid de categorías */}
         {!loading && !error && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {categorias.map((cat) => {
               const colors = getColors(cat.nombre);
               const isSelected = selected === cat.id;
@@ -183,35 +177,20 @@ function Categorias() {
                     setSelected(cat.id);
                     navigate(`/proyectos/categoria/${cat.id}`);
                   }}
-                  className={`relative group cursor-pointer transition-all duration-300 transform hover:scale-105 ${
-                    isSelected ? "scale-105" : ""
-                  }`}
+                  className={`group relative cursor-pointer transition-all duration-300 transform hover:scale-[1.03] active:scale-[0.99]`}
                 >
                   <div
-                    className={`rounded-2xl shadow-lg overflow-hidden border-4 transition-all duration-300 ${
-                      isSelected
-                        ? `${colors.selected} ${colors.border} shadow-2xl`
-                        : `${colors.bg} border-transparent ${colors.hover} shadow-md hover:shadow-xl`
-                    }`}
+                    className={`rounded-3xl shadow-xl overflow-hidden border-2 bg-gradient-to-b ${colors.bg} ${colors.border} transition-all duration-300 ${colors.glow}`}
                   >
                     {/* Header colorido */}
-                    <div className="h-32 flex items-center justify-center relative overflow-hidden">
-                      {/* Patrón de fondo */}
-                      <div className="absolute inset-0 opacity-10">
-                        <div
-                          className="absolute inset-0"
-                          style={{
-                            backgroundImage:
-                              "radial-gradient(circle, white 1px, transparent 1px)",
-                            backgroundSize: "20px 20px",
-                          }}
-                        ></div>
-                      </div>
+                    <div className="h-28 flex items-center justify-center relative overflow-hidden bg-slate-950/40 border-b border-slate-900">
+                      {/* Patrón de fondo técnico */}
+                      <div className="absolute inset-0 opacity-[0.03] bg-[linear-gradient(to_right,#808080_1px,transparent_1px),linear-gradient(to_bottom,#808080_1px,transparent_1px)] bg-[size:14px_14px]"></div>
 
                       {/* Icono decorativo */}
-                      <div className="relative z-10">
+                      <div className="relative z-10 transition-transform duration-300 group-hover:scale-110">
                         <svg
-                          className="w-16 h-16 text-white"
+                          className={`w-12 h-12 ${colors.accent}`}
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -219,48 +198,37 @@ function Categorias() {
                           <path
                             strokeLinecap="round"
                             strokeLinejoin="round"
-                            strokeWidth={2}
+                            strokeWidth={1.5}
                             d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"
                           />
                         </svg>
                       </div>
 
-                      {/* Badge de selección */}
-                      {isSelected && (
-                        <div className="absolute top-3 right-3">
-                          <div className="bg-white rounded-full p-1 shadow-lg">
-                            <svg
-                              className="w-6 h-6 text-green-600"
-                              fill="currentColor"
-                              viewBox="0 0 20 20"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
-                          </div>
-                        </div>
-                      )}
+                      {/* Badge de selección o indicador */}
+                      <div className="absolute top-4 right-4">
+                        <span className={`inline-flex px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider ${colors.badge}`}>
+                          Física
+                        </span>
+                      </div>
                     </div>
 
                     {/* Contenido */}
-                    <div className="bg-white p-6">
-                      <h3 className={`text-xl font-bold mb-2 ${colors.text}`}>
+                    <div className="p-6 bg-slate-900/40 backdrop-blur-md">
+                      <h3 className={`text-lg font-extrabold mb-1 text-white group-hover:text-cyan-400 transition-colors tracking-tight`}>
                         {cat.nombre}
                       </h3>
-                      <p className="text-gray-600 text-sm">
-                        Haz clic para ver proyectos de esta categoría
+                      <p className="text-slate-400 text-xs font-medium leading-relaxed mb-4">
+                        Haz clic para ver y calificar los proyectos inscritos en esta categoría de la feria.
                       </p>
+                      
+                      {/* Enlace técnico */}
+                      <div className="flex items-center gap-1.5 text-[11px] font-bold text-cyan-400 uppercase tracking-widest group-hover:gap-2.5 transition-all">
+                        <span>Explorar Proyectos</span>
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                        </svg>
+                      </div>
                     </div>
-
-                    {/* Barra inferior decorativa */}
-                    <div
-                      className={`h-2 ${
-                        isSelected ? colors.selected : colors.bg
-                      } transition-all`}
-                    ></div>
                   </div>
                 </div>
               );
