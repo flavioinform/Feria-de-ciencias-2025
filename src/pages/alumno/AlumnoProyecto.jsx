@@ -234,11 +234,11 @@ export default function AlumnoProyecto() {
               </div>
             ) : (
               integrantes.map((i, index) => (
-                <div 
+                <div
                   key={i.rut || index}
                   className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border text-[10px] font-tech font-bold uppercase transition-all duration-300 select-none
-                    ${i.rut === alumno.rut 
-                      ? "bg-[#f490b1]/15 border-[#f490b1]/45 text-[#f490b1] shadow-[0_0_12px_rgba(244,144,177,0.12)]" 
+                    ${i.rut === alumno.rut
+                      ? "bg-[#f490b1]/15 border-[#f490b1]/45 text-[#f490b1] shadow-[0_0_12px_rgba(244,144,177,0.12)]"
                       : "bg-[#0d0d0d] border-slate-800 text-slate-400 hover:border-[#f490b1]/30"}`}
                 >
                   <span className={`w-1.5 h-1.5 rounded-full ${i.rut === alumno.rut ? "bg-[#f490b1] animate-pulse" : "bg-slate-600"}`}></span>
@@ -321,7 +321,7 @@ export default function AlumnoProyecto() {
             {guardandoImg && (
               <div className="absolute inset-0 bg-black/90 backdrop-blur-sm flex flex-col items-center justify-center gap-3 text-[#f490b1] font-tech font-bold text-xs">
                 <Spinner />
-                <span className="tracking-widest uppercase">Subiendo imagen a Supabase...</span>
+                <span className="tracking-widest uppercase">Paciencia...</span>
               </div>
             )}
           </div>
@@ -330,8 +330,8 @@ export default function AlumnoProyecto() {
           <label
             htmlFor="imagen-proyecto"
             className={`flex items-center justify-center gap-3 w-full px-4 py-3.5 rounded-2xl border-2 border-dashed transition-all duration-300 cursor-pointer text-xs font-tech font-black uppercase tracking-wider
-              ${guardandoImg 
-                ? "border-slate-800 text-slate-600 cursor-not-allowed bg-black/10" 
+              ${guardandoImg
+                ? "border-slate-800 text-slate-600 cursor-not-allowed bg-black/10"
                 : "border-[#f490b1]/20 hover:border-[#f490b1] text-[#f490b1] hover:bg-[#f490b1]/5 bg-black/40"}`}
           >
             <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -417,9 +417,8 @@ export default function AlumnoProyecto() {
                 placeholder="Ingresa una breve descripción de tu proyecto (máx. 200 caracteres)..."
                 className="w-full min-h-[120px] px-4 py-4 pb-10 rounded-2xl border border-[#f490b1]/30 focus:border-[#f490b1] bg-black/60 text-slate-200 font-tech text-sm leading-relaxed focus:outline-none focus:ring-1 focus:ring-[#f490b1]/30 resize-none transition-all duration-300"
               />
-              <div className={`absolute bottom-3 right-4 text-[10px] font-tech font-bold ${
-                descripcionText.length >= 180 ? "text-[#f490b1]" : "text-slate-500"
-              }`}>
+              <div className={`absolute bottom-3 right-4 text-[10px] font-tech font-bold ${descripcionText.length >= 180 ? "text-[#f490b1]" : "text-slate-500"
+                }`}>
                 {descripcionText.length}/200
               </div>
             </div>
@@ -430,26 +429,24 @@ export default function AlumnoProyecto() {
       {/* ── Floating Notification Alert (Material UI style) ── */}
       {toast && (
         <div className="fixed bottom-6 left-6 right-6 md:left-auto md:right-6 md:w-auto md:max-w-sm z-[100] animate-[slideIn_0.25s_cubic-bezier(0.16,1,0.3,1)_forwards]">
-          <div className={`flex items-start gap-3 p-4 rounded-xl border shadow-2xl relative overflow-hidden ${
-            toast.severity === "success" 
-              ? "bg-[#142316] border-[#2e7d32] text-[#4caf50]" 
+          <div className={`flex items-start gap-3 p-4 rounded-xl border shadow-2xl relative overflow-hidden ${toast.severity === "success"
+              ? "bg-[#142316] border-[#2e7d32] text-[#4caf50]"
               : "bg-[#2c1414] border-[#d32f2f] text-[#ef5350]"
-          }`}>
-            
+            }`}>
+
             {/* Mini colored left bar indicator */}
-            <div className={`absolute left-0 top-0 bottom-0 w-1 ${
-              toast.severity === "success" ? "bg-[#4caf50]" : "bg-[#ef5350]"
-            }`}></div>
+            <div className={`absolute left-0 top-0 bottom-0 w-1 ${toast.severity === "success" ? "bg-[#4caf50]" : "bg-[#ef5350]"
+              }`}></div>
 
             {/* Left Icon (Material UI Success/Error SVG icons) */}
             <div className="flex-shrink-0 mt-0.5">
               {toast.severity === "success" ? (
                 <svg className="w-5 h-5 text-[#4caf50]" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
                 </svg>
               ) : (
                 <svg className="w-5 h-5 text-[#ef5350]" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
                 </svg>
               )}
             </div>
@@ -465,7 +462,7 @@ export default function AlumnoProyecto() {
             </div>
 
             {/* Close Button */}
-            <button 
+            <button
               onClick={() => setToast(null)}
               className="text-slate-400 hover:text-white transition-colors duration-200 flex-shrink-0 mt-0.5 cursor-pointer"
             >
@@ -478,7 +475,8 @@ export default function AlumnoProyecto() {
       )}
 
       {/* SlideIn Keyframe style injection */}
-      <style dangerouslySetInnerHTML={{__html: `
+      <style dangerouslySetInnerHTML={{
+        __html: `
         @keyframes slideIn {
           from {
             transform: translateY(120%);
