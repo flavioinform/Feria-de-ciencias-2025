@@ -35,6 +35,17 @@ export default function AlumnoProyecto() {
   const [integrantes, setIntegrantes] = useState([]);
   const [cargandoIntegrantes, setCargandoIntegrantes] = useState(false);
 
+  // Estados para descripción editable
+  const [isEditing, setIsEditing] = useState(false);
+  const [descripcionText, setDescripcionText] = useState(proyecto?.descripcion || "");
+  const [guardandoDesc, setGuardandoDesc] = useState(false);
+
+  useEffect(() => {
+    if (proyecto?.descripcion !== undefined) {
+      setDescripcionText(proyecto.descripcion || "");
+    }
+  }, [proyecto?.descripcion]);
+
   // ── Cargar integrantes del grupo ──
   useEffect(() => {
     if (!proyecto?.id) return;
@@ -147,6 +158,37 @@ export default function AlumnoProyecto() {
       actualizarProyecto({ image: publicUrl });
       showToast("success", "Imagen demostrativa actualizada y guardada con éxito.");
     }
+  };
+
+  // ── Guardar descripción editada ─────────────────────────────────────────────
+  const handleGuardarDesc = async () => {
+    const textNormalizado = descripcionText.trim();
+    if (textNormalizado.length > 200) {
+      showToast("error", "La descripción no puede superar los 200 caracteres.");
+      return;
+    }
+
+    setGuardandoDesc(true);
+
+    const { error: updateError } = await supabase
+      .from("proyectos")
+      .update({ descripcion: textNormalizado })
+      .eq("id", proyecto.id);
+
+    setGuardandoDesc(false);
+
+    if (updateError) {
+      showToast("error", `Error al guardar la descripción: ${updateError.message}`);
+    } else {
+      actualizarProyecto({ descripcion: textNormalizado });
+      setIsEditing(false);
+      showToast("success", "Descripción del proyecto actualizada con éxito.");
+    }
+  };
+
+  const handleCancelarDesc = () => {
+    setDescripcionText(proyecto?.descripcion || "");
+    setIsEditing(false);
   };
 
   if (!alumno || !proyecto) {
@@ -307,19 +349,81 @@ export default function AlumnoProyecto() {
           </label>
         </div>
 
-        {/* ── Descripción (Read-only) ── */}
+        {/* ── Descripción (Editable) ── */}
         <div className="bg-[#0d0d0d]/85 backdrop-blur-xl rounded-3xl border-2 border-[#f490b1]/15 p-6 shadow-[8px_8px_0px_rgba(244,144,177,0.06)] relative overflow-hidden">
           {/* Subtle top stripe */}
           <div className="absolute top-0 left-0 w-full h-[3px] bg-[#f490b1]"></div>
 
-          <h2 className="text-xs font-bold text-slate-300 font-tech uppercase tracking-widest mb-4 flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#f490b1] shadow-[0_0_8px_#f490b1]"></span>
-            Descripción del Proyecto
-          </h2>
-
-          <div className="w-full px-4 py-4 rounded-2xl border border-[#f490b1]/10 bg-black/40 text-slate-300 font-tech text-sm leading-relaxed whitespace-pre-wrap">
-            {proyecto.descripcion || "No se ha ingresado una descripción para este proyecto."}
+          <div className="flex items-center justify-between mb-4 gap-4">
+            <h2 className="text-xs font-bold text-slate-300 font-tech uppercase tracking-widest flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#f490b1] shadow-[0_0_8px_#f490b1]"></span>
+              Descripción del Proyecto
+            </h2>
+            {!isEditing ? (
+              <button
+                onClick={() => {
+                  setDescripcionText(proyecto?.descripcion || "");
+                  setIsEditing(true);
+                }}
+                className="text-[10px] font-bold font-tech uppercase text-[#f490b1] hover:text-white bg-[#f490b1]/10 hover:bg-[#f490b1]/20 border border-[#f490b1]/30 hover:border-[#f490b1] px-3 py-1.5 rounded-lg transition-all duration-300 cursor-pointer flex items-center gap-1.5"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                </svg>
+                Editar
+              </button>
+            ) : (
+              <div className="flex gap-2">
+                <button
+                  onClick={handleCancelarDesc}
+                  disabled={guardandoDesc}
+                  className="text-[10px] font-bold font-tech uppercase text-slate-400 hover:text-slate-200 bg-slate-800/40 hover:bg-slate-800/70 border border-slate-700 px-3 py-1.5 rounded-lg transition-all duration-300 cursor-pointer"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleGuardarDesc}
+                  disabled={guardandoDesc}
+                  className="text-[10px] font-bold font-tech uppercase text-emerald-400 hover:text-white bg-emerald-500/10 hover:bg-emerald-500/25 border border-emerald-500/30 hover:border-emerald-500 px-3 py-1.5 rounded-lg transition-all duration-300 cursor-pointer flex items-center gap-1.5"
+                >
+                  {guardandoDesc ? (
+                    <>
+                      <Spinner sm />
+                      <span>Guardando...</span>
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span>Guardar</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            )}
           </div>
+
+          {!isEditing ? (
+            <div className="w-full px-4 py-4 rounded-2xl border border-[#f490b1]/10 bg-black/40 text-slate-300 font-tech text-sm leading-relaxed whitespace-pre-wrap">
+              {proyecto.descripcion || "No se ha ingresado una descripción para este proyecto."}
+            </div>
+          ) : (
+            <div className="relative">
+              <textarea
+                value={descripcionText}
+                onChange={(e) => setDescripcionText(e.target.value)}
+                maxLength={200}
+                placeholder="Ingresa una breve descripción de tu proyecto (máx. 200 caracteres)..."
+                className="w-full min-h-[120px] px-4 py-4 pb-10 rounded-2xl border border-[#f490b1]/30 focus:border-[#f490b1] bg-black/60 text-slate-200 font-tech text-sm leading-relaxed focus:outline-none focus:ring-1 focus:ring-[#f490b1]/30 resize-none transition-all duration-300"
+              />
+              <div className={`absolute bottom-3 right-4 text-[10px] font-tech font-bold ${
+                descripcionText.length >= 180 ? "text-[#f490b1]" : "text-slate-500"
+              }`}>
+                {descripcionText.length}/200
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
