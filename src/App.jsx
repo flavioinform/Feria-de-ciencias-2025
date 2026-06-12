@@ -15,8 +15,8 @@ import AlumnoProyecto from "./pages/alumno/AlumnoProyecto";
 import Categorias from "./pages/categorias";
 import Home from "./pages/home";
 import Login from "./pages/login";
-import Registro from "./pages/registro";
-import RegistroParticipantePage from "./pages/RegistroParticipantePage";
+// import Registro from "./pages/registro";
+// import RegistroParticipantePage from "./pages/RegistroParticipantePage";
 
 /** Ruta protegida: redirige a login si no hay sesión de alumno */
 function RutaAlumno({ children }) {
@@ -29,17 +29,16 @@ function AppContent() {
   const isGestionProyecto = location.pathname === "/alumno/proyecto";
 
   return (
-    <div className={`text-slate-100 min-h-screen flex flex-col justify-between selection:bg-[#f490b1] selection:text-[#050505] ${
-      isGestionProyecto ? "bg-[#08080c]" : "bg-[#050505] bg-brutalist-noise"
-    }`}>
+    <div className={`text-slate-100 min-h-screen flex flex-col justify-between selection:bg-[#f490b1] selection:text-[#050505] ${isGestionProyecto ? "bg-[#08080c]" : "bg-[#050505] bg-brutalist-noise"
+      }`}>
       <div>
         <Navbar />
 
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/registro" element={<Registro />} />
-          <Route path="/registro-participante" element={<RegistroParticipantePage />} />
+          {/* <Route path="/registro" element={<Registro />} />
+          <Route path="/registro-participante" element={<RegistroParticipantePage />} /> */}
           <Route path="/categorias" element={<Categorias />} />
           <Route
             path="/proyectos/categoria/:idCategoria"

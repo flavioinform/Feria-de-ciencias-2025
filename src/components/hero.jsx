@@ -53,7 +53,7 @@ function Hero() {
               <svg className="w-9 h-9 text-[#f490b1]" viewBox="0 0 100 100" fill="none" stroke="currentColor">
                 {/* Nucleus with pulse animation */}
                 <circle cx="50" cy="50" r="7" fill="#f490b1" className="animate-pulse" />
-                
+
                 {/* 3 electron orbits spinning infinitely around the center */}
                 <g className="animate-[spin_4s_linear_infinite] origin-center" style={{ transformOrigin: '50px 50px' }}>
                   <ellipse cx="50" cy="50" rx="38" ry="12" strokeWidth="2.2" stroke="#f490b1" />
@@ -145,12 +145,12 @@ function Hero() {
               Portal del Alumno
             </Link>
 
-            <Link
+            {/* <Link
               to="/registro-participante"
               className="w-full sm:w-auto px-8 py-4 bg-[#050505] border-2 border-white text-white hover:bg-white hover:text-[#050505] font-tech text-sm font-bold uppercase tracking-widest rounded-xl transition-all duration-300 shadow-[4px_4px_0px_#ffffff] hover:shadow-[0px_0px_0px_transparent] active:translate-x-1 active:translate-y-1 text-center"
             >
               Registrar Proyecto
-            </Link>
+            </Link> */}
           </div>
         </div>
 
