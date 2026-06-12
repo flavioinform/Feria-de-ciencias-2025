@@ -76,12 +76,12 @@ function Navbar() {
                 >
                   Iniciar sesión
                 </Link>
-                {/* <Link
+                <Link
                   to="/registro-participante"
                   className="px-5 py-2.5 bg-[#050505] border-2 border-white text-white hover:bg-white hover:text-[#050505] font-tech text-xs font-bold uppercase transition-all duration-300 shadow-[3px_3px_0px_#ffffff] hover:shadow-[0px_0px_0px_transparent] active:translate-x-0.5 active:translate-y-0.5 text-center"
                 >
                   Registrarse
-                </Link> */}
+                </Link>
               </div>
             )}
           </div>
