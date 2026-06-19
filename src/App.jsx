@@ -16,7 +16,7 @@ import Categorias from "./pages/categorias";
 import Home from "./pages/home";
 import Login from "./pages/login";
 // import Registro from "./pages/registro";
-//import RegistroParticipantePage from "./pages/RegistroParticipantePage";
+import RegistroParticipantePage from "./pages/RegistroParticipantePage";
 
 /** Ruta protegida: redirige a login si no hay sesión de alumno */
 function RutaAlumno({ children }) {
@@ -38,7 +38,7 @@ function AppContent() {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           {/* <Route path="/registro" element={<Registro />} /> */}
-          {/* <Route path="/registro-participante" element={<RegistroParticipantePage />} /> */}
+          <Route path="/registro-participante" element={<RegistroParticipantePage />} />
           <Route path="/categorias" element={<Categorias />} />
           <Route
             path="/proyectos/categoria/:idCategoria"
