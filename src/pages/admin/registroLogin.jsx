@@ -62,12 +62,57 @@ function RegistroLogin() {
   const [pinGenerado, setPinGenerado] = useState("");
   const [cargando, setCargando] = useState(false);
 
+  // Estados para el buscador de estudiantes
+  const [busquedaEstudiante, setBusquedaEstudiante] = useState("");
+  const [resultadosBusqueda, setResultadosBusqueda] = useState([]);
+  const [buscandoEstudiantes, setBuscandoEstudiantes] = useState(false);
+  const [mostrarResultados, setMostrarResultados] = useState(false);
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setForm((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
+    setForm((prev) => {
+      const next = { ...prev, [name]: type === "checkbox" ? checked : value };
+      // Limpiar el buscador si se desmarca
+      if (name === "vienePorAlguien" && !checked) {
+        next.por_quien_vino = "";
+        setBusquedaEstudiante("");
+        setMostrarResultados(false);
+      }
+      return next;
+    });
+  };
+
+  const handleBuscarEstudiante = async (e) => {
+    const valor = e.target.value;
+    setBusquedaEstudiante(valor);
+    setForm((prev) => ({ ...prev, por_quien_vino: valor })); // Guarda el texto crudo por si no elige de la lista
+
+    if (valor.length < 3) {
+      setResultadosBusqueda([]);
+      setMostrarResultados(false);
+      return;
+    }
+    
+    setBuscandoEstudiantes(true);
+    setMostrarResultados(true);
+    
+    const { data, error } = await supabase
+      .from("participantes")
+      .select("id, nombre, rut")
+      .or(`nombre.ilike.%${valor}%,rut.ilike.%${valor}%`)
+      .limit(6);
+
+    if (!error && data) {
+      setResultadosBusqueda(data);
+    }
+    setBuscandoEstudiantes(false);
+  };
+
+  const seleccionarEstudiante = (estudiante) => {
+    const texto = `${estudiante.nombre} (${estudiante.rut})`;
+    setForm(prev => ({ ...prev, por_quien_vino: texto }));
+    setBusquedaEstudiante(texto);
+    setMostrarResultados(false);
   };
 
   // PIN de 4 dígitos
@@ -148,6 +193,8 @@ function RegistroLogin() {
         vienePorAlguien: false,
         por_quien_vino: "",
       });
+      setBusquedaEstudiante("");
+      setMostrarResultados(false);
     } catch (err) {
       console.error("Error inesperado en registroLogin:", err);
       setMensaje("Error inesperado del servidor");
@@ -221,17 +268,42 @@ function RegistroLogin() {
             </div>
 
             {form.vienePorAlguien && (
-              <div>
+              <div className="relative">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  ¿Por quién viene?
+                  ¿Por quién viene? (Busca por nombre o RUT)
                 </label>
                 <input
                   type="text"
                   name="por_quien_vino"
-                  value={form.por_quien_vino}
-                  onChange={handleChange}
+                  value={busquedaEstudiante}
+                  onChange={handleBuscarEstudiante}
+                  onFocus={() => { if (resultadosBusqueda.length > 0) setMostrarResultados(true); }}
+                  placeholder="Ej: Juan Pérez"
+                  autoComplete="off"
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none bg-gray-50 text-black"
                 />
+
+                {/* Dropdown de resultados */}
+                {mostrarResultados && (
+                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-xl max-h-56 overflow-y-auto">
+                    {buscandoEstudiantes ? (
+                      <div className="p-4 text-sm text-gray-500 text-center">Buscando...</div>
+                    ) : resultadosBusqueda.length > 0 ? (
+                      resultadosBusqueda.map(est => (
+                        <div
+                          key={est.id || est.rut}
+                          onClick={() => seleccionarEstudiante(est)}
+                          className="p-3 hover:bg-emerald-50 cursor-pointer border-b border-gray-100 last:border-0 transition-colors"
+                        >
+                          <div className="font-semibold text-gray-800 text-sm">{est.nombre}</div>
+                          <div className="text-xs text-emerald-600 mt-0.5">{est.rut}</div>
+                        </div>
+                      ))
+                    ) : busquedaEstudiante.length >= 3 ? (
+                      <div className="p-4 text-sm text-gray-500 text-center">No se encontraron estudiantes</div>
+                    ) : null}
+                  </div>
+                )}
               </div>
             )}
 
