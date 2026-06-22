@@ -38,21 +38,21 @@ function obtenerClave(rutFormateado) {
 
 // ── Helpers UI ────────────────────────────────────────────────────────────────
 const Spinner = () => (
-  <svg className="animate-spin h-5 w-5 text-[#f490b1]" viewBox="0 0 24 24">
+  <svg className="animate-spin h-5 w-5 text-[#db2777]" viewBox="0 0 24 24">
     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
   </svg>
 );
 
 const FieldError = ({ msg }) =>
-  msg ? <p className="mt-1.5 text-rose-400 text-xs font-semibold tracking-wide">⚠ {msg}</p> : null;
+  msg ? <p className="mt-1.5 text-rose-500 text-xs font-semibold tracking-wide">⚠ {msg}</p> : null;
 
 function inputCls(error) {
   const base =
-    "w-full px-4 py-3.5 rounded-xl border-2 outline-none transition-all duration-300 bg-black/60 text-white placeholder-slate-600 text-sm focus:ring-2 focus:ring-offset-0 font-tech";
+    "w-full px-4 py-3.5 rounded-xl border-2 outline-none transition-all duration-300 bg-white text-slate-900 placeholder-slate-400 text-sm focus:ring-2 focus:ring-offset-0 font-tech";
   return error
     ? `${base} border-rose-500/50 focus:border-rose-500 focus:ring-rose-500/20`
-    : `${base} border-[#f490b1]/15 focus:border-[#f490b1] focus:ring-[#f490b1]/10`;
+    : `${base} border-[#db2777]/15 focus:border-[#db2777] focus:ring-[#db2777]/10`;
 }
 
 // ── Componente ────────────────────────────────────────────────────────────────
@@ -122,32 +122,32 @@ export default function AlumnoLogin() {
   };
 
   return (
-    <div className="min-h-[85vh] flex items-center justify-center px-4 py-16 relative overflow-hidden bg-[#050505] bg-brutalist-noise border-b border-[#f490b1]/10">
+    <div className="min-h-[85vh] flex items-center justify-center px-4 py-16 relative overflow-hidden bg-white bg-brutalist-noise border-b border-[#db2777]/10">
       {/* Elementos decorativos de fondo (Glows) */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[#f490b1]/5 rounded-full blur-[110px] pointer-events-none" />
-      <div className="absolute bottom-10 right-10 w-72 h-72 bg-[#f490b1]/3 rounded-full blur-[130px] pointer-events-none" />
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[#db2777]/5 rounded-full blur-[110px] pointer-events-none" />
+      <div className="absolute bottom-10 right-10 w-72 h-72 bg-[#db2777]/3 rounded-full blur-[130px] pointer-events-none" />
 
       <div className="max-w-md w-full relative z-10">
         {/* Header */}
         <div className="text-center mb-8">
 
-          <h1 className="text-4xl font-display font-black text-white tracking-tight uppercase">
+          <h1 className="text-4xl font-display font-black text-slate-900 tracking-tight uppercase">
             Portal del Alumno
           </h1>
-          <p className="text-[#f490b1] font-tech font-bold mt-1 text-xs tracking-[0.2em] uppercase">Feria de Ciencias 2026</p>
+          <p className="text-[#db2777] font-tech font-bold mt-1 text-xs tracking-[0.2em] uppercase">Feria de Ciencias 2026</p>
         </div>
 
         {/* Card */}
-        <div className="bg-[#0d0d0d]/90 backdrop-blur-xl rounded-3xl p-8 border-2 border-[#f490b1]/15 shadow-[8px_8px_0px_rgba(244,144,177,0.06)] relative overflow-hidden">
+        <div className="bg-white/90 backdrop-blur-xl rounded-3xl p-8 border-2 border-[#db2777]/15 shadow-sm shadow-[#db2777]/10 relative overflow-hidden">
           
           {/* Subtle top stripe */}
-          <div className="absolute top-0 left-0 w-full h-[3px] bg-[#f490b1]"></div>
+          <div className="absolute top-0 left-0 w-full h-[3px] bg-[#db2777]"></div>
 
           <form onSubmit={handleSubmit} noValidate className="space-y-6">
             {/* RUT */}
             <div>
-              <label htmlFor="rut-alumno" className="block text-xs font-bold text-slate-300 font-tech uppercase tracking-wider mb-2">
-                RUT del Alumno <span className="text-[#f490b1]" aria-hidden>*</span>
+              <label htmlFor="rut-alumno" className="block text-xs font-bold text-slate-700 font-tech uppercase tracking-wider mb-2">
+                RUT del Alumno <span className="text-[#db2777]" aria-hidden>*</span>
               </label>
               <input
                 id="rut-alumno"
@@ -166,8 +166,8 @@ export default function AlumnoLogin() {
             {/* Contraseña */}
             <div>
               <div className="flex items-center justify-between mb-2">
-                <label htmlFor="pass-alumno" className="block text-xs font-bold text-slate-300 font-tech uppercase tracking-wider">
-                  Contraseña <span className="text-[#f490b1]" aria-hidden>*</span>
+                <label htmlFor="pass-alumno" className="block text-xs font-bold text-slate-700 font-tech uppercase tracking-wider">
+                  Contraseña <span className="text-[#db2777]" aria-hidden>*</span>
                 </label>
                 <span className="text-slate-500 text-[10px] font-tech">Últimos 4 dígitos del RUT (sin DV)</span>
               </div>
@@ -188,7 +188,7 @@ export default function AlumnoLogin() {
             <button
               type="submit"
               disabled={cargando}
-              className="w-full py-4 bg-transparent border-2 border-[#f490b1] text-white hover:bg-[#f490b1] hover:text-[#050505] font-tech text-xs font-black uppercase tracking-widest rounded-xl transition-all duration-300 shadow-[4px_4px_0px_#f490b1] hover:shadow-[0px_0px_0px_transparent] active:translate-x-1 active:translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-4 cursor-pointer"
+              className="w-full py-4 bg-transparent border-2 border-[#db2777] text-slate-900 hover:bg-[#db2777] hover:text-white font-tech text-xs font-black uppercase tracking-widest rounded-xl transition-all duration-300 shadow-[4px_4px_0px_#db2777] hover:shadow-[0px_0px_0px_transparent] active:translate-x-1 active:translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-4 cursor-pointer"
             >
               {cargando ? (
                 <>

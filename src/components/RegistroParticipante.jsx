@@ -79,16 +79,16 @@ function validarDV(dv, rutNumero) {
 // ── Helpers de estilo ─────────────────────────────────────────────────────────
 function cls(error, valid) {
   const base =
-    "w-full px-4 py-3.5 rounded-xl border-2 outline-none transition-all duration-300 bg-black/60 text-white placeholder-slate-600 text-sm focus:ring-2 focus:ring-offset-0 font-tech";
+    "w-full px-4 py-3.5 rounded-xl border-2 outline-none transition-all duration-300 bg-white text-slate-900 placeholder-slate-400 text-sm focus:ring-2 focus:ring-offset-0 font-tech";
   if (error)
     return `${base} border-rose-500/50 focus:border-rose-500 focus:ring-rose-500/10`;
   if (valid)
     return `${base} border-emerald-500/50 focus:border-emerald-500 focus:ring-emerald-500/10`;
-  return `${base} border-[#f490b1]/15 focus:border-[#f490b1] focus:ring-[#f490b1]/10`;
+  return `${base} border-[#db2777]/15 focus:border-[#db2777] focus:ring-[#db2777]/10`;
 }
 
 const Spinner = () => (
-  <svg className="animate-spin h-5 w-5 text-[#f490b1]" viewBox="0 0 24 24">
+  <svg className="animate-spin h-5 w-5 text-[#db2777]" viewBox="0 0 24 24">
     <circle
       className="opacity-25"
       cx="12"
@@ -107,7 +107,7 @@ const Spinner = () => (
 );
 
 const FieldError = ({ msg }) =>
-  msg ? <p className="mt-1.5 text-rose-450 text-xs font-semibold tracking-wide">⚠ {msg}</p> : null;
+  msg ? <p className="mt-1.5 text-rose-500 text-xs font-semibold tracking-wide">⚠ {msg}</p> : null;
 
 // ── Componente principal ──────────────────────────────────────────────────────
 export default function RegistroParticipante() {
@@ -338,26 +338,26 @@ export default function RegistroParticipante() {
   // ── Pantalla de éxito ────────────────────────────────────────────────────
   if (resultado?.ok) {
     return (
-      <div className="min-h-[80vh] flex items-center justify-center px-4 py-12 bg-[#050505] bg-brutalist-noise">
-        <div className="max-w-md w-full bg-[#0d0d0d]/90 backdrop-blur-xl rounded-3xl p-8 text-center border-2 border-[#f490b1]/15 shadow-[8px_8px_0px_rgba(244,144,177,0.06)] relative overflow-hidden">
+      <div className="min-h-[80vh] flex items-center justify-center px-4 py-12 bg-white bg-brutalist-noise">
+        <div className="max-w-md w-full bg-white/90 backdrop-blur-xl rounded-3xl p-8 text-center border-2 border-[#db2777]/15 shadow-[8px_8px_0px_rgba(219,39,119,0.06)] relative overflow-hidden">
           
           {/* Subtle top stripe */}
-          <div className="absolute top-0 left-0 w-full h-[3px] bg-[#f490b1]"></div>
+          <div className="absolute top-0 left-0 w-full h-[3px] bg-[#db2777]"></div>
 
           <div className="flex justify-center mb-6">
             <img 
               src="https://i.giphy.com/138K59Sf88gGA.gif" 
               alt="Sonic Running" 
-              className="w-28 h-28 object-contain select-none filter drop-shadow-[0_0_12px_#f490b1] hover:scale-105 transition-transform duration-300"
+              className="w-28 h-28 object-contain select-none filter drop-shadow-[0_0_12px_#db2777] hover:scale-105 transition-transform duration-300"
             />
           </div>
-          <h2 className="text-3xl font-display font-black text-white mb-2 uppercase leading-none">
+          <h2 className="text-3xl font-display font-black text-slate-900 mb-2 uppercase leading-none">
             ¡Registro Exitoso!
           </h2>
-          <p className="text-slate-400 mb-6 text-xs font-tech">
+          <p className="text-slate-500 mb-6 text-xs font-tech">
             Los datos han sido validados y guardados correctamente en la base de datos de la Feria.
           </p>
-          <div className="bg-black/60 border border-[#f490b1]/10 rounded-2xl p-5 text-left space-y-4 mb-6">
+          <div className="bg-white/60 border border-[#db2777]/10 rounded-2xl p-5 text-left space-y-4 mb-6">
             {[
               { label: "Nombre del Alumno", value: resultado.data.nombre },
               {
@@ -367,12 +367,12 @@ export default function RegistroParticipante() {
               },
               { label: "Proyecto Científico Inscrito", value: resultado.data.proyecto },
             ].map(({ label, value, mono }) => (
-              <div key={label} className="border-b border-[#f490b1]/10 last:border-0 pb-3 last:pb-0 font-tech">
+              <div key={label} className="border-b border-[#db2777]/10 last:border-0 pb-3 last:pb-0 font-tech">
                 <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">
                   {label}
                 </p>
                 <p
-                  className={`text-slate-200 font-bold ${mono ? "font-mono text-[#f490b1] text-sm" : "text-sm"}`}
+                  className={`text-slate-800 font-bold ${mono ? "font-mono text-[#db2777] text-sm" : "text-sm"}`}
                 >
                   {value}
                 </p>
@@ -381,7 +381,7 @@ export default function RegistroParticipante() {
           </div>
           <button
             onClick={handleNuevoRegistro}
-            className="w-full py-4 bg-transparent border-2 border-[#f490b1] text-white hover:bg-[#f490b1] hover:text-[#050505] font-tech text-xs font-black uppercase tracking-widest rounded-xl transition-all duration-300 shadow-[4px_4px_0px_#f490b1] hover:shadow-[0px_0px_0px_transparent] active:translate-x-1 active:translate-y-1 cursor-pointer"
+            className="w-full py-4 bg-transparent border-2 border-[#db2777] text-slate-900 hover:bg-[#db2777] hover:text-white font-tech text-xs font-black uppercase tracking-widest rounded-xl transition-all duration-300 shadow-[4px_4px_0px_#db2777] hover:shadow-[0px_0px_0px_transparent] active:translate-x-1 active:translate-y-1 cursor-pointer"
           >
             Registrar Otro Participante
           </button>
@@ -392,24 +392,24 @@ export default function RegistroParticipante() {
 
   // ── Formulario ───────────────────────────────────────────────────────────
   return (
-    <div className="min-h-[80vh] flex items-center justify-center px-4 py-12 bg-[#050505] bg-brutalist-noise border-b border-[#f490b1]/10 relative overflow-hidden">
+    <div className="min-h-[80vh] flex items-center justify-center px-4 py-12 bg-white bg-brutalist-noise border-b border-[#db2777]/10 relative overflow-hidden">
       {/* Decors */}
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[#f490b1]/5 rounded-full blur-[110px] pointer-events-none" />
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[#db2777]/5 rounded-full blur-[110px] pointer-events-none" />
 
       <div className="max-w-lg w-full relative z-10">
         {/* Encabezado */}
         <div className="text-center mb-8">
 
-          <h1 className="text-4xl font-display font-black text-white uppercase tracking-wider">
+          <h1 className="text-4xl font-display font-black text-slate-900 uppercase tracking-wider">
             Registro de Alumnos
           </h1>
-          <p className="text-[#f490b1] font-tech font-bold uppercase tracking-widest mt-1 text-xs">Feria de Ciencias 2026</p>
+          <p className="text-[#db2777] font-tech font-bold uppercase tracking-widest mt-1 text-xs">Feria de Ciencias 2026</p>
         </div>
 
-        <div className="bg-[#0d0d0d]/90 backdrop-blur-xl rounded-3xl p-8 border-2 border-[#f490b1]/15 shadow-[8px_8px_0px_rgba(244,144,177,0.06)] relative overflow-hidden">
+        <div className="bg-white/90 backdrop-blur-xl rounded-3xl p-8 border-2 border-[#db2777]/15 shadow-[8px_8px_0px_rgba(219,39,119,0.06)] relative overflow-hidden">
           
           {/* Subtle top stripe */}
-          <div className="absolute top-0 left-0 w-full h-[3px] bg-[#f490b1]"></div>
+          <div className="absolute top-0 left-0 w-full h-[3px] bg-[#db2777]"></div>
 
           <form onSubmit={handleSubmit} noValidate className="space-y-6">
 
@@ -419,9 +419,9 @@ export default function RegistroParticipante() {
               <div>
                 <label
                   htmlFor="nombres"
-                  className="block text-xs font-bold text-slate-350 font-tech uppercase tracking-widest mb-2"
+                  className="block text-xs font-bold text-slate-600 font-tech uppercase tracking-widest mb-2"
                 >
-                  Nombres <span className="text-rose-450" aria-hidden>*</span>
+                  Nombres <span className="text-rose-500" aria-hidden>*</span>
                 </label>
                 <input
                   id="nombres"
@@ -445,9 +445,9 @@ export default function RegistroParticipante() {
                 <div>
                   <label
                     htmlFor="primerApellido"
-                    className="block text-xs font-bold text-slate-350 font-tech uppercase tracking-widest mb-2"
+                    className="block text-xs font-bold text-slate-600 font-tech uppercase tracking-widest mb-2"
                   >
-                    1er Apellido <span className="text-rose-450" aria-hidden>*</span>
+                    1er Apellido <span className="text-rose-500" aria-hidden>*</span>
                   </label>
                   <input
                     id="primerApellido"
@@ -469,9 +469,9 @@ export default function RegistroParticipante() {
                 <div>
                   <label
                     htmlFor="segundoApellido"
-                    className="block text-xs font-bold text-slate-350 font-tech uppercase tracking-widest mb-2"
+                    className="block text-xs font-bold text-slate-600 font-tech uppercase tracking-widest mb-2"
                   >
-                    2do Apellido <span className="text-rose-450" aria-hidden>*</span>
+                    2do Apellido <span className="text-rose-500" aria-hidden>*</span>
                   </label>
                   <input
                     id="segundoApellido"
@@ -493,8 +493,8 @@ export default function RegistroParticipante() {
 
             {/* ── RUT ── */}
             <div>
-              <label className="block text-xs font-bold text-slate-355 font-tech uppercase tracking-widest mb-2">
-                RUT del Estudiante <span className="text-rose-455" aria-hidden>*</span>
+              <label className="block text-xs font-bold text-slate-600 font-tech uppercase tracking-widest mb-2">
+                RUT del Estudiante <span className="text-rose-500" aria-hidden>*</span>
               </label>
               <div className="flex gap-3 items-start">
                 {/* Número */}
@@ -518,7 +518,7 @@ export default function RegistroParticipante() {
                 </div>
 
                 {/* Separador */}
-                <span className="pt-3 text-[#f490b1] font-black text-lg select-none">
+                <span className="pt-3 text-[#db2777] font-black text-lg select-none">
                   –
                 </span>
 
@@ -535,7 +535,7 @@ export default function RegistroParticipante() {
                     className={`${cls(
                       tocados.rutDV && errores.rutDV,
                       isValid("rutDV")
-                    )} text-center font-mono font-bold uppercase tracking-widest text-[#f490b1]`}
+                    )} text-center font-mono font-bold uppercase tracking-widest text-[#db2777]`}
                     aria-label="Dígito verificador (0-9 o K)"
                   />
                   <FieldError msg={tocados.rutDV && errores.rutDV} />
@@ -548,9 +548,9 @@ export default function RegistroParticipante() {
             <div>
               <label
                 htmlFor="categoriaId"
-                className="block text-xs font-bold text-slate-355 font-tech uppercase tracking-widest mb-2"
+                className="block text-xs font-bold text-slate-600 font-tech uppercase tracking-widest mb-2"
               >
-                Filtro por Asignatura <span className="text-rose-455" aria-hidden>*</span>
+                Filtro por Asignatura <span className="text-rose-500" aria-hidden>*</span>
               </label>
               <select
                 id="categoriaId"
@@ -562,9 +562,9 @@ export default function RegistroParticipante() {
                   isValid("categoriaId")
                 )}
               >
-                <option value="" className="bg-[#050505] text-slate-400">— Selecciona una asignatura —</option>
+                <option value="" className="bg-white text-slate-400">— Selecciona una asignatura —</option>
                 {categorias.map((c) => (
-                  <option key={c.id} value={c.id} className="bg-[#050505] text-white font-tech">
+                  <option key={c.id} value={c.id} className="bg-white text-slate-900 font-tech">
                     {c.nombre}
                   </option>
                 ))}
@@ -576,11 +576,11 @@ export default function RegistroParticipante() {
             <div>
               <label
                 htmlFor="proyectoId"
-                className="block text-xs font-bold text-slate-355 font-tech uppercase tracking-widest mb-2 flex items-center"
+                className="block text-xs font-bold text-slate-600 font-tech uppercase tracking-widest mb-2 flex items-center"
               >
-                Selección de Proyecto <span className="text-rose-455 mr-1" aria-hidden>*</span>
+                Selección de Proyecto <span className="text-rose-500 mr-1" aria-hidden>*</span>
                 {cargandoProyectos && (
-                  <span className="ml-2.5 inline-flex align-middle text-[#f490b1]">
+                  <span className="ml-2.5 inline-flex align-middle text-[#db2777]">
                     <Spinner />
                   </span>
                 )}
@@ -596,7 +596,7 @@ export default function RegistroParticipante() {
                   isValid("proyectoId")
                 )} disabled:opacity-40 disabled:cursor-not-allowed`}
               >
-                <option value="" className="bg-[#050505] text-slate-400">
+                <option value="" className="bg-white text-slate-400">
                   {!form.categoriaId
                     ? "Selecciona primero una asignatura para cargar proyectos"
                     : proyectos.length === 0 && !cargandoProyectos
@@ -604,7 +604,7 @@ export default function RegistroParticipante() {
                       : "— Selecciona tu proyecto —"}
                 </option>
                 {proyectos.map((p) => (
-                  <option key={p.id} value={p.id} className="bg-[#050505] text-white font-tech">
+                  <option key={p.id} value={p.id} className="bg-white text-slate-900 font-tech">
                     {p.titulo}
                   </option>
                 ))}
@@ -614,9 +614,9 @@ export default function RegistroParticipante() {
 
             {/* ── Error de envío ── */}
             {resultado?.ok === false && (
-              <div className="flex gap-3 items-start p-4 bg-rose-950/20 border-2 border-rose-500/30 rounded-2xl text-rose-300 text-sm font-tech">
+              <div className="flex gap-3 items-start p-4 bg-rose-50 border-2 border-rose-500/30 rounded-2xl text-rose-600 text-sm font-tech">
                 <svg
-                  className="w-5 h-5 flex-shrink-0 mt-0.5 text-rose-400"
+                  className="w-5 h-5 flex-shrink-0 mt-0.5 text-rose-500"
                   fill="currentColor"
                   viewBox="0 0 20 20"
                 >
@@ -628,7 +628,7 @@ export default function RegistroParticipante() {
                 </svg>
                 <div>
                   <p className="font-bold uppercase tracking-wider text-xs">Error de Registro</p>
-                  <p className="text-rose-455 mt-0.5 text-xs">{resultado.errorMsg}</p>
+                  <p className="text-rose-500 mt-0.5 text-xs">{resultado.errorMsg}</p>
                 </div>
               </div>
             )}
@@ -637,7 +637,7 @@ export default function RegistroParticipante() {
             <button
               type="submit"
               disabled={cargando}
-              className="w-full py-4 bg-transparent border-2 border-[#f490b1] text-white hover:bg-[#f490b1] hover:text-[#050505] font-tech text-xs font-black uppercase tracking-widest rounded-xl transition-all duration-300 shadow-[4px_4px_0px_#f490b1] hover:shadow-[0px_0px_0px_transparent] active:translate-x-1 active:translate-y-1 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-4 cursor-pointer"
+              className="w-full py-4 bg-transparent border-2 border-[#db2777] text-slate-900 hover:bg-[#db2777] hover:text-white font-tech text-xs font-black uppercase tracking-widest rounded-xl transition-all duration-300 shadow-[4px_4px_0px_#db2777] hover:shadow-[0px_0px_0px_transparent] active:translate-x-1 active:translate-y-1 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-4 cursor-pointer"
             >
               {cargando ? (
                 <>

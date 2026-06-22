@@ -10,6 +10,8 @@ import ProyectosPorCategoria from "./pages/ProyectosPorCategoria";
 import AdminPorQuienVino from "./pages/admin/AdminPorQuienVino";
 import AdminResultadosJurado from "./pages/admin/AdminResultadosJurado";
 import RegistroLogin from "./pages/admin/registroLogin";
+import AdminCategorias from "./pages/admin/AdminCategorias";
+import AdminProyectosPorCategoria from "./pages/admin/AdminProyectosPorCategoria";
 import AlumnoLogin from "./pages/alumno/AlumnoLogin";
 import AlumnoProyecto from "./pages/alumno/AlumnoProyecto";
 import Categorias from "./pages/categorias";
@@ -29,7 +31,7 @@ function AppContent() {
   const isGestionProyecto = location.pathname === "/alumno/proyecto";
 
   return (
-    <div className={`text-slate-100 min-h-screen flex flex-col justify-between selection:bg-[#f490b1] selection:text-[#050505] ${isGestionProyecto ? "bg-[#08080c]" : "bg-[#050505] bg-brutalist-noise"
+    <div className={`text-slate-900 min-h-screen flex flex-col justify-between selection:bg-[#db2777] selection:text-white ${isGestionProyecto ? "bg-slate-50" : "bg-white bg-brutalist-noise"
       }`}>
       <div>
         <Navbar />
@@ -65,6 +67,8 @@ function AppContent() {
             <Route path="registroLogin" element={<RegistroLogin />} />
             <Route path="resultados" element={<AdminResultadosJurado />} />
             <Route path="por-quien-vino" element={<AdminPorQuienVino />} />
+            <Route path="categorias-proyectos" element={<AdminCategorias />} />
+            <Route path="proyectos/categoria/:idCategoria" element={<AdminProyectosPorCategoria />} />
           </Route>
         </Routes>
       </div>
