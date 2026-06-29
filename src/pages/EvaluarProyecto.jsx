@@ -15,12 +15,25 @@ function EvaluarProyecto() {
 
   // valores elegidos por criterio: { criterioId: puntaje }
   const [valores, setValores] = useState({});
-  const [observacion, setObservacion] = useState("");
   const [enviando, setEnviando] = useState(false);
   const [mensaje, setMensaje] = useState("");
   const [tipoMensaje, setTipoMensaje] = useState(""); // "success" | "error"
 
+  // Criterios fijos del jurado (no dependen de la BD)
+  const CRITERIOS_JURADO = [
+    { id: "j1", nombre: "Claridad en la explicación del proyecto", peso: 1.0, orden: 1 },
+    { id: "j2", nombre: "Dominio del tema", peso: 1.0, orden: 2 },
+    { id: "j3", nombre: "Capacidad comunicativa", peso: 1.0, orden: 3 },
+    { id: "j4", nombre: "Relevancia e impacto del proyecto", peso: 1.0, orden: 4 },
+    { id: "j5", nombre: "Originalidad y creatividad", peso: 1.0, orden: 5 },
+    { id: "j6", nombre: "Recursos visuales y materiales", peso: 1.0, orden: 6 },
+    { id: "j7", nombre: "Trabajo en equipo", peso: 1.0, orden: 7 },
+  ];
+
   useEffect(() => {
+    // No ejecutar hasta que el usuario esté disponible en el contexto
+    if (user === null) return;
+
     async function fetchData() {
       setLoading(true);
       setError(null);
@@ -42,32 +55,39 @@ function EvaluarProyecto() {
 
         setProyecto(proy);
 
-        // 2) Traer la rúbrica "Presentación"
-        const { data: rubrica, error: rubError } = await supabase
-          .from("rubricas")
-          .select("id, nombre")
-          .eq("nombre", "Presentación")
-          .maybeSingle();
+        // Determinar si el usuario es jurado
+        const esJurado = user?.rut?.startsWith("JUR");
 
-        if (rubError || !rubrica) {
-          console.error(rubError);
-          setError("No se pudo cargar la rúbrica de evaluación.");
-          setLoading(false);
-          return;
-        }
-
-        // 3) Traer criterios de esa rúbrica
-        const { data: crits, error: critError } = await supabase
-          .from("criterios")
-          .select("id, nombre, peso, orden")
-          .eq("rubrica_id", rubrica.id)
-          .order("orden", { ascending: true });
-
-        if (critError) {
-          console.error(critError);
-          setError("No se pudieron cargar los criterios.");
+        if (esJurado) {
+          // Para el jurado usamos criterios fijos (no dependen de la BD)
+          setCriterios(CRITERIOS_JURADO);
         } else {
-          setCriterios(crits);
+          // Para visitantes: cargar rúbrica desde la BD
+          const { data: rubrica, error: rubError } = await supabase
+            .from("rubricas")
+            .select("id, nombre")
+            .ilike("nombre", "Presentaci%")
+            .maybeSingle();
+
+          if (rubError || !rubrica) {
+            console.error("Rúbrica no encontrada:", rubError);
+            setError("No se pudo cargar la rúbrica de evaluación.");
+            setLoading(false);
+            return;
+          }
+
+          const { data: crits, error: critError } = await supabase
+            .from("criterios")
+            .select("id, nombre, peso, orden")
+            .eq("rubrica_id", rubrica.id)
+            .order("orden", { ascending: true });
+
+          if (critError) {
+            console.error(critError);
+            setError("No se pudieron cargar los criterios.");
+          } else {
+            setCriterios(crits);
+          }
         }
       } catch (err) {
         console.error("Error inesperado:", err);
@@ -78,7 +98,7 @@ function EvaluarProyecto() {
     }
 
     fetchData();
-  }, [proyectoId]);
+  }, [proyectoId, user]);
 
   const handleChangePuntaje = (criterioId, puntaje) => {
     setValores((prev) => ({
@@ -155,7 +175,7 @@ function EvaluarProyecto() {
           proyecto_id: proyectoId,
           visitante_id: visitanteId,
           nota_final: notaFinal,
-          observacion_general: observacion || null,
+          observacion_general: null,
         })
         .select("id")
         .single();
@@ -169,32 +189,33 @@ function EvaluarProyecto() {
 
       const evaluacionId = evalInsert.id;
 
-      // 3) Insertar detalle por criterio
-      const detalles = criterios.map((c) => ({
-        evaluacion_id: evaluacionId,
-        criterio_id: c.id,
-        puntaje: valores[c.id],
-        comentario: null,
-      }));
+      // 3) Insertar detalle por criterio (solo si los criterios vienen de la BD, no hardcodeados del jurado)
+      const esJurado = user?.rut?.startsWith("JUR");
+      if (!esJurado) {
+        const detalles = criterios.map((c) => ({
+          evaluacion_id: evaluacionId,
+          criterio_id: c.id,
+          puntaje: valores[c.id],
+          comentario: null,
+        }));
 
-      const { error: detError } = await supabase
-        .from("evaluacion_detalle")
-        .insert(detalles);
+        const { error: detError } = await supabase
+          .from("evaluacion_detalle")
+          .insert(detalles);
 
-      if (detError) {
-        console.error("Error al insertar detalle:", detError);
-        setMensaje(`Error al guardar el detalle: ${detError.message}`);
-        setTipoMensaje("error");
-        return;
-      }
+        if (detError) {
+          console.error("Error al insertar detalle:", detError);
+          setMensaje(`Error al guardar el detalle: ${detError.message}`);
+          setTipoMensaje("error");
+          return;
+        }
+      } // fin if (!esJurado)
 
       // Si todo salió bien
       setMensaje("¡Evaluación registrada correctamente!");
       setTipoMensaje("success");
 
-      // Limpiar formulario
       setValores({});
-      setObservacion("");
 
       // Redirigir después de 1 segundo
       setTimeout(() => {
@@ -210,43 +231,43 @@ function EvaluarProyecto() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 py-12 px-4 relative overflow-hidden">
+    <div className="min-h-screen bg-white py-12 px-4 relative overflow-hidden">
       {/* Luces de fondo (Glows) */}
-      <div className="absolute top-10 left-1/3 w-80 h-80 bg-cyan-500/5 rounded-full blur-[110px] pointer-events-none" />
-      <div className="absolute bottom-20 right-10 w-96 h-96 bg-teal-500/5 rounded-full blur-[130px] pointer-events-none" />
+      <div className="absolute top-10 left-1/3 w-80 h-80 bg-rose-500/5 rounded-full blur-[110px] pointer-events-none" />
+      <div className="absolute bottom-20 right-10 w-96 h-96 bg-rose-400/5 rounded-full blur-[130px] pointer-events-none" />
 
       <div className="max-w-3xl mx-auto relative z-10">
         {/* Volver */}
         <button
           onClick={() => navigate(-1)}
-          className="mb-8 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-cyan-400 bg-slate-900/60 hover:bg-slate-900 border border-slate-800/80 px-4 py-2.5 rounded-xl cursor-pointer transition-all duration-300"
+          className="mb-8 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-600 hover:text-[#db2777] bg-white hover:bg-rose-50 border border-rose-200 px-4 py-2.5 rounded-xl cursor-pointer transition-all duration-300"
         >
           ← Volver a Proyectos
         </button>
 
         {/* Header del Proyecto */}
         {proyecto && (
-          <div className="mb-8 bg-slate-900/60 backdrop-blur-xl rounded-3xl p-6 border border-slate-850 shadow-xl shadow-black/30 relative overflow-hidden">
+          <div className="mb-8 bg-white rounded-3xl p-6 border border-rose-200 shadow-xl shadow-rose-500/10 relative overflow-hidden">
             {/* Decoración lateral */}
-            <div className="absolute left-0 top-0 h-full w-1.5 bg-gradient-to-b from-cyan-500 to-blue-600" />
-            
+            <div className="absolute left-0 top-0 h-full w-1.5 bg-gradient-to-b from-[#db2777] to-rose-400" />
+
             <div className="flex items-center gap-2 mb-2.5">
               {proyecto.stand_num && (
-                <span className="inline-flex px-3 py-1 bg-cyan-500/10 border border-cyan-400/25 text-cyan-400 rounded-full text-[10px] font-bold uppercase tracking-wider">
+                <span className="inline-flex px-3 py-1 bg-rose-50 border border-rose-300 text-[#db2777] rounded-full text-[10px] font-bold uppercase tracking-wider">
                   Stand #{proyecto.stand_num}
                 </span>
               )}
-              <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">
+              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
                 PROYECTO EVALUADO
               </span>
             </div>
-            
-            <h1 className="text-2xl font-extrabold text-white mb-2 leading-snug tracking-tight">
+
+            <h1 className="text-2xl font-extrabold text-slate-900 mb-2 leading-snug tracking-tight">
               {proyecto.titulo}
             </h1>
             {proyecto.participantes && (
-              <p className="text-xs text-slate-450 font-semibold leading-relaxed">
-                <span className="text-slate-500">Participantes: </span>
+              <p className="text-xs text-slate-500 font-semibold leading-relaxed">
+                <span className="text-slate-400">Participantes: </span>
                 {proyecto.participantes}
               </p>
             )}
@@ -256,15 +277,15 @@ function EvaluarProyecto() {
         {/* Loading */}
         {loading && (
           <div className="flex justify-center items-center py-20">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-500"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#db2777]"></div>
           </div>
         )}
 
         {/* Error */}
         {!loading && error && (
-          <div className="bg-rose-950/20 border border-rose-500/30 text-rose-350 p-4 rounded-2xl">
+          <div className="bg-rose-50 border border-rose-300 text-rose-600 p-4 rounded-2xl">
             <div className="flex items-center gap-2">
-              <svg className="w-5 h-5 text-rose-450" fill="currentColor" viewBox="0 0 20 20">
+              <svg className="w-5 h-5 text-rose-500" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
               </svg>
               {error}
@@ -276,15 +297,15 @@ function EvaluarProyecto() {
         {!loading && !error && criterios.length > 0 && (
           <form
             onSubmit={handleSubmit}
-            className="bg-slate-900/60 backdrop-blur-xl rounded-3xl p-8 border border-slate-800 space-y-8 shadow-2xl shadow-black/50"
+            className="bg-white rounded-3xl p-8 border border-rose-200 space-y-8 shadow-2xl shadow-rose-500/10"
           >
             <div>
-              <h2 className="text-xl font-extrabold text-white mb-1.5 tracking-tight flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
-                Presentación del Proyecto
+              <h2 className="text-xl font-extrabold text-slate-900 mb-1.5 tracking-tight flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-[#db2777] animate-pulse"></span>
+                {user?.rut?.startsWith("JUR") || user?.role === "jurado" ? "Evaluación Oficial del Jurado" : "Presentación del Proyecto"}
               </h2>
-              <p className="text-xs text-slate-450 leading-relaxed font-semibold">
-                Califica cada criterio del <span className="text-cyan-400">1 al 4</span> basándote en la rúbrica formal, donde 4 representa un desempeño excelente y 1 un desempeño insuficiente.
+              <p className="text-xs text-slate-500 leading-relaxed font-semibold">
+                Califica cada criterio del <span className="text-[#db2777]">1 al {user?.rut?.startsWith("JUR") || user?.role === "jurado" ? "7" : "4"}</span>.
               </p>
             </div>
 
@@ -292,40 +313,35 @@ function EvaluarProyecto() {
               {criterios.map((c, index) => (
                 <div
                   key={c.id}
-                  className="border border-slate-800/80 rounded-2xl p-5 bg-slate-950/40 hover:bg-slate-950/70 transition-colors"
+                  className="border border-rose-200 rounded-2xl p-5 bg-white hover:bg-rose-50/50 transition-colors"
                 >
                   <div className="flex items-start gap-3 mb-4">
-                    <span className="flex-shrink-0 flex items-center justify-center w-6 h-6 bg-slate-900 rounded-lg text-slate-500 font-bold text-xs">
+                    <span className="flex-shrink-0 flex items-center justify-center w-6 h-6 bg-rose-50 border border-rose-200 rounded-lg text-[#db2777] font-bold text-xs">
                       {index + 1}
                     </span>
-                    <p className="font-extrabold text-slate-200 text-sm pt-0.5 tracking-tight">{c.nombre}</p>
+                    <p className="font-extrabold text-slate-800 text-sm pt-0.5 tracking-tight">{c.nombre}</p>
                   </div>
 
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
-                    {[
-                      { label: "Deficiente", value: 1, color: "hover:border-rose-500/40 hover:bg-rose-500/5 active:bg-rose-500/10", activeColor: "bg-rose-500/10 border-rose-500/80 text-rose-400 font-bold" },
-                      { label: "Regular", value: 2, color: "hover:border-amber-500/40 hover:bg-amber-500/5 active:bg-amber-500/10", activeColor: "bg-amber-500/10 border-amber-500/80 text-amber-400 font-bold" },
-                      { label: "Bueno", value: 3, color: "hover:border-teal-500/40 hover:bg-teal-500/5 active:bg-teal-500/10", activeColor: "bg-teal-500/10 border-teal-500/80 text-teal-400 font-bold" },
-                      { label: "Muy bueno", value: 4, color: "hover:border-cyan-500/40 hover:bg-cyan-500/5 active:bg-cyan-500/10", activeColor: "bg-cyan-500/10 border-cyan-500/80 text-cyan-400 font-bold" },
-                    ].map((opt) => {
-                      const isSelected = valores[c.id] === opt.value;
+                  <div className="flex justify-between items-center gap-1 sm:gap-2 mt-2">
+                    {Array.from({ length: user?.rut?.startsWith("JUR") || user?.role === "jurado" ? 7 : 4 }, (_, i) => i + 1).map((val) => {
+                      const isSelected = valores[c.id] === val;
                       return (
                         <label
-                          key={opt.value}
-                          className={`flex items-center justify-center gap-1.5 cursor-pointer rounded-xl border px-3 py-3 transition-all duration-300 select-none text-center
+                          key={val}
+                          className={`flex-1 flex items-center justify-center cursor-pointer rounded-lg border py-3 transition-all duration-300 select-none text-center font-bold text-sm sm:text-base
                             ${isSelected
-                              ? opt.activeColor
-                              : `bg-slate-950/60 border-slate-850 text-slate-400 ${opt.color}`}`}
+                              ? "bg-[#db2777]/10 border-[#db2777] text-[#db2777] scale-105 shadow-md shadow-rose-500/20"
+                              : "bg-white border-rose-200 text-slate-500 hover:border-[#db2777]/50 hover:bg-rose-50"}`}
                         >
                           <input
                             type="radio"
                             name={`criterio-${c.id}`}
-                            value={opt.value}
+                            value={val}
                             checked={isSelected}
-                            onChange={() => handleChangePuntaje(c.id, opt.value)}
+                            onChange={() => handleChangePuntaje(c.id, val)}
                             className="hidden"
                           />
-                          <span>{opt.label}</span>
+                          <span>{val}</span>
                         </label>
                       );
                     })}
@@ -334,37 +350,22 @@ function EvaluarProyecto() {
               ))}
             </div>
 
-            {/* Observaciones generales */}
-            <div>
-              <label htmlFor="observacion-general" className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-2">
-                <span>Comentarios u Observaciones Generales (Opcional)</span>
-              </label>
-              <textarea
-                id="observacion-general"
-                rows={3}
-                placeholder="Escribe sugerencias de mejora, aspectos destacados o notas complementarias sobre la presentación del proyecto..."
-                value={observacion}
-                onChange={(e) => setObservacion(e.target.value)}
-                className="w-full px-4 py-3.5 border border-slate-800 rounded-2xl bg-slate-950/80 text-white placeholder-slate-650 text-xs resize-none focus:border-cyan-500/80 focus:ring-2 focus:ring-cyan-500/10 outline-none transition duration-300"
-              />
-            </div>
-
             {/* Mensaje */}
             {mensaje && (
               <div
                 className={`p-4 rounded-2xl border text-sm font-semibold ${
                   tipoMensaje === "error"
-                    ? "bg-rose-950/20 border-rose-500/30 text-rose-350"
-                    : "bg-emerald-950/20 border-emerald-500/30 text-emerald-350"
+                    ? "bg-rose-50 border-rose-300 text-rose-600"
+                    : "bg-emerald-50 border-emerald-300 text-emerald-700"
                 }`}
               >
                 <div className="flex items-center gap-2">
                   {tipoMensaje === "error" ? (
-                    <svg className="w-5 h-5 text-rose-450" fill="currentColor" viewBox="0 0 20 20">
+                    <svg className="w-5 h-5 text-rose-500" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                     </svg>
                   ) : (
-                    <svg className="w-5 h-5 text-emerald-450" fill="currentColor" viewBox="0 0 20 20">
+                    <svg className="w-5 h-5 text-emerald-500" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                     </svg>
                   )}
@@ -377,7 +378,7 @@ function EvaluarProyecto() {
             <button
               type="submit"
               disabled={enviando}
-              className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold py-4 px-6 rounded-2xl active:scale-[0.98] transition-all duration-300 shadow-md shadow-cyan-500/10 disabled:opacity-50 disabled:cursor-not-allowed text-xs uppercase tracking-widest"
+              className="w-full bg-gradient-to-r from-white to-[#db2777] hover:from-rose-50 hover:to-rose-500 text-slate-900 font-bold py-4 px-6 rounded-2xl active:scale-[0.98] transition-all duration-300 shadow-md shadow-rose-500/10 disabled:opacity-50 disabled:cursor-not-allowed text-xs uppercase tracking-widest"
             >
               {enviando ? (
                 <span className="flex items-center justify-center gap-2">

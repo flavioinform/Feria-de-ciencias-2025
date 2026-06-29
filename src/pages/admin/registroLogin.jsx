@@ -68,6 +68,31 @@ function RegistroLogin() {
   const [buscandoEstudiantes, setBuscandoEstudiantes] = useState(false);
   const [mostrarResultados, setMostrarResultados] = useState(false);
 
+  // Formatea el RUT automáticamente: 12.345.678-9
+  const formatearRut = (valor) => {
+    // Quitar todo excepto números y K
+    let limpio = valor.replace(/[^0-9kK]/g, "").toUpperCase();
+    if (limpio.length === 0) return "";
+
+    const dv = limpio.slice(-1);       // dígito verificador
+    let cuerpo = limpio.slice(0, -1);  // el resto
+
+    // Agregar puntos cada 3 dígitos desde la derecha
+    let cuerpoFormateado = "";
+    while (cuerpo.length > 3) {
+      cuerpoFormateado = "." + cuerpo.slice(-3) + cuerpoFormateado;
+      cuerpo = cuerpo.slice(0, -3);
+    }
+    cuerpoFormateado = cuerpo + cuerpoFormateado;
+
+    return cuerpoFormateado + "-" + dv;
+  };
+
+  const handleRutChange = (e) => {
+    const valorFormateado = formatearRut(e.target.value);
+    setForm((prev) => ({ ...prev, rut: valorFormateado }));
+  };
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setForm((prev) => {
@@ -205,14 +230,14 @@ function RegistroLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 flex items-center justify-center px-4 py-8 sm:py-12">
       <div className="max-w-lg w-full">
-        <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">
+        <div className="bg-white rounded-2xl shadow-xl p-5 sm:p-8 border border-gray-100">
+          <div className="text-center mb-6 sm:mb-8">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">
               Registro de visitantes
             </h1>
-            <p className="text-gray-500">
+            <p className="text-gray-500 text-sm sm:text-base">
               Ingresa los datos del visitante para generar su PIN de acceso.
             </p>
           </div>
@@ -242,8 +267,9 @@ function RegistroLogin() {
                 type="text"
                 name="rut"
                 value={form.rut}
-                onChange={handleChange}
+                onChange={handleRutChange}
                 placeholder="12.345.678-9"
+                maxLength={12}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none bg-gray-50 text-black"
                 required
               />

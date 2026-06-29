@@ -1,6 +1,6 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { supabase } from "../lib/supabase";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { AppContext } from "../context/AppContext";
 
 function Login() {
@@ -10,50 +10,25 @@ function Login() {
   const [tipo, setTipo] = useState("");
   const [cargando, setCargando] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const { login } = useContext(AppContext); // Obtener función login del context
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const r = params.get("rut");
+    const p = params.get("pin");
+    if (r && p) {
+      setRut(r);
+      setPin(p);
+      authenticate(r, p);
+    }
+  }, [location.search]);
+
+  const authenticate = async (rutIngresado, pinIngresado) => {
     setMensaje("");
     setCargando(true);
 
-    const rutNormalizado = rut.replace(/[.\-]/g, "").toUpperCase();
-
-    // Crear admin automáticamente si es el RUT solicitado
-    if (rutNormalizado === "146803180" && pin === "Feria2026F") {
-      const { data: existente } = await supabase
-        .from("usuarios")
-        .select("id")
-        .eq("rut", "146803180")
-        .maybeSingle();
-
-      if (!existente) {
-        // Intenta insertar (puede fallar si RLS está activo, pero no detendremos el login)
-        await supabase.from("usuarios").insert({
-          rut: "146803180",
-          nombre: "Administrador",
-          pin_hash: "Feria2026F",
-          role: "admin",
-          viene_por_alguien: false,
-          por_quien_vino: null
-        });
-      }
-
-      // Bypass forzado para garantizar acceso incluso si la base de datos restringe la inserción
-      const userData = {
-        id: existente?.id || "temp-admin-id",
-        nombre: "Administrador",
-        rut: "146803180",
-        role: "admin"
-      };
-      
-      login(userData);
-      setMensaje(`Bienvenido/a Administrador`);
-      setTipo("success");
-      setCargando(false);
-      setTimeout(() => navigate("/admin/categorias-proyectos"), 1000);
-      return;
-    }
+    const rutNormalizado = rutIngresado.replace(/[.\-]/g, "").toUpperCase();
 
     const { data: usuario, error } = await supabase
       .from("usuarios")
@@ -68,7 +43,7 @@ function Login() {
       return;
     }
 
-    if (usuario.pin_hash !== pin) {
+    if (usuario.pin_hash !== pinIngresado) {
       setMensaje("PIN incorrecto");
       setTipo("error");
       setCargando(false);
@@ -91,41 +66,88 @@ function Login() {
 
     // Redirigir después de un momento
     setTimeout(() => {
-      navigate("/categorias");
+      if (usuario.role === "admin") {
+        navigate("/admin/categorias-proyectos");
+      } else {
+        navigate("/categorias");
+      }
     }, 1000);
   };
 
+  const formatRUT = (value) => {
+    // Remover caracteres no numéricos excepto guión
+    let cleaned = value.replace(/[^\dkK-]/g, "").toUpperCase();
+
+    // Si está vacío, retornar vacío
+    if (!cleaned) return "";
+
+    // Separar el dígito verificador (último carácter)
+    let body = cleaned.replace(/-/g, "").slice(0, -1);
+    let dv = cleaned.replace(/-/g, "").slice(-1);
+
+    // Si no hay dígito verificador aún, solo formatear body
+    if (!dv) {
+      body = cleaned.replace(/-/g, "");
+      dv = "";
+    }
+
+    // Formatear body con puntos: XX.XXX.XXX
+    let formatted = "";
+    for (let i = 0; i < body.length; i++) {
+      if (i > 0 && (body.length - i) % 3 === 0) {
+        formatted += ".";
+      }
+      formatted += body[i];
+    }
+
+    // Agregar dígito verificador con guión
+    if (dv) {
+      formatted += "-" + dv;
+    }
+
+    return formatted;
+  };
+
+  const handleRUTChange = (e) => {
+    const formatted = formatRUT(e.target.value);
+    setRut(formatted);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    authenticate(rut, pin);
+  };
+
   return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center px-4 py-12 relative overflow-hidden">
+    <div className="min-h-screen bg-white flex items-center justify-center px-4 py-12 relative overflow-hidden">
       {/* Glows de fondo */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-cyan-500/5 rounded-full blur-[110px] pointer-events-none" />
-      <div className="absolute bottom-10 right-10 w-72 h-72 bg-emerald-500/5 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-rose-500/5 rounded-full blur-[110px] pointer-events-none" />
+      <div className="absolute bottom-10 right-10 w-72 h-72 bg-rose-400/5 rounded-full blur-[120px] pointer-events-none" />
 
       <div className="max-w-md w-full relative z-10">
         <div className="text-center mb-8">
 
-          <h1 className="text-3xl font-extrabold bg-gradient-to-r from-white to-slate-350 bg-clip-text text-transparent tracking-tight">Portal de Evaluación</h1>
-          <p className="text-cyan-400 font-medium mt-1 text-sm tracking-wider">Acceso para Jurados y Administradores</p>
+          <h1 className="text-3xl font-extrabold bg-gradient-to-r from-slate-900 to-rose-600 bg-clip-text text-transparent tracking-tight">Portal de Evaluación</h1>
         </div>
 
-        <div className="bg-slate-900/60 backdrop-blur-xl rounded-3xl p-8 border border-slate-800 shadow-2xl shadow-black/50">
+        <div className="bg-white/80 backdrop-blur-xl rounded-3xl p-8 border border-rose-200 shadow-2xl shadow-rose-500/10">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
                 RUT
               </label>
               <input
                 type="text"
-                placeholder="Ingresa tu RUT sin puntos ni guion"
+                placeholder="Ej: 12.345.678-9"
                 value={rut}
-                onChange={(e) => setRut(e.target.value)}
-                className="w-full px-4 py-3.5 border border-slate-800 rounded-xl bg-slate-950/80 text-white placeholder-slate-600 text-sm focus:border-cyan-500/80 focus:ring-2 focus:ring-cyan-500/10 outline-none transition duration-300"
+                onChange={handleRUTChange}
+                className="w-full px-4 py-3.5 border border-rose-300 rounded-xl bg-white text-slate-900 placeholder-slate-400 text-sm focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 outline-none transition duration-300"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
                 PIN de Acceso
               </label>
               <input
@@ -133,7 +155,7 @@ function Login() {
                 placeholder="••••"
                 value={pin}
                 onChange={(e) => setPin(e.target.value)}
-                className="w-full px-4 py-3.5 border border-slate-800 rounded-xl bg-slate-950/80 text-white placeholder-slate-600 text-sm focus:border-cyan-500/80 focus:ring-2 focus:ring-cyan-500/10 outline-none transition duration-300"
+                className="w-full px-4 py-3.5 border border-rose-300 rounded-xl bg-white text-slate-900 placeholder-slate-400 text-sm focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 outline-none transition duration-300"
                 required
               />
             </div>
@@ -164,7 +186,7 @@ function Login() {
             <button
               type="submit"
               disabled={cargando}
-              className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold py-4 px-6 rounded-2xl active:scale-[0.98] transition-all duration-300 shadow-md shadow-cyan-500/10 disabled:opacity-50 disabled:cursor-not-allowed text-sm uppercase tracking-wider"
+              className="w-full bg-gradient-to-r from-white to-[#db2777] hover:from-slate-100 hover:to-rose-500 text-slate-900 font-bold py-4 px-6 rounded-2xl active:scale-[0.98] transition-all duration-300 shadow-md shadow-rose-500/10 disabled:opacity-50 disabled:cursor-not-allowed text-sm uppercase tracking-wider"
             >
               {cargando ? (
                 <span className="flex items-center justify-center gap-2">

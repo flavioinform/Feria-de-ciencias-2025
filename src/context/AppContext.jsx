@@ -1,7 +1,5 @@
-// src/context/AppContext.jsx
 import { createContext, useState, useEffect } from "react";
-import { Link} from "react-router-dom";
-
+import { supabase } from "../lib/supabase";
 
 export const AppContext = createContext();
 
@@ -11,10 +9,39 @@ export function AppProvider({ children }) {
 
   useEffect(() => {
     const savedUser = localStorage.getItem("user");
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
+    if (!savedUser) {
+      setLoading(false);
+      return;
     }
-    setLoading(false);
+
+    let parsed;
+    try {
+      parsed = JSON.parse(savedUser);
+    } catch {
+      localStorage.removeItem("user");
+      setLoading(false);
+      return;
+    }
+
+    // Verificar que el usuario y su rol realmente existen en la BD
+    // Esto evita que alguien manipule localStorage para cambiar su rol
+    supabase
+      .from("usuarios")
+      .select("id, nombre, rut, role")
+      .eq("id", parsed.id)
+      .eq("role", parsed.role)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data) {
+          // Usar los datos reales de la BD, no los del localStorage
+          setUser(data);
+        } else {
+          // El rol no coincide o el usuario no existe → sesión inválida
+          localStorage.removeItem("user");
+          setUser(null);
+        }
+        setLoading(false);
+      });
   }, []);
 
   const login = (userData) => {
@@ -25,7 +52,6 @@ export function AppProvider({ children }) {
   const logout = () => {
     setUser(null);
     localStorage.removeItem("user");
-   
   };
 
   return (

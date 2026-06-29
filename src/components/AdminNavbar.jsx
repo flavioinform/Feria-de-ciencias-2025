@@ -67,9 +67,17 @@ function AdminNavbar() {
             {/* Desktop Nav */}
             <div className="hidden lg:flex items-center gap-1.5">
               <NavLink to="/admin/registroLogin">Visitantes</NavLink>
-              <NavLink to="/admin/resultados">Resultados</NavLink>
-              <NavLink to="/admin/por-quien-vino">Búsquedas</NavLink>
-              <NavLink to="/admin/categorias-proyectos">Proyectos</NavLink>
+              {user?.role === "admin" && (
+                <>
+                  <NavLink to="/admin/ayudantes">Ayudantes</NavLink>
+                  <NavLink to="/admin/resultados">Resultados</NavLink>
+                  <NavLink to="/admin/coevaluaciones">Coevaluaciones</NavLink>
+                  <NavLink to="/admin/por-quien-vino">Búsquedas</NavLink>
+                  <NavLink to="/admin/categorias-proyectos">Proyectos</NavLink>
+                  <NavLink to="/admin/jurados">Jurados</NavLink>
+                  <NavLink to="/admin/configuracion">Configuración</NavLink>
+                </>
+              )}
             </div>
 
             {/* User & Logout (Desktop) */}
@@ -77,7 +85,9 @@ function AdminNavbar() {
               {user && (
                 <div className="flex flex-col items-end">
                   <span className="text-sm font-bold text-white leading-tight">{user.nombre || "Admin"}</span>
-                  <span className="text-xs font-medium text-pink-100">Administrador</span>
+                  <span className="text-xs font-medium text-pink-100">
+                    {user.role === "admin" ? "Administrador" : user.role === "ayudante" ? "Ayudante" : "Usuario"}
+                  </span>
                 </div>
               )}
               <button
@@ -114,9 +124,17 @@ function AdminNavbar() {
           <div className="bg-pink-700/60 backdrop-blur-md shadow-inner">
             <div className="px-4 pt-3 pb-3 space-y-1">
               <Link to="/admin/registroLogin" onClick={() => setMenuAbierto(false)} className="block px-3 py-2.5 rounded-lg text-base font-semibold text-white hover:bg-white/20">Registrar visitantes</Link>
-              <Link to="/admin/resultados" onClick={() => setMenuAbierto(false)} className="block px-3 py-2.5 rounded-lg text-base font-semibold text-white hover:bg-white/20">Resultados / votos</Link>
-              <Link to="/admin/por-quien-vino" onClick={() => setMenuAbierto(false)} className="block px-3 py-2.5 rounded-lg text-base font-semibold text-white hover:bg-white/20">¿Por quién vinieron?</Link>
-              <Link to="/admin/categorias-proyectos" onClick={() => setMenuAbierto(false)} className="block px-3 py-2.5 rounded-lg text-base font-semibold text-white hover:bg-white/20">Categorías y Proyectos</Link>
+              {user?.role === "admin" && (
+                <>
+                  <Link to="/admin/ayudantes" onClick={() => setMenuAbierto(false)} className="block px-3 py-2.5 rounded-lg text-base font-semibold text-white hover:bg-white/20">Gestionar ayudantes</Link>
+                  <Link to="/admin/resultados" onClick={() => setMenuAbierto(false)} className="block px-3 py-2.5 rounded-lg text-base font-semibold text-white hover:bg-white/20">Resultados / votos</Link>
+                  <Link to="/admin/coevaluaciones" onClick={() => setMenuAbierto(false)} className="block px-3 py-2.5 rounded-lg text-base font-semibold text-white hover:bg-white/20">Coevaluaciones</Link>
+                  <Link to="/admin/por-quien-vino" onClick={() => setMenuAbierto(false)} className="block px-3 py-2.5 rounded-lg text-base font-semibold text-white hover:bg-white/20">¿Por quién vinieron?</Link>
+                  <Link to="/admin/categorias-proyectos" onClick={() => setMenuAbierto(false)} className="block px-3 py-2.5 rounded-lg text-base font-semibold text-white hover:bg-white/20">Categorías y Proyectos</Link>
+                  <Link to="/admin/jurados" onClick={() => setMenuAbierto(false)} className="block px-3 py-2.5 rounded-lg text-base font-semibold text-white hover:bg-white/20">Jurados y Códigos QR</Link>
+                  <Link to="/admin/configuracion" onClick={() => setMenuAbierto(false)} className="block px-3 py-2.5 rounded-lg text-base font-semibold text-white hover:bg-white/20">Configuración</Link>
+                </>
+              )}
             </div>
             <div className="pt-4 pb-4 border-t border-pink-500/50">
               <div className="flex items-center px-6 gap-3">
@@ -127,7 +145,9 @@ function AdminNavbar() {
                 </div>
                 <div className="ml-3">
                   <div className="text-base font-bold text-white">{user?.nombre || "Administrador"}</div>
-                  <div className="text-sm font-medium text-pink-200 mt-0.5">Gestión Feria</div>
+                  <div className="text-sm font-medium text-pink-200 mt-0.5">
+                    {user?.role === "admin" ? "Administrador" : user?.role === "ayudante" ? "Ayudante" : "Gestión Feria"}
+                  </div>
                 </div>
               </div>
               <div className="mt-4 px-4">
