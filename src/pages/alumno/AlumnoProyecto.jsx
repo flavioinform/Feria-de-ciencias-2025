@@ -279,18 +279,17 @@ export default function AlumnoProyecto() {
       <div className="absolute bottom-20 right-10 w-80 h-80 bg-[#db2777]/3 rounded-full blur-[120px] pointer-events-none" />
 
       {/* Header */}
-      <div className="flex flex-col items-start sm:flex-row sm:items-center sm:justify-between mb-10 gap-6 relative z-10 w-full">
-        <div>
-          <h1 className="text-4xl font-display font-black text-slate-900 tracking-tight uppercase leading-none">
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-6 gap-4 relative z-10 w-full">
+        <div className="flex-1">
+          <h1 className="text-3xl font-display font-black text-slate-900 tracking-tight uppercase leading-none">
             Gestión de Proyecto
           </h1>
-          <p className="text-slate-500 text-xs font-tech mt-1 tracking-wide">
-            Alumno participante:{" "}
+          <p className="text-slate-500 text-xs font-tech mt-0.5 tracking-wide">
             <span className="font-bold text-[#db2777]">{alumno.nombre}</span>
           </p>
 
-          {/* Chic Equipo Pills */}
-          <div className="flex flex-wrap gap-2.5 mt-4">
+          {/* Equipo Pills - Grid de 2 columnas */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-1.5 mt-3">
             {cargandoIntegrantes ? (
               <div className="flex items-center gap-2 text-xs font-tech text-slate-500">
                 <Spinner sm />
@@ -300,31 +299,48 @@ export default function AlumnoProyecto() {
               integrantes.map((i, index) => (
                 <div
                   key={i.rut || index}
-                  className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border text-[10px] font-tech font-bold uppercase transition-all duration-300 select-none
+                  title={i.nombre}
+                  className={`flex items-center gap-1 px-2 py-1 rounded-lg border text-[9px] font-tech font-bold uppercase transition-all duration-300 select-none cursor-help group relative
                     ${i.rut === alumno.rut
-                      ? "bg-[#db2777]/10 border-[#db2777]/45 text-[#db2777] shadow-[0_0_12px_rgba(219,39,119,0.12)]"
-                      : "bg-white border-slate-200 text-slate-500 hover:border-[#db2777]/30"}`}
+                      ? "bg-[#db2777]/10 border-[#db2777]/45 text-[#db2777]"
+                      : "bg-slate-50 border-slate-200 text-slate-600"}`}
                 >
-                  <span className={`w-1.5 h-1.5 rounded-full ${i.rut === alumno.rut ? "bg-[#db2777] animate-pulse" : "bg-slate-400"}`}></span>
-                  <span>{i.nombre}</span>
-                  {i.rut === alumno.rut && <span className="text-[8px] bg-[#db2777]/20 px-1.5 py-0.5 rounded-full font-black text-[#db2777]">TÚ</span>}
+                  <span className={`w-1 h-1 rounded-full flex-shrink-0 ${i.rut === alumno.rut ? "bg-[#db2777]" : "bg-slate-400"}`}></span>
+                  <span className="truncate">{i.nombre}</span>
+                  {i.rut === alumno.rut && <span className="text-[7px] bg-[#db2777]/20 px-1 py-0.5 rounded text-[#db2777] ml-auto flex-shrink-0">TÚ</span>}
+
+                  {/* Tooltip personalizado */}
+                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-2 py-1 bg-slate-900 text-white text-[8px] rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+                    {i.nombre}
+                  </div>
                 </div>
               ))
             )}
           </div>
         </div>
-        <button
-          onClick={handleLogoutClick}
-          className="flex items-center justify-center gap-2 text-xs font-bold text-rose-500 border-2 border-rose-500 bg-transparent hover:bg-rose-500 hover:text-white font-tech transition-all duration-300 px-5 py-2.5 rounded-xl shadow-[3px_3px_0px_rgba(239,68,68,0.2)] hover:shadow-[0px_0px_0px_transparent] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer flex-shrink-0"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-          </svg>
-          Cerrar sesión
-        </button>
+        <div className="flex gap-3 flex-shrink-0">
+          <button
+            onClick={() => navigate("/alumno/coevaluacion")}
+            className="flex items-center justify-center gap-2 text-xs font-bold text-[#db2777] border-2 border-[#db2777] bg-transparent hover:bg-[#db2777] hover:text-white font-tech transition-all duration-300 px-5 py-2.5 rounded-xl shadow-[3px_3px_0px_rgba(219,39,119,0.2)] hover:shadow-[0px_0px_0px_transparent] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
+            Coevaluación
+          </button>
+          <button
+            onClick={handleLogoutClick}
+            className="flex items-center justify-center gap-2 text-xs font-bold text-rose-500 border-2 border-rose-500 bg-transparent hover:bg-rose-500 hover:text-white font-tech transition-all duration-300 px-5 py-2.5 rounded-xl shadow-[3px_3px_0px_rgba(239,68,68,0.2)] hover:shadow-[0px_0px_0px_transparent] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+            Cerrar sesión
+          </button>
+        </div>
       </div>
 
-      <div className="space-y-8 relative z-10">
+      <div className="space-y-6 relative z-10">
         {/* ── Detalles Generales ── */}
         <div className="bg-[#0d0d0d]/85 backdrop-blur-xl rounded-3xl border-2 border-[#db2777]/15 p-6 shadow-[8px_8px_0px_rgba(219,39,119,0.06)] relative overflow-hidden">
           {/* Subtle top stripe */}

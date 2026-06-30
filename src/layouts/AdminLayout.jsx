@@ -15,8 +15,8 @@ function AdminLayout() {
     );
   }
 
-  // si no es admin, fuera del panel
-  if (!user || user.role !== "admin") {
+  // si no es admin ni ayudante, fuera del panel
+  if (!user || (user.role !== "admin" && user.role !== "ayudante")) {
     return <Navigate to="/registro" replace />;
   }
 
