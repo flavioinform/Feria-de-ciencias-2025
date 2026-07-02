@@ -168,6 +168,19 @@ function EvaluarProyecto() {
       );
       const notaFinal = sumPesos > 0 ? sumPonderado / sumPesos : null;
 
+      // Determinar si el usuario es jurado
+      const esJurado = user?.rut?.startsWith("JUR");
+
+      // Para el jurado guardamos el puntaje de cada criterio (por nombre) en un
+      // objeto JSON, para poder rankear por "Capacidad comunicativa" (oral) y
+      // "Recursos visuales y materiales" (visual) en los resultados.
+      const detalleCriterios = esJurado
+        ? criterios.reduce((acc, c) => {
+            acc[c.nombre] = valores[c.id];
+            return acc;
+          }, {})
+        : null;
+
       // 2) Insertar en tabla evaluaciones
       const { data: evalInsert, error: evalError } = await supabase
         .from("evaluaciones")
@@ -176,6 +189,7 @@ function EvaluarProyecto() {
           visitante_id: visitanteId,
           nota_final: notaFinal,
           observacion_general: null,
+          detalle_criterios: detalleCriterios,
         })
         .select("id")
         .single();
@@ -190,7 +204,6 @@ function EvaluarProyecto() {
       const evaluacionId = evalInsert.id;
 
       // 3) Insertar detalle por criterio (solo si los criterios vienen de la BD, no hardcodeados del jurado)
-      const esJurado = user?.rut?.startsWith("JUR");
       if (!esJurado) {
         const detalles = criterios.map((c) => ({
           evaluacion_id: evaluacionId,

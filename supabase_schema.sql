@@ -122,6 +122,9 @@ CREATE TABLE IF NOT EXISTS evaluaciones (
     visitante_id UUID REFERENCES usuarios(id) ON DELETE CASCADE NOT NULL,
     nota_final NUMERIC NOT NULL,
     observacion_general TEXT,
+    -- Puntaje de cada criterio del jurado (mapa nombre_criterio -> puntaje 1-7).
+    -- Se usa para los rankings de "Mejor Presentación Oral" y "Visual".
+    detalle_criterios JSONB,
     CONSTRAINT unica_evaluacion_por_visitante_proyecto UNIQUE (proyecto_id, visitante_id)
 );
 
