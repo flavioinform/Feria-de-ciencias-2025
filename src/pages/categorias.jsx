@@ -35,14 +35,14 @@ function Categorias() {
   // Mapeo de colores basado en los Banderines del sistema (Light Theme - Colores Fuertes)
   const colorMap = {
     [normalizeName("Intro física")]: {
-      accent: "text-slate-600",
+      accent: "text-amber-500",
       bg: "bg-white",
-      border: "border-slate-400 group-hover:border-slate-600",
-      glow: "shadow-[6px_6px_0px_#94a3b8] group-hover:shadow-[6px_6px_0px_#475569]",
-      badge: "bg-slate-600 text-white border-slate-700",
-      grid: "bg-[linear-gradient(to_right,#94a3b8_1px,transparent_1px),linear-gradient(to_bottom,#94a3b8_1px,transparent_1px)]",
-      bgHeader: "bg-slate-100",
-      titleHover: "group-hover:text-slate-700",
+      border: "border-amber-400 group-hover:border-amber-500",
+      glow: "shadow-[6px_6px_0px_#fbbf24] group-hover:shadow-[6px_6px_0px_#d97706]",
+      badge: "bg-amber-500 text-white border-amber-600",
+      grid: "bg-[linear-gradient(to_right,#fbbf24_1px,transparent_1px),linear-gradient(to_bottom,#fbbf24_1px,transparent_1px)]",
+      bgHeader: "bg-amber-50",
+      titleHover: "group-hover:text-amber-600",
     },
     [normalizeName("Kinesiología")]: {
       accent: "text-red-600",
