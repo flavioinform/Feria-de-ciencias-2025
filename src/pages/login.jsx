@@ -50,6 +50,15 @@ function Login() {
       return;
     }
 
+    // Acceso restringido: solo el administrador puede ingresar.
+    // Visitantes/jurados y ayudantes están bloqueados temporalmente.
+    if (usuario.role !== "admin") {
+      setMensaje("El acceso está deshabilitado. Solo el administrador puede ingresar.");
+      setTipo("error");
+      setCargando(false);
+      return;
+    }
+
     // Guardar usuario en el contexto y localStorage
     const userData = {
       id: usuario.id,
@@ -64,13 +73,9 @@ function Login() {
     setTipo("success");
     setCargando(false);
 
-    // Redirigir después de un momento
+    // Redirigir después de un momento (solo admin llega hasta aquí)
     setTimeout(() => {
-      if (usuario.role === "admin") {
-        navigate("/admin/categorias-proyectos");
-      } else {
-        navigate("/categorias");
-      }
+      navigate("/admin/categorias-proyectos");
     }, 1000);
   };
 

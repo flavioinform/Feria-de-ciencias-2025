@@ -152,7 +152,7 @@ export default function AlumnoLogin() {
               <input
                 id="rut-alumno"
                 type="text"
-                inputMode="numeric"
+                inputMode="text"
                 placeholder="Ej: 12.345.678-9"
                 maxLength={12}
                 value={rutDisplay}
@@ -174,6 +174,7 @@ export default function AlumnoLogin() {
               <input
                 id="pass-alumno"
                 type="password"
+                inputMode="numeric"
                 placeholder="••••"
                 maxLength={4}
                 value={password}

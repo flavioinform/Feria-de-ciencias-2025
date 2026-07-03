@@ -32,9 +32,15 @@ export function AppProvider({ children }) {
       .eq("role", parsed.role)
       .maybeSingle()
       .then(({ data }) => {
-        if (data) {
-          // Usar los datos reales de la BD, no los del localStorage
+        if (data && data.role === "admin") {
+          // Acceso restringido: solo el administrador conserva la sesión.
+          // Visitantes/jurados y ayudantes quedan expulsados aunque tengan
+          // una sesión guardada.
           setUser(data);
+        } else if (data) {
+          // Rol válido pero bloqueado (visitante, jurado o ayudante)
+          localStorage.removeItem("user");
+          setUser(null);
         } else {
           // El rol no coincide o el usuario no existe → sesión inválida
           localStorage.removeItem("user");

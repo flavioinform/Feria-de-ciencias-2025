@@ -32,12 +32,12 @@ function RutaAlumno({ children }) {
   return alumno ? children : <Navigate to="/alumno/login" replace />;
 }
 
-/** Ruta protegida: solo admin y ayudante */
+/** Ruta protegida: solo admin (ayudantes bloqueados temporalmente) */
 function RutaAdminAyudante({ children }) {
   const { user, loading } = useContext(AppContext);
 
   if (loading) return <div className="min-h-screen flex items-center justify-center">Cargando...</div>;
-  if (!user || (user.role !== "admin" && user.role !== "ayudante")) {
+  if (!user || user.role !== "admin") {
     return <Navigate to="/login" replace />;
   }
 
@@ -56,28 +56,19 @@ function RutaAdmin({ children }) {
   return children;
 }
 
-/** Ruta pública: redirige a ayudantes al panel */
+/** Ruta pública */
 function RutaPublica({ children }) {
-  const { user } = useContext(AppContext);
-
-  if (user && user.role === "ayudante") {
-    return <Navigate to="/admin/registroLogin" replace />;
-  }
-
   return children;
 }
 
-/** Ruta protegida para visitantes/jurados: requiere sesión activa */
-function RutaVisitante({ children }) {
+/** Rutas de visitante/jurado: bloqueadas temporalmente (solo admin) */
+function RutaVisitante() {
   const { user, loading } = useContext(AppContext);
 
   if (loading) return <div className="min-h-screen flex items-center justify-center">Cargando...</div>;
-  if (!user) return <Navigate to="/login" replace />;
-  // Los ayudantes y admins no deberían estar aquí
-  if (user.role === "admin") return <Navigate to="/admin/categorias-proyectos" replace />;
-  if (user.role === "ayudante") return <Navigate to="/admin/registroLogin" replace />;
-
-  return children;
+  // Acceso restringido: visitantes y jurados están bloqueados.
+  if (user && user.role === "admin") return <Navigate to="/admin/categorias-proyectos" replace />;
+  return <Navigate to="/login" replace />;
 }
 
 function AppContent() {
