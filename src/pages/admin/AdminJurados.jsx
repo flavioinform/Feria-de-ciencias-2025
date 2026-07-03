@@ -8,6 +8,7 @@ function AdminJurados() {
   const [form, setForm] = useState({ nombre: "" });
   const [mensaje, setMensaje] = useState("");
   const [tipo, setTipo] = useState("");
+  const [qrGrande, setQrGrande] = useState(null); // jurado seleccionado para ver el QR ampliado
 
   const cargarJurados = async () => {
     setCargando(true);
@@ -124,22 +125,37 @@ function AdminJurados() {
                     <h3 className="font-bold text-gray-800 text-lg">{jurado.nombre}</h3>
                     <p className="text-gray-500 text-sm mb-4">ID: {jurado.rut}</p>
                     
-                    <div className="bg-white p-2 rounded-xl shadow-sm border border-gray-100">
+                    <button
+                      type="button"
+                      onClick={() => setQrGrande(jurado)}
+                      title="Clic para ampliar y escanear más rápido"
+                      className="bg-white p-2 rounded-xl shadow-sm border border-gray-100 cursor-pointer hover:border-emerald-400 hover:shadow-md transition-all"
+                    >
                       <QRCodeSVG value={loginUrl} size={150} />
-                    </div>
-                    
+                    </button>
+
                     <p className="mt-3 text-xs text-gray-400 break-all w-full px-2 text-center">
                       Escanea para iniciar sesión<br />
                       PIN: <span className="font-bold text-gray-700">{jurado.pin_hash}</span>
                     </p>
-                    <a
-                      href={loginUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="mt-3 text-sm text-emerald-600 hover:text-emerald-700 font-medium"
-                    >
-                      Probar Enlace
-                    </a>
+                    <div className="mt-3 flex items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setQrGrande(jurado)}
+                        className="text-sm text-emerald-600 hover:text-emerald-700 font-medium"
+                      >
+                        Ampliar QR
+                      </button>
+                      <span className="text-gray-300">|</span>
+                      <a
+                        href={loginUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-sm text-emerald-600 hover:text-emerald-700 font-medium"
+                      >
+                        Probar Enlace
+                      </a>
+                    </div>
                   </div>
                 );
               })}
@@ -148,6 +164,46 @@ function AdminJurados() {
         </div>
 
       </div>
+
+      {/* Modal QR ampliado para escaneo rápido */}
+      {qrGrande && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+          onClick={() => setQrGrande(null)}
+        >
+          <div
+            className="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full flex flex-col items-center text-center relative"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              onClick={() => setQrGrande(null)}
+              className="absolute top-4 right-4 w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 text-xl font-bold leading-none"
+              aria-label="Cerrar"
+            >
+              ×
+            </button>
+
+            <h3 className="font-bold text-gray-900 text-2xl mb-1">{qrGrande.nombre}</h3>
+            <p className="text-gray-500 text-sm mb-6">ID: {qrGrande.rut}</p>
+
+            <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
+              <QRCodeSVG
+                value={`${baseUrl}/login?rut=${qrGrande.rut}&pin=${qrGrande.pin_hash}`}
+                size={340}
+                className="w-[70vw] h-[70vw] max-w-[340px] max-h-[340px]"
+              />
+            </div>
+
+            <p className="mt-6 text-sm text-gray-500">
+              Escanea para iniciar sesión
+            </p>
+            <p className="mt-1 text-lg text-gray-700">
+              PIN: <span className="font-bold">{qrGrande.pin_hash}</span>
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
