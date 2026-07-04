@@ -192,3 +192,15 @@ END $$;
 INSERT INTO usuarios (nombre, rut, viene_por_alguien, por_quien_vino, pin_hash, role) VALUES
 ('Administrador Feria', '123456789', false, NULL, '1234', 'admin')
 ON CONFLICT (rut) DO NOTHING;
+
+
+-- =========================================================================
+-- POLÍTICA RLS: permitir borrar coevaluaciones
+-- =========================================================================
+-- La tabla 'coevaluaciones' tenía RLS con políticas de SELECT/INSERT/UPDATE
+-- pero SIN política de DELETE, por lo que el admin no podía "rehabilitar"
+-- (borrar) las coevaluaciones de un participante: Supabase rechazaba el
+-- borrado en silencio (0 filas, sin error).
+-- Ejecuta esto una vez en el SQL Editor de Supabase.
+CREATE POLICY "Permitir borrar coevaluaciones" ON coevaluaciones
+    FOR DELETE USING (true);
