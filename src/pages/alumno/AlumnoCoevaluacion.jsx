@@ -16,6 +16,9 @@ function AlumnoCoevaluacion() {
   const [tipo, setTipo] = useState("");
   const [yaEvaluado, setYaEvaluado] = useState(false);
   const [coevaluacionActiva, setCoevaluacionActiva] = useState(true);
+  // true si el alumno ya había coevaluado antes y ahora solo le faltan
+  // integrantes nuevos que se incorporaron al proyecto
+  const [soloNuevos, setSoloNuevos] = useState(false);
 
   const ESCALA = {
     7: "Excelente",
@@ -73,35 +76,36 @@ function AlumnoCoevaluacion() {
         .select("id, nombre, rut")
         .eq("proyecto_id", proyectoId);
 
-      if (!compError && compañerosList) {
-        setCompañeros(compañerosList);
-      }
+      const listaCompleta = !compError && compañerosList ? compañerosList : [];
 
+      // Compañeros que este alumno YA coevaluó (por evaluado_id)
       const { data: evalExistentes } = await supabase
         .from("coevaluaciones")
-        .select("*")
+        .select("evaluado_id")
         .eq("proyecto_id", proyectoId)
         .eq("evaluador_id", alumno.id);
 
-      if (evalExistentes && evalExistentes.length > 0) {
-        if (evalExistentes.length === compañerosList.length) {
-          setYaEvaluado(true);
-          setCargando(false);
-          return;
-        }
+      const yaEvaluadosIds = new Set(
+        (evalExistentes || []).map((ev) => String(ev.evaluado_id))
+      );
 
-        const evalMap = {};
-        evalExistentes.forEach((ev) => {
-          evalMap[ev.evaluado_id] = {
-            tiempo_actividades: ev.tiempo_actividades,
-            asistencia: ev.asistencia,
-            motivacion_equipo: ev.motivacion_equipo,
-            apoyo_informe: ev.apoyo_informe,
-            presentacion: ev.presentacion,
-          };
-        });
-        setEvaluaciones(evalMap);
+      // Solo mostramos los que faltan por coevaluar (pendientes).
+      // Si se incorporó un integrante nuevo, aquí aparece únicamente ese.
+      const pendientes = listaCompleta.filter(
+        (c) => !yaEvaluadosIds.has(String(c.id))
+      );
+
+      // Ya coevaluó a todos sus compañeros actuales → pantalla de "ya evaluaste"
+      if (listaCompleta.length > 0 && pendientes.length === 0) {
+        setYaEvaluado(true);
+        setCargando(false);
+        return;
       }
+
+      // Si ya había enviado coevaluaciones antes, avisamos que solo debe
+      // evaluar a los integrantes nuevos.
+      setSoloNuevos(yaEvaluadosIds.size > 0);
+      setCompañeros(pendientes);
     } catch (err) {
       console.error(err);
       setMensaje("Error al cargar datos");
@@ -245,6 +249,19 @@ function AlumnoCoevaluacion() {
           </div>
         ) : (
           <>
+            {soloNuevos && (
+              <div className="mb-5 p-4 rounded-lg border-2 border-[#db2777]/30 bg-[#db2777]/5 text-sm text-slate-700 flex items-start gap-3">
+                <svg className="w-5 h-5 text-[#db2777] shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p>
+                  Ya coevaluaste a tus compañeros anteriores. Se incorporó
+                  {compañeros.length > 1 ? "n nuevos integrantes" : " un nuevo integrante"} al
+                  proyecto: solo debes coevaluar a quien aparece a continuación.
+                </p>
+              </div>
+            )}
+
             {mensaje && (
               <div className={`mb-5 p-4 rounded-lg border text-sm ${
                 tipo === "error"
