@@ -1,6 +1,6 @@
 // src/pages/admin/AdminResultadosJurado.jsx
 import { useEffect, useState } from "react";
-import { supabase } from "../../lib/supabase";
+import { supabase, fetchAllRows } from "../../lib/supabase";
 import BotonDescargarExcel from "../../components/boton";
 
 // Nombres de los criterios del jurado usados para los rankings especiales.
@@ -31,12 +31,15 @@ function AdminResultadosJurado() {
         setCategorias(catData);
       }
 
-      // Traemos todas las evaluaciones con el proyecto asociado, categoría y usuario
-      const { data, error } = await supabase
-        .from("evaluaciones")
-        .select("proyecto_id, nota_final, detalle_criterios, proyectos(titulo, categorias_id), usuarios(rut, role)");
-
-      if (error) {
+      // Traemos TODAS las evaluaciones (paginado, pueden ser >1000) con el
+      // proyecto asociado, categoría y usuario
+      let data;
+      try {
+        data = await fetchAllRows(
+          "evaluaciones",
+          "proyecto_id, nota_final, detalle_criterios, proyectos(titulo, categorias_id), usuarios(rut, role)"
+        );
+      } catch (error) {
         console.error(error);
         setMensaje("Error al cargar las evaluaciones.");
         setLoading(false);

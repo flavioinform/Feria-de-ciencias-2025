@@ -1,6 +1,6 @@
 // src/pages/admin/AdminResultadosJurado.jsx
 import { useEffect, useState } from "react";
-import { supabase } from "../../lib/supabase";
+import { fetchAllRows } from "../../lib/supabase";
 
 function AdminResultados() {
   const [items, setItems] = useState([]);
@@ -12,12 +12,15 @@ function AdminResultados() {
       setLoading(true);
       setMensaje("");
 
-      // Traemos todas las evaluaciones con el proyecto asociado y el usuario que evaluó
-      const { data, error } = await supabase
-        .from("evaluaciones")
-        .select("proyecto_id, nota_final, proyectos(titulo), usuarios(rut)");
-
-      if (error) {
+      // Traemos TODAS las evaluaciones (paginado, pueden ser >1000) con el
+      // proyecto asociado y el usuario que evaluó
+      let data;
+      try {
+        data = await fetchAllRows(
+          "evaluaciones",
+          "proyecto_id, nota_final, proyectos(titulo), usuarios(rut)"
+        );
+      } catch (error) {
         console.error(error);
         setMensaje("Error al cargar las evaluaciones.");
         setLoading(false);

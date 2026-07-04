@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { supabase } from "../../lib/supabase";
+import { supabase, fetchAllRows } from "../../lib/supabase";
 
 function AdminCoevaluaciones() {
   const [categorias, setCategorias] = useState([]);
@@ -22,18 +22,15 @@ function AdminCoevaluaciones() {
       const { data: cats } = await supabase.from("categorias").select("id, nombre");
       setCategorias(cats || []);
 
-      const { data: parts } = await supabase.from("participantes").select("id, nombre, rut, proyecto_id");
+      // Paginado: puede haber más de 1000 participantes / coevaluaciones.
+      const parts = await fetchAllRows("participantes", "id, nombre, rut, proyecto_id");
       const partMap = {};
-      parts?.forEach((p) => { partMap[p.id] = p; });
+      parts.forEach((p) => { partMap[p.id] = p; });
       setUsuarios(partMap);
-      setParticipantes(parts || []);
+      setParticipantes(parts);
 
-      const { data: coeval, error: coevalError } = await supabase
-        .from("coevaluaciones")
-        .select("*, proyectos(id, titulo, categorias_id)");
-
-      if (coevalError) console.error("Error cargando coevaluaciones:", coevalError);
-      setCoevaluaciones(coeval || []);
+      const coeval = await fetchAllRows("coevaluaciones", "*, proyectos(id, titulo, categorias_id)");
+      setCoevaluaciones(coeval);
 
       const { data: proy } = await supabase.from("proyectos").select("id, titulo, categorias_id");
       setProyectos(proy || []);
