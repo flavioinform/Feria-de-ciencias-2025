@@ -26,6 +26,40 @@ import Login from "./pages/login";
 // import Registro from "./pages/registro";
 import RegistroParticipantePage from "./pages/RegistroParticipantePage";
 
+/**
+ * ─────────────────────────────────────────────────────────────────────────
+ *  CIERRE DE LA FERIA
+ *  Mientras esto sea `true`, TODAS las rutas quedan deshabilitadas y solo
+ *  se muestra el mensaje de cierre (incluido el admin).
+ *  Para reabrir la feria el próximo semestre: cambiar a `false`.
+ * ─────────────────────────────────────────────────────────────────────────
+ */
+const FERIA_CONCLUIDA = true;
+
+/** Pantalla de cierre que se muestra en cualquier ruta cuando la feria terminó */
+function FeriaConcluida() {
+  return (
+    <div className="min-h-screen bg-white bg-brutalist-noise flex items-center justify-center px-4 relative overflow-hidden">
+      {/* Glows de fondo */}
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[#db2777]/5 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-10 right-10 w-72 h-72 bg-[#db2777]/5 rounded-full blur-[130px] pointer-events-none" />
+
+      <div className="max-w-lg w-full text-center relative z-10">
+        <p className="text-[#db2777] font-bold text-xs tracking-[0.25em] uppercase mb-4">
+          Feria de Ciencias
+        </p>
+        <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight uppercase leading-tight mb-4">
+          La Feria de Ciencias ha concluido
+        </h1>
+        <div className="w-16 h-[3px] bg-[#db2777] mx-auto mb-5" />
+        <p className="text-slate-600 text-base sm:text-lg">
+          ¡Gracias por participar! Nos vemos el otro semestre. 👋
+        </p>
+      </div>
+    </div>
+  );
+}
+
 /** Ruta protegida: redirige a login si no hay sesión de alumno */
 function RutaAlumno({ children }) {
   const { alumno } = useAlumno();
@@ -74,6 +108,11 @@ function RutaVisitante() {
 function AppContent() {
   const location = useLocation();
   const isGestionProyecto = location.pathname === "/alumno/proyecto";
+
+  // Feria cerrada: cualquier ruta muestra únicamente el mensaje de cierre.
+  if (FERIA_CONCLUIDA) {
+    return <FeriaConcluida />;
+  }
 
   return (
     <div className={`text-slate-900 min-h-screen flex flex-col justify-between selection:bg-[#db2777] selection:text-white ${isGestionProyecto ? "bg-slate-50" : "bg-white bg-brutalist-noise"
