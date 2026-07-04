@@ -6,10 +6,12 @@ function AdminCoevaluaciones() {
   const [proyectos, setProyectos] = useState([]);
   const [coevaluaciones, setCoevaluaciones] = useState([]);
   const [usuarios, setUsuarios] = useState({});
+  const [participantes, setParticipantes] = useState([]);
 
   const [filtros, setFiltros] = useState({ categoria: "", proyecto: "" });
   const [cargando, setCargando] = useState(true);
   const [exportando, setExportando] = useState(false);
+  const [rehabilitandoId, setRehabilitandoId] = useState(null);
 
   useEffect(() => {
     fetchData();
@@ -20,10 +22,11 @@ function AdminCoevaluaciones() {
       const { data: cats } = await supabase.from("categorias").select("id, nombre");
       setCategorias(cats || []);
 
-      const { data: parts } = await supabase.from("participantes").select("id, nombre, rut");
+      const { data: parts } = await supabase.from("participantes").select("id, nombre, rut, proyecto_id");
       const partMap = {};
       parts?.forEach((p) => { partMap[p.id] = p; });
       setUsuarios(partMap);
+      setParticipantes(parts || []);
 
       const { data: coeval, error: coevalError } = await supabase
         .from("coevaluaciones")
@@ -41,15 +44,57 @@ function AdminCoevaluaciones() {
     }
   };
 
+  // Los ids de la BD llegan como número y el value del <select> es string,
+  // por eso comparamos siempre con String() para evitar falsos negativos.
   const proyectosFilterados = filtros.categoria
-    ? proyectos.filter((p) => p.categorias_id === filtros.categoria)
+    ? proyectos.filter((p) => String(p.categorias_id) === String(filtros.categoria))
     : proyectos;
 
   const coevaluacionesFilteradas = coevaluaciones.filter((c) => {
-    if (filtros.categoria && c.proyectos?.categorias_id !== filtros.categoria) return false;
-    if (filtros.proyecto && c.proyecto_id !== filtros.proyecto) return false;
+    if (filtros.categoria && String(c.proyectos?.categorias_id) !== String(filtros.categoria)) return false;
+    if (filtros.proyecto && String(c.proyecto_id) !== String(filtros.proyecto)) return false;
     return true;
   });
+
+  // ── Rehabilitar coevaluación de un participante (solo con proyecto elegido) ──
+  const participantesDelProyecto = filtros.proyecto
+    ? participantes.filter((p) => String(p.proyecto_id) === String(filtros.proyecto))
+    : [];
+
+  // Cuántos compañeros coevaluó cada participante en el proyecto seleccionado
+  const contarEvaluados = (evaluadorId) =>
+    coevaluaciones.filter(
+      (c) =>
+        String(c.proyecto_id) === String(filtros.proyecto) &&
+        String(c.evaluador_id) === String(evaluadorId)
+    ).length;
+
+  const rehabilitar = async (persona) => {
+    const totalCompaneros = participantesDelProyecto.length;
+    const ok = window.confirm(
+      `¿Rehabilitar la coevaluación de ${persona.nombre}?\n\n` +
+      `Se borrarán sus coevaluaciones de este proyecto y podrá volver a ` +
+      `evaluar a sus ${totalCompaneros} compañeros la próxima vez que ingrese.`
+    );
+    if (!ok) return;
+
+    setRehabilitandoId(persona.id);
+    try {
+      const { error } = await supabase
+        .from("coevaluaciones")
+        .delete()
+        .eq("proyecto_id", filtros.proyecto)
+        .eq("evaluador_id", persona.id);
+
+      if (error) throw error;
+      await fetchData();
+    } catch (err) {
+      console.error(err);
+      alert("Error al rehabilitar la coevaluación");
+    } finally {
+      setRehabilitandoId(null);
+    }
+  };
 
   const exportToCSV = () => {
     setExportando(true);
@@ -141,6 +186,54 @@ function AdminCoevaluaciones() {
           </div>
         </div>
       </div>
+
+      {/* Rehabilitar coevaluación por participante (requiere proyecto elegido) */}
+      {filtros.proyecto && (
+        <div className="bg-white rounded-xl shadow p-4 border border-gray-100">
+          <h2 className="text-sm font-bold text-gray-700 mb-1 uppercase tracking-wider">
+            Rehabilitar coevaluación
+          </h2>
+          <p className="text-gray-500 text-xs mb-3">
+            Borra las coevaluaciones de un participante en este proyecto para que pueda volver a evaluar a sus compañeros.
+          </p>
+
+          {participantesDelProyecto.length === 0 ? (
+            <p className="text-gray-500 text-sm py-2">Este proyecto no tiene participantes registrados.</p>
+          ) : (
+            <div className="space-y-2">
+              {participantesDelProyecto.map((persona) => {
+                const evaluados = contarEvaluados(persona.id);
+                const total = participantesDelProyecto.length;
+                const completo = evaluados >= total;
+                return (
+                  <div
+                    key={persona.id}
+                    className="flex items-center justify-between gap-3 border border-gray-100 rounded-lg px-3 py-2"
+                  >
+                    <div className="min-w-0">
+                      <p className="font-medium text-gray-800 text-sm truncate">{persona.nombre}</p>
+                      <p className="text-xs text-gray-500">
+                        Coevaluó {evaluados} de {total}
+                        {completo && evaluados > 0 && (
+                          <span className="ml-2 text-green-600 font-semibold">✓ Completo</span>
+                        )}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => rehabilitar(persona)}
+                      disabled={evaluados === 0 || rehabilitandoId === persona.id}
+                      className="shrink-0 px-3 py-1.5 text-xs font-bold rounded-lg border border-pink-300 text-pink-600 hover:bg-pink-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                      title={evaluados === 0 ? "Este participante aún no ha coevaluado" : "Borrar sus coevaluaciones y rehabilitar"}
+                    >
+                      {rehabilitandoId === persona.id ? "Rehabilitando..." : "Rehabilitar"}
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Botón Exportar + contador */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
