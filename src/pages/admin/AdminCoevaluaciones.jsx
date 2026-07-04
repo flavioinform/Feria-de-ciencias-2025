@@ -80,14 +80,28 @@ function AdminCoevaluaciones() {
 
     setRehabilitandoId(persona.id);
     try {
-      const { error } = await supabase
+      // .select() nos devuelve las filas borradas para poder verificar que
+      // realmente se eliminaron (si RLS bloquea el DELETE, no hay error pero
+      // se borran 0 filas).
+      const { data: borradas, error } = await supabase
         .from("coevaluaciones")
         .delete()
         .eq("proyecto_id", filtros.proyecto)
-        .eq("evaluador_id", persona.id);
+        .eq("evaluador_id", persona.id)
+        .select();
 
       if (error) throw error;
+
+      if (!borradas || borradas.length === 0) {
+        alert(
+          "No se borró ninguna coevaluación. Es probable que falte el permiso " +
+          "de borrado (RLS) en la tabla 'coevaluaciones' de Supabase."
+        );
+        return;
+      }
+
       await fetchData();
+      alert(`Coevaluación de ${persona.nombre} rehabilitada (${borradas.length} registros borrados).`);
     } catch (err) {
       console.error(err);
       alert("Error al rehabilitar la coevaluación");
