@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { QRCodeSVG } from "qrcode.react";
 import { supabase } from "../../lib/supabase";
+import { authFeria, mensajeError } from "../../lib/authFeria";
 
 // ---------- Helpers de RUT ----------
 
@@ -59,7 +61,9 @@ function RegistroLogin() {
 
   const [mensaje, setMensaje] = useState("");
   const [tipo, setTipo] = useState(""); // "ok" | "error"
-  const [pinGenerado, setPinGenerado] = useState("");
+  const [registrado, setRegistrado] = useState(null); // { rut, rutFmt, nombre, hasta }
+  const [segundos, setSegundos] = useState(0);
+  const [rutExistente, setRutExistente] = useState(""); // RUT ya registrado que se puede re-habilitar
   const [cargando, setCargando] = useState(false);
 
   // Estados para el buscador de estudiantes
@@ -67,6 +71,15 @@ function RegistroLogin() {
   const [resultadosBusqueda, setResultadosBusqueda] = useState([]);
   const [buscandoEstudiantes, setBuscandoEstudiantes] = useState(false);
   const [mostrarResultados, setMostrarResultados] = useState(false);
+
+  useEffect(() => {
+    if (!registrado) return;
+    const tick = () =>
+      setSegundos(Math.max(0, Math.round((registrado.hasta - Date.now()) / 1000)));
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [registrado]);
 
   // Formatea el RUT automáticamente: 12.345.678-9
   const formatearRut = (valor) => {
@@ -140,78 +153,49 @@ function RegistroLogin() {
     setMostrarResultados(false);
   };
 
-  // PIN de 4 dígitos
-  const generarPin = () =>
-    Math.floor(1000 + Math.random() * 9000).toString();
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMensaje("");
     setTipo("");
-    setPinGenerado("");
+    setRegistrado(null);
+    setRutExistente("");
     setCargando(true);
 
     try {
       const rutIngresado = form.rut.trim();
 
-      // 0) Validar RUT antes de cualquier cosa
+      // Validación rápida en el cliente (el servidor vuelve a validar)
       if (!validarRut(rutIngresado)) {
         setMensaje(
           "RUT inválido. Verifica el número, el dígito verificador y que sea un RUT real."
         );
         setTipo("error");
-        setCargando(false);
         return;
       }
 
-      // usamos el RUT normalizado para BD
-      const rutNormalizado = normalizarRut(rutIngresado);
-
-      // 1) revisar si el RUT ya existe
-      const { data: existente, error: errorBusqueda } = await supabase
-        .from("usuarios")
-        .select("id")
-        .eq("rut", rutNormalizado)
-        .maybeSingle();
-
-      if (errorBusqueda) {
-        console.error(errorBusqueda);
-        setMensaje("Error al buscar el RUT");
-        setTipo("error");
-        return;
-      }
-
-      if (existente) {
-        setMensaje("Este RUT ya está registrado.");
-        setTipo("error");
-        return;
-      }
-
-      // 2) generar PIN
-      const nuevoPin = generarPin();
-
-      // 3) insertar usuario visitante
-      const { error: errorInsert } = await supabase.from("usuarios").insert({
+      const r = await authFeria("registrar_visitante", {
         nombre: form.nombre,
-        rut: rutNormalizado, // se guarda normalizado
+        rut: rutIngresado,
         viene_por_alguien: form.vienePorAlguien,
         por_quien_vino: form.vienePorAlguien ? form.por_quien_vino : null,
-        pin_hash: nuevoPin,
-        role: "visitante",
       });
 
-      if (errorInsert) {
-        console.error(errorInsert);
-        setMensaje("Error al registrar al visitante");
+      if (!r.ok) {
+        setMensaje(mensajeError(r.error));
         setTipo("error");
+        if (r.error === "rut_existente") setRutExistente(rutIngresado);
         return;
       }
 
       setMensaje("Visitante registrado correctamente.");
       setTipo("ok");
-      setPinGenerado(nuevoPin);
+      setRegistrado({
+        rut: r.rut,
+        rutFmt: rutIngresado,
+        nombre: form.nombre,
+        hasta: Date.now() + 15 * 60 * 1000,
+      });
 
-      // limpiar formulario
       setForm({
         nombre: "",
         rut: "",
@@ -229,6 +213,37 @@ function RegistroLogin() {
     }
   };
 
+  // Visitante ya registrado que olvidó su contraseña o cuya ventana venció:
+  // vuelve a quedar pendiente 15 min para que defina una nueva.
+  const handleRehabilitar = async () => {
+    setCargando(true);
+    setMensaje("");
+    const { data: u } = await supabase
+      .from("usuarios")
+      .select("id, nombre, rut, role")
+      .eq("rut", normalizarRut(rutExistente))
+      .maybeSingle();
+
+    if (!u || u.role !== "visitante") {
+      setMensaje("Ese RUT no corresponde a un visitante.");
+      setTipo("error");
+      setCargando(false);
+      return;
+    }
+
+    const r = await authFeria("habilitar_visitante", { usuario_id: u.id });
+    setCargando(false);
+    if (!r.ok) {
+      setMensaje(mensajeError(r.error));
+      setTipo("error");
+      return;
+    }
+    setMensaje("Visitante habilitado de nuevo.");
+    setTipo("ok");
+    setRutExistente("");
+    setRegistrado({ rut: u.rut, rutFmt: rutExistente, nombre: u.nombre, hasta: Date.now() + 15 * 60 * 1000 });
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 flex items-center justify-center px-4 py-8 sm:py-12">
       <div className="max-w-lg w-full">
@@ -238,7 +253,7 @@ function RegistroLogin() {
               Registro de visitantes
             </h1>
             <p className="text-gray-500 text-sm sm:text-base">
-              Ingresa los datos del visitante para generar su PIN de acceso.
+              Ingresa los datos del visitante. Él mismo definirá su contraseña al entrar por primera vez.
             </p>
           </div>
 
@@ -346,15 +361,39 @@ function RegistroLogin() {
               </div>
             )}
 
-            {pinGenerado && (
-              <div className="p-4 rounded-lg border bg-yellow-50 border-yellow-200 text-yellow-800 text-center">
-                <p className="font-semibold">
-                  PIN generado para el visitante:
-                  <span className="ml-2 text-2xl font-bold">{pinGenerado}</span>
-                </p>
+            {rutExistente && (
+              <button
+                type="button"
+                onClick={handleRehabilitar}
+                disabled={cargando}
+                className="w-full border-2 border-emerald-600 text-emerald-700 font-semibold py-3 rounded-lg hover:bg-emerald-50 disabled:opacity-50"
+              >
+                Volver a habilitar este RUT (nueva contraseña)
+              </button>
+            )}
+
+            {registrado && (
+              <div className="p-4 rounded-lg border bg-yellow-50 border-yellow-200 text-yellow-900 text-center">
+                <p className="font-semibold">{registrado.nombre} ({registrado.rutFmt})</p>
                 <p className="text-sm mt-1">
-                  Entrégale este PIN a la persona para que pueda iniciar sesión.
+                  {segundos > 0
+                    ? "Pídele que escanee este código y defina su contraseña (6 números)."
+                    : "El tiempo venció. Si aún no definió su contraseña, vuelve a habilitarlo."}
                 </p>
+                {segundos > 0 && (
+                  <>
+                    <div className="inline-block bg-white p-3 rounded-xl border border-yellow-200 mt-3">
+                      <QRCodeSVG
+                        value={`${window.location.origin}/login?rut=${registrado.rut}`}
+                        size={200}
+                      />
+                    </div>
+                    <p className="text-2xl font-bold mt-2 tabular-nums">
+                      {String(Math.floor(segundos / 60)).padStart(2, "0")}:
+                      {String(segundos % 60).padStart(2, "0")}
+                    </p>
+                  </>
+                )}
               </div>
             )}
 

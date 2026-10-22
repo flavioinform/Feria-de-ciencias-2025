@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../../lib/supabase";
+import { authFeria, mensajeError } from "../../lib/authFeria";
 import { QRCodeSVG } from "qrcode.react";
 
 function AdminJurados() {
@@ -8,14 +9,21 @@ function AdminJurados() {
   const [form, setForm] = useState({ nombre: "" });
   const [mensaje, setMensaje] = useState("");
   const [tipo, setTipo] = useState("");
-  const [qrGrande, setQrGrande] = useState(null); // jurado seleccionado para ver el QR ampliado
+  const [creando, setCreando] = useState(false);
+  // Los códigos se guardan con hash en la base: solo se pueden mostrar justo
+  // después de crearlos o regenerarlos. { [usuario_id]: codigo }
+  const [codigos, setCodigos] = useState({});
+  const [qrGrande, setQrGrande] = useState(null); // jurado con QR ampliado
+
+  const baseUrl = window.location.origin;
+  const urlLogin = (jurado) => `${baseUrl}/login?rut=${jurado.rut}&code=${codigos[jurado.id]}`;
 
   const cargarJurados = async () => {
     setCargando(true);
     const { data, error } = await supabase
       .from("usuarios")
-      .select("*")
-      .like("rut", "JUR%") // Identificamos a los jurados por el prefijo JUR
+      .select("id, nombre, rut, created_at")
+      .eq("role", "jurado")
       .order("created_at", { ascending: false });
 
     if (!error && data) {
@@ -32,9 +40,6 @@ function AdminJurados() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const generarPin = () => Math.floor(1000 + Math.random() * 9000).toString();
-  const generarRutJurado = () => "JUR" + Math.floor(100000 + Math.random() * 900000).toString();
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMensaje("");
@@ -46,36 +51,55 @@ function AdminJurados() {
       return;
     }
 
-    const rutGenerado = generarRutJurado();
-    const nuevoPin = generarPin();
+    setCreando(true);
+    const r = await authFeria("crear_jurado", { nombre: form.nombre });
+    setCreando(false);
 
-    const { error: errorInsert } = await supabase.from("usuarios").insert({
-      nombre: form.nombre,
-      rut: rutGenerado,
-      pin_hash: nuevoPin,
-      role: "visitante", // Usamos visitante para respetar la restricción CHECK de la BD
-      viene_por_alguien: false,
-      por_quien_vino: null
-    });
-
-    if (errorInsert) {
-      console.error("Error de Supabase al registrar jurado:", errorInsert);
-      setMensaje("Error al registrar jurado: " + (errorInsert.message || "Error desconocido"));
+    if (!r.ok) {
+      setMensaje("Error al registrar jurado: " + mensajeError(r.error));
       setTipo("error");
-    } else {
-      setMensaje("Jurado registrado correctamente.");
-      setTipo("ok");
-      setForm({ nombre: "" });
-      cargarJurados();
+      return;
     }
+
+    setCodigos((prev) => ({ ...prev, [r.id]: r.codigo }));
+    setMensaje("Jurado registrado. Descarga o muestra su QR ahora: el código no se podrá volver a ver.");
+    setTipo("ok");
+    setForm({ nombre: "" });
+    cargarJurados();
   };
 
-  const baseUrl = window.location.origin;
+  const handleRegenerar = async (jurado) => {
+    if (!window.confirm(`Se generará un código nuevo para ${jurado.nombre} y el QR anterior dejará de funcionar. ¿Continuar?`)) return;
+    const r = await authFeria("regenerar_jurado", { usuario_id: jurado.id });
+    if (!r.ok) {
+      setMensaje("Error al regenerar el QR: " + mensajeError(r.error));
+      setTipo("error");
+      return;
+    }
+    setCodigos((prev) => ({ ...prev, [jurado.id]: r.codigo }));
+    setMensaje(`Nuevo QR generado para ${jurado.nombre}.`);
+    setTipo("ok");
+  };
+
+  const handleEliminar = async (jurado) => {
+    if (!window.confirm(`¿Eliminar a ${jurado.nombre}? También se borrarán las evaluaciones que hizo.`)) return;
+    const r = await authFeria("eliminar_usuario", { usuario_id: jurado.id });
+    if (!r.ok) {
+      setMensaje("Error al eliminar: " + mensajeError(r.error));
+      setTipo("error");
+      return;
+    }
+    setCodigos((prev) => {
+      const { [jurado.id]: _quitado, ...resto } = prev;
+      return resto;
+    });
+    cargarJurados();
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       <div className="flex flex-col md:flex-row justify-between items-start gap-8">
-        
+
         {/* Formulario de registro */}
         <div className="w-full md:w-1/3 bg-white rounded-2xl shadow p-6 border border-gray-100">
           <h2 className="text-xl font-bold text-gray-800 mb-2">Registrar Nuevo Jurado</h2>
@@ -93,18 +117,19 @@ function AdminJurados() {
                 required
               />
             </div>
-            
+
             {mensaje && (
               <div className={`p-3 rounded text-sm ${tipo === "error" ? "bg-red-50 text-red-700" : "bg-green-50 text-green-700"}`}>
                 {mensaje}
               </div>
             )}
-            
+
             <button
               type="submit"
-              className="w-full bg-black text-white font-semibold py-2 px-4 rounded-lg hover:bg-emerald-700 transition-colors"
+              disabled={creando}
+              className="w-full bg-black text-white font-semibold py-2 px-4 rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-50"
             >
-              Registrar Jurado
+              {creando ? "Registrando..." : "Registrar Jurado"}
             </button>
           </form>
         </div>
@@ -119,42 +144,56 @@ function AdminJurados() {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {jurados.map((jurado) => {
-                const loginUrl = `${baseUrl}/login?rut=${jurado.rut}&pin=${jurado.pin_hash}`;
+                const tieneCodigo = Boolean(codigos[jurado.id]);
                 return (
                   <div key={jurado.id} className="bg-white rounded-2xl shadow p-6 border border-gray-100 flex flex-col items-center text-center">
                     <h3 className="font-bold text-gray-800 text-lg">{jurado.nombre}</h3>
                     <p className="text-gray-500 text-sm mb-4">ID: {jurado.rut}</p>
-                    
-                    <button
-                      type="button"
-                      onClick={() => setQrGrande(jurado)}
-                      title="Clic para ampliar y escanear más rápido"
-                      className="bg-white p-2 rounded-xl shadow-sm border border-gray-100 cursor-pointer hover:border-emerald-400 hover:shadow-md transition-all"
-                    >
-                      <QRCodeSVG value={loginUrl} size={150} />
-                    </button>
 
-                    <p className="mt-3 text-xs text-gray-400 break-all w-full px-2 text-center">
-                      Escanea para iniciar sesión<br />
-                      PIN: <span className="font-bold text-gray-700">{jurado.pin_hash}</span>
-                    </p>
+                    {tieneCodigo ? (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => setQrGrande(jurado)}
+                          title="Clic para ampliar y escanear más rápido"
+                          className="bg-white p-2 rounded-xl shadow-sm border border-gray-100 cursor-pointer hover:border-emerald-400 hover:shadow-md transition-all"
+                        >
+                          <QRCodeSVG value={urlLogin(jurado)} size={150} />
+                        </button>
+                        <p className="mt-3 text-xs text-gray-400 w-full px-2 text-center">
+                          Escanea para iniciar sesión.<br />
+                          Este QR solo se ve ahora.
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() => setQrGrande(jurado)}
+                          className="mt-3 text-sm text-emerald-600 hover:text-emerald-700 font-medium"
+                        >
+                          Ampliar QR
+                        </button>
+                      </>
+                    ) : (
+                      <p className="text-xs text-gray-400 px-2 mb-2">
+                        El QR no se puede volver a mostrar. Si lo necesitas, genera uno nuevo.
+                      </p>
+                    )}
+
                     <div className="mt-3 flex items-center gap-3">
                       <button
                         type="button"
-                        onClick={() => setQrGrande(jurado)}
+                        onClick={() => handleRegenerar(jurado)}
                         className="text-sm text-emerald-600 hover:text-emerald-700 font-medium"
                       >
-                        Ampliar QR
+                        Generar QR nuevo
                       </button>
                       <span className="text-gray-300">|</span>
-                      <a
-                        href={loginUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-sm text-emerald-600 hover:text-emerald-700 font-medium"
+                      <button
+                        type="button"
+                        onClick={() => handleEliminar(jurado)}
+                        className="text-sm text-red-600 hover:text-red-700 font-medium"
                       >
-                        Probar Enlace
-                      </a>
+                        Eliminar
+                      </button>
                     </div>
                   </div>
                 );
@@ -166,7 +205,7 @@ function AdminJurados() {
       </div>
 
       {/* Modal QR ampliado para escaneo rápido */}
-      {qrGrande && (
+      {qrGrande && codigos[qrGrande.id] && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
           onClick={() => setQrGrande(null)}
@@ -189,7 +228,7 @@ function AdminJurados() {
 
             <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
               <QRCodeSVG
-                value={`${baseUrl}/login?rut=${qrGrande.rut}&pin=${qrGrande.pin_hash}`}
+                value={urlLogin(qrGrande)}
                 size={340}
                 className="w-[70vw] h-[70vw] max-w-[340px] max-h-[340px]"
               />
@@ -197,9 +236,6 @@ function AdminJurados() {
 
             <p className="mt-6 text-sm text-gray-500">
               Escanea para iniciar sesión
-            </p>
-            <p className="mt-1 text-lg text-gray-700">
-              PIN: <span className="font-bold">{qrGrande.pin_hash}</span>
             </p>
           </div>
         </div>

@@ -1,5 +1,6 @@
 // src/pages/admin/AdminResultadosJurado.jsx
 import { useEffect, useState } from "react";
+import { promedioRecortado } from "../../lib/estadisticas";
 import { supabase, fetchAllRows } from "../../lib/supabase";
 import BotonDescargarExcel from "../../components/boton";
 
@@ -84,6 +85,9 @@ function AdminResultadosJurado() {
         };
         actual.sumaNotas += row.nota_final || 0;
         actual.cantidad += 1;
+        if (!esJurado) {
+          actual.notas = [...(actual.notas || []), row.nota_final || 0];
+        }
         mapaDestino.set(id, actual);
 
         // Rankings de presentación oral/visual: solo desde el jurado
@@ -94,17 +98,19 @@ function AdminResultadosJurado() {
       });
 
       // Convierte un mapa acumulado en lista ordenada por promedio (desc)
-      const aLista = (mapa) =>
+      const aLista = (mapa, recortado = false) =>
         Array.from(mapa.values())
           .map((item) => ({
             ...item,
-            promedio: item.cantidad > 0 ? item.sumaNotas / item.cantidad : 0,
+            promedio: recortado
+              ? promedioRecortado(item.notas || [])
+              : item.cantidad > 0 ? item.sumaNotas / item.cantidad : 0,
           }))
           .sort((a, b) => b.promedio - a.promedio);
 
       setItems({
         jurado: aLista(mapaJurado),
-        publico: aLista(mapaPublico),
+        publico: aLista(mapaPublico, true),
         oral: aLista(mapaOral),
         visual: aLista(mapaVisual),
       });

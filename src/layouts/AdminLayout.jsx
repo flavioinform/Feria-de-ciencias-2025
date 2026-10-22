@@ -17,7 +17,7 @@ function AdminLayout() {
 
   // si no es admin ni ayudante, fuera del panel
   if (!user || (user.role !== "admin" && user.role !== "ayudante")) {
-    return <Navigate to="/registro" replace />;
+    return <Navigate to="/login" replace />;
   }
 
   return (

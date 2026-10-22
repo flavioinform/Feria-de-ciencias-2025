@@ -26,7 +26,7 @@ function Categorias() {
   // ORDEN FIJO usando nombres NORMALIZADOS
   const ordenCategorias = [
     normalizeName("Introducción a la física"),   // verde
-    normalizeName("Formulación de proyectos"),   // amarillo
+    normalizeName("Introducción a la formulación de proyectos"),   // teal
     normalizeName("Mecánica"),                   // naranjo
     normalizeName("Electromagnetismo"),          // rojo
     normalizeName("Física contemporánea"),       // azul
@@ -43,6 +43,16 @@ function Categorias() {
       grid: "bg-[linear-gradient(to_right,#fbbf24_1px,transparent_1px),linear-gradient(to_bottom,#fbbf24_1px,transparent_1px)]",
       bgHeader: "bg-amber-50",
       titleHover: "group-hover:text-amber-600",
+    },
+    [normalizeName("Introducción a la formulación de proyectos")]: {
+      accent: "text-teal-600",
+      bg: "bg-white",
+      border: "border-teal-400 group-hover:border-teal-600",
+      glow: "shadow-[6px_6px_0px_#2dd4bf] group-hover:shadow-[6px_6px_0px_#0d9488]",
+      badge: "bg-teal-600 text-white border-teal-700",
+      grid: "bg-[linear-gradient(to_right,#2dd4bf_1px,transparent_1px),linear-gradient(to_bottom,#2dd4bf_1px,transparent_1px)]",
+      bgHeader: "bg-teal-50",
+      titleHover: "group-hover:text-teal-700",
     },
     [normalizeName("Kinesiología")]: {
       accent: "text-red-600",

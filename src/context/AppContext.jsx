@@ -3,65 +3,70 @@ import { supabase } from "../lib/supabase";
 
 export const AppContext = createContext();
 
+// Quién es el usuario de la sesión, sin confiar en nada que el cliente pueda
+// escribir:
+//  - jurado / visitante: el rol viaja en app_metadata (lo fija solo el servidor).
+//  - admin / ayudante: cuenta de Google cuyo correo está en `staff_google`;
+//    el rol lo resuelve la base de datos (jwt_role) y es el mismo que usan
+//    las políticas RLS.
+async function resolverUsuario(session) {
+  const u = session?.user;
+  if (!u) return null;
+
+  const m = u.app_metadata ?? {};
+  if (m.role && m.usuario_id) {
+    return { id: m.usuario_id, nombre: m.nombre, rut: m.rut, role: m.role };
+  }
+
+  if (m.provider === "google") {
+    const { data: role } = await supabase.rpc("jwt_role");
+    if (role === "admin" || role === "ayudante") {
+      return {
+        id: u.id,
+        nombre: u.user_metadata?.full_name ?? u.user_metadata?.name ?? u.email,
+        rut: null,
+        email: u.email,
+        role,
+      };
+    }
+  }
+  // Alumnos (Google sin rol) los maneja AlumnoContext
+  return null;
+}
+
 export function AppProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const savedUser = localStorage.getItem("user");
-    if (!savedUser) {
-      setLoading(false);
-      return;
-    }
-
-    let parsed;
-    try {
-      parsed = JSON.parse(savedUser);
-    } catch {
-      localStorage.removeItem("user");
-      setLoading(false);
-      return;
-    }
-
-    // Verificar que el usuario y su rol realmente existen en la BD
-    // Esto evita que alguien manipule localStorage para cambiar su rol
-    supabase
-      .from("usuarios")
-      .select("id, nombre, rut, role")
-      .eq("id", parsed.id)
-      .eq("role", parsed.role)
-      .maybeSingle()
-      .then(({ data }) => {
-        if (data && data.role === "admin") {
-          // Acceso restringido: solo el administrador conserva la sesión.
-          // Visitantes/jurados y ayudantes quedan expulsados aunque tengan
-          // una sesión guardada.
-          setUser(data);
-        } else if (data) {
-          // Rol válido pero bloqueado (visitante, jurado o ayudante)
-          localStorage.removeItem("user");
-          setUser(null);
-        } else {
-          // El rol no coincide o el usuario no existe → sesión inválida
-          localStorage.removeItem("user");
-          setUser(null);
+    let activo = true;
+    const aplicar = (session) =>
+      resolverUsuario(session).then((u) => {
+        if (activo) {
+          setUser(u);
+          setLoading(false);
         }
-        setLoading(false);
       });
+
+    supabase.auth.getSession().then(({ data }) => aplicar(data.session));
+
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      // Se difiere para no llamar a supabase dentro del propio callback
+      setTimeout(() => aplicar(session), 0);
+    });
+    return () => {
+      activo = false;
+      listener?.subscription?.unsubscribe();
+    };
   }, []);
 
-  const login = (userData) => {
-    setUser(userData);
-    localStorage.setItem("user", JSON.stringify(userData));
-  };
-
-  const logout = () => {
+  const logout = async () => {
     setUser(null);
-    localStorage.removeItem("user");
+    await supabase.auth.signOut();
   };
 
   return (
-    <AppContext.Provider value={{ user, login, logout, loading }}>
+    <AppContext.Provider value={{ user, logout, loading }}>
       {children}
     </AppContext.Provider>
   );

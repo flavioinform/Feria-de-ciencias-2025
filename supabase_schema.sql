@@ -1,3 +1,6 @@
+-- OBSOLETO: este archivo es el esquema antiguo (políticas abiertas a todo el mundo).
+-- Usa supabase_nuevo_proyecto.sql, que incluye RLS real y el login por RUT seguro.
+
 -- =========================================================================
 -- SCRIPT DE CREACIÓN DE TABLAS Y SEMILLA DE DATOS PARA SUPABASE
 -- Feria de Ciencias 2025
@@ -204,3 +207,58 @@ ON CONFLICT (rut) DO NOTHING;
 -- Ejecuta esto una vez en el SQL Editor de Supabase.
 CREATE POLICY "Permitir borrar coevaluaciones" ON coevaluaciones
     FOR DELETE USING (true);
+
+
+-- =========================================================================
+-- FIX CRÍTICO: RLS deshabilitado en producción pese a tener políticas
+-- =========================================================================
+-- Supabase Advisor detectó que categorias, proyectos, criterios,
+-- evaluacion_detalle y rubricas tenían políticas creadas pero RLS
+-- DESACTIVADO a nivel de tabla (probablemente apagado manualmente desde
+-- el Table Editor). Con RLS off, Postgres ignora las políticas por
+-- completo: como el frontend usa la anon key (pública), cualquiera podía
+-- leer/escribir/borrar esas tablas directo por la API REST sin pasar por
+-- ninguna regla. Este script ya las crea con RLS habilitado (ver arriba),
+-- pero si vuelven a aparecer como "RLS Disabled in Public" en el Advisor,
+-- ejecuta esto una vez en el SQL Editor de Supabase:
+ALTER TABLE public.categorias ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.proyectos ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.criterios ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.evaluacion_detalle ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.rubricas ENABLE ROW LEVEL SECURITY;
+
+
+-- =========================================================================
+-- LOGIN DE ALUMNOS CON GOOGLE (@alumnos.uta.cl)
+-- =========================================================================
+-- La tabla 'participantes' no vive en este script (se crea aparte, ver el
+-- comentario en src/components/RegistroParticipante.jsx), así que estos
+-- ALTER se ejecutan sobre la tabla ya existente. Permiten vincular una fila
+-- de participante con una identidad real de Supabase Auth (login con Google
+-- restringido al dominio institucional), sin tocar el login viejo de
+-- RUT + contraseña que sigue funcionando en paralelo.
+--
+-- Antes de correr esto, configurar (fuera del repo, una sola vez):
+--   1. Google Cloud Console: credencial OAuth 2.0 (Web application) con
+--      Authorized redirect URI = https://<PROJECT_REF>.supabase.co/auth/v1/callback
+--   2. Supabase Dashboard > Authentication > Providers > Google: pegar
+--      Client ID / Secret y habilitar el proveedor.
+--   3. Supabase Dashboard > Authentication > URL Configuration: agregar
+--      http://localhost:5173/alumno/login y la URL de producción
+--      equivalente a la lista de "Redirect URLs".
+--
+-- Ejecuta esto una vez en el SQL Editor de Supabase:
+ALTER TABLE public.participantes
+    ADD COLUMN IF NOT EXISTS auth_user_id uuid REFERENCES auth.users(id),
+    ADD COLUMN IF NOT EXISTS email text;
+
+CREATE UNIQUE INDEX IF NOT EXISTS participantes_auth_user_id_key
+    ON public.participantes(auth_user_id) WHERE auth_user_id IS NOT NULL;
+
+-- SELECT e INSERT quedan igual de abiertos (los usan los paneles de admin
+-- y el registro manual, ambos sin sesión de Supabase Auth). Solo se
+-- restringe UPDATE: un alumno logueado con Google solo puede editar su
+-- propia fila, no la de otro participante.
+CREATE POLICY "Alumno actualiza su propio perfil" ON public.participantes
+    FOR UPDATE USING (auth_user_id IS NULL OR auth.uid() = auth_user_id)
+    WITH CHECK (auth.uid() = auth_user_id);
