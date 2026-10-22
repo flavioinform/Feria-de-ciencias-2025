@@ -1,40 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../../lib/supabase";
 import { useAlumno } from "../../context/AlumnoContext";
-
-// ── Utilidades RUT ────────────────────────────────────────────────────────────
-function calcularDV(rutNumero) {
-  const digits = String(rutNumero).replace(/\D/g, "");
-  if (digits.length < 7) return "";
-  let suma = 0,
-    factor = 2;
-  for (let i = digits.length - 1; i >= 0; i--) {
-    suma += Number(digits[i]) * factor;
-    factor = factor === 7 ? 2 : factor + 1;
-  }
-  const r = 11 - (suma % 11);
-  if (r === 11) return "0";
-  if (r === 10) return "K";
-  return String(r);
-}
-
-function formatearRutInput(raw) {
-  const limpio = raw.replace(/[^0-9kK]/g, "");
-  if (!limpio) return "";
-  if (limpio.length === 1) return limpio;
-  const dv = limpio.slice(-1).toUpperCase();
-  const numero = limpio.slice(0, -1);
-  const conPuntos = numero.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-  return `${conPuntos}-${dv}`;
-}
-
-function obtenerClave(rutFormateado) {
-  const partes = rutFormateado.split("-");
-  if (partes.length < 2) return "";
-  const numero = partes[0].replace(/\./g, "");
-  return numero.slice(-4);
-}
+import CompletarPerfilAlumno from "./CompletarPerfilAlumno";
 
 // ── Helpers UI ────────────────────────────────────────────────────────────────
 const Spinner = () => (
@@ -44,82 +12,31 @@ const Spinner = () => (
   </svg>
 );
 
-const FieldError = ({ msg }) =>
-  msg ? <p className="mt-1.5 text-rose-500 text-xs font-semibold tracking-wide">⚠ {msg}</p> : null;
-
-function inputCls(error) {
-  const base =
-    "w-full px-4 py-3.5 rounded-xl border-2 outline-none transition-all duration-300 bg-white text-slate-900 placeholder-slate-400 text-sm focus:ring-2 focus:ring-offset-0 font-tech";
-  return error
-    ? `${base} border-rose-500/50 focus:border-rose-500 focus:ring-rose-500/20`
-    : `${base} border-[#db2777]/15 focus:border-[#db2777] focus:ring-[#db2777]/10`;
-}
-
 // ── Componente ────────────────────────────────────────────────────────────────
 export default function AlumnoLogin() {
-  const [rutDisplay, setRutDisplay] = useState("");
-  const [password, setPassword] = useState("");
-  const [errorRut, setErrorRut] = useState("");
-  const [errorPass, setErrorPass] = useState("");
-  const [cargando, setCargando] = useState(false);
-
-  const { loginAlumno } = useAlumno();
+  const { alumno, googlePendiente, errorGoogle } = useAlumno();
   const navigate = useNavigate();
+  const [cargandoGoogle, setCargandoGoogle] = useState(false);
 
-  const handleRutChange = (e) => {
-    setRutDisplay(formatearRutInput(e.target.value));
-    setErrorRut("");
+  // Al volver de Google con un alumno ya inscrito, ir directo a su proyecto
+  useEffect(() => {
+    if (alumno) navigate("/alumno/proyecto", { replace: true });
+  }, [alumno, navigate]);
+
+  const handleGoogleLogin = async () => {
+    setCargandoGoogle(true);
+    await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/alumno/login`,
+        queryParams: { hd: "alumnos.uta.cl", prompt: "select_account" },
+      },
+    });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setErrorRut("");
-    setErrorPass("");
-
-    const partes = rutDisplay.split("-");
-    if (partes.length !== 2 || !partes[0] || !partes[1]) {
-      setErrorRut("Ingresa un RUT válido (ej: 12.345.678-9)");
-      return;
-    }
-    const numero = partes[0].replace(/\./g, "");
-    const dvIngresado = partes[1].toUpperCase();
-    const dvCalculado = calcularDV(numero);
-
-    if (dvIngresado !== dvCalculado) {
-      setErrorRut(`RUT inválido. El dígito verificador debería ser ${dvCalculado}`);
-      return;
-    }
-    if (!password) {
-      setErrorPass("Ingresa tu contraseña");
-      return;
-    }
-
-    setCargando(true);
-
-    const { data, error } = await supabase
-      .from("participantes")
-      .select(
-        "*, proyectos(id, titulo, descripcion, image, categorias_id, categorias(nombre))"
-      )
-      .eq("rut", rutDisplay)
-      .single();
-
-    setCargando(false);
-
-    if (error || !data) {
-      setErrorRut("RUT no registrado en la feria");
-      return;
-    }
-
-    const claveEsperada = obtenerClave(rutDisplay);
-    if (password !== claveEsperada) {
-      setErrorPass("Contraseña incorrecta");
-      return;
-    }
-
-    loginAlumno(data);
-    navigate("/alumno/proyecto");
-  };
+  if (googlePendiente) {
+    return <CompletarPerfilAlumno />;
+  }
 
   return (
     <div className="min-h-[85vh] flex items-center justify-center px-4 py-16 relative overflow-hidden bg-white bg-brutalist-noise border-b border-[#db2777]/10">
@@ -130,7 +47,6 @@ export default function AlumnoLogin() {
       <div className="max-w-md w-full relative z-10">
         {/* Header */}
         <div className="text-center mb-8">
-
           <h1 className="text-4xl font-display font-black text-slate-900 tracking-tight uppercase">
             Portal del Alumno
           </h1>
@@ -139,68 +55,35 @@ export default function AlumnoLogin() {
 
         {/* Card */}
         <div className="bg-white/90 backdrop-blur-xl rounded-3xl p-8 border-2 border-[#db2777]/15 shadow-sm shadow-[#db2777]/10 relative overflow-hidden">
-          
+
           {/* Subtle top stripe */}
           <div className="absolute top-0 left-0 w-full h-[3px] bg-[#db2777]"></div>
 
-          <form onSubmit={handleSubmit} noValidate className="space-y-6">
-            {/* RUT */}
-            <div>
-              <label htmlFor="rut-alumno" className="block text-xs font-bold text-slate-700 font-tech uppercase tracking-wider mb-2">
-                RUT del Alumno <span className="text-[#db2777]" aria-hidden>*</span>
-              </label>
-              <input
-                id="rut-alumno"
-                type="text"
-                inputMode="text"
-                placeholder="Ej: 12.345.678-9"
-                maxLength={12}
-                value={rutDisplay}
-                onChange={handleRutChange}
-                className={inputCls(errorRut)}
-                autoComplete="off"
-              />
-              <FieldError msg={errorRut} />
+          {errorGoogle && (
+            <div className="mb-6 p-4 bg-rose-50 border-2 border-rose-500/30 rounded-2xl text-rose-600 text-xs font-tech">
+              ⚠ {errorGoogle}
             </div>
+          )}
 
-            {/* Contraseña */}
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <label htmlFor="pass-alumno" className="block text-xs font-bold text-slate-700 font-tech uppercase tracking-wider">
-                  Contraseña <span className="text-[#db2777]" aria-hidden>*</span>
-                </label>
-                <span className="text-slate-500 text-[10px] font-tech">Últimos 4 dígitos del RUT (sin DV)</span>
-              </div>
-              <input
-                id="pass-alumno"
-                type="password"
-                inputMode="numeric"
-                placeholder="••••"
-                maxLength={4}
-                value={password}
-                onChange={(e) => { setPassword(e.target.value.replace(/\D/g, "")); setErrorPass(""); }}
-                className={inputCls(errorPass)}
-                autoComplete="current-password"
-              />
-              <FieldError msg={errorPass} />
-            </div>
+          <button
+            type="button"
+            onClick={handleGoogleLogin}
+            disabled={cargandoGoogle}
+            className="w-full py-4 flex items-center justify-center gap-3 bg-white border-2 border-slate-200 text-slate-700 hover:border-[#db2777]/40 font-tech text-xs font-bold uppercase tracking-widest rounded-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+          >
+            {cargandoGoogle ? (
+              <Spinner />
+            ) : (
+              <svg className="w-5 h-5" viewBox="0 0 24 24">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+              </svg>
+            )}
+            <span>Ingresar con cuenta @alumnos.uta.cl</span>
+          </button>
 
-            {/* Botón */}
-            <button
-              type="submit"
-              disabled={cargando}
-              className="w-full py-4 bg-transparent border-2 border-[#db2777] text-slate-900 hover:bg-[#db2777] hover:text-white font-tech text-xs font-black uppercase tracking-widest rounded-xl transition-all duration-300 shadow-[4px_4px_0px_#db2777] hover:shadow-[0px_0px_0px_transparent] active:translate-x-1 active:translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-4 cursor-pointer"
-            >
-              {cargando ? (
-                <>
-                  <Spinner />
-                  <span>Verificando...</span>
-                </>
-              ) : (
-                "Ingresar al Portal"
-              )}
-            </button>
-          </form>
         </div>
       </div>
     </div>

@@ -33,11 +33,11 @@ function AdminCategorias() {
       textClass: "text-yellow-400",
       borderClass: "border-yellow-400",
     },
-    [normalizeName("Formulación de proyectos")]: { // Alias in case DB has this name
-      colorName: "Amarillo",
-      bgClass: "bg-yellow-400",
-      textClass: "text-yellow-400",
-      borderClass: "border-yellow-400",
+    [normalizeName("Introducción a la formulación de proyectos")]: {
+      colorName: "Turquesa",
+      bgClass: "bg-teal-500",
+      textClass: "text-teal-500",
+      borderClass: "border-teal-500",
     },
     [normalizeName("Mecánica Clásica")]: {
       colorName: "Verde",

@@ -24,17 +24,22 @@ import Categorias from "./pages/categorias";
 import Home from "./pages/home";
 import Login from "./pages/login";
 // import Registro from "./pages/registro";
-import RegistroParticipantePage from "./pages/RegistroParticipantePage";
 
 /**
  * ─────────────────────────────────────────────────────────────────────────
  *  CIERRE DE LA FERIA
- *  Mientras esto sea `true`, TODAS las rutas quedan deshabilitadas y solo
- *  se muestra el mensaje de cierre (incluido el admin).
- *  Para reabrir la feria el próximo semestre: cambiar a `false`.
+ *  Mientras esto sea `true`, el público (visitantes, alumnos, jurados y
+ *  ayudantes) solo ve el mensaje de cierre. El ADMIN sigue con acceso por
+ *  /login y /admin para revisar resultados y exportar los Excel.
+ *  Para reabrir la feria por completo el próximo semestre: cambiar a `false`.
  * ─────────────────────────────────────────────────────────────────────────
  */
-const FERIA_CONCLUIDA = true;
+const FERIA_CONCLUIDA = false;
+
+/** Rutas que siguen disponibles para el admin aunque la feria esté cerrada */
+function esRutaAdmin(pathname) {
+  return pathname === "/login" || pathname.startsWith("/admin");
+}
 
 /** Pantalla de cierre que se muestra en cualquier ruta cuando la feria terminó */
 function FeriaConcluida() {
@@ -66,12 +71,12 @@ function RutaAlumno({ children }) {
   return alumno ? children : <Navigate to="/alumno/login" replace />;
 }
 
-/** Ruta protegida: solo admin (ayudantes bloqueados temporalmente) */
+/** Ruta protegida: admin o ayudante (el rol viene del token, lo fija el servidor) */
 function RutaAdminAyudante({ children }) {
   const { user, loading } = useContext(AppContext);
 
   if (loading) return <div className="min-h-screen flex items-center justify-center">Cargando...</div>;
-  if (!user || user.role !== "admin") {
+  if (!user || (user.role !== "admin" && user.role !== "ayudante")) {
     return <Navigate to="/login" replace />;
   }
 
@@ -84,7 +89,7 @@ function RutaAdmin({ children }) {
 
   if (loading) return <div className="min-h-screen flex items-center justify-center">Cargando...</div>;
   if (!user || user.role !== "admin") {
-    return <Navigate to="/admin/registroLogin" replace />;
+    return <Navigate to={user ? "/admin/registroLogin" : "/login"} replace />;
   }
 
   return children;
@@ -95,22 +100,24 @@ function RutaPublica({ children }) {
   return children;
 }
 
-/** Rutas de visitante/jurado: bloqueadas temporalmente (solo admin) */
-function RutaVisitante() {
+/** Rutas de visitante/jurado: requieren sesión de visitante o jurado */
+function RutaVisitante({ children }) {
   const { user, loading } = useContext(AppContext);
 
   if (loading) return <div className="min-h-screen flex items-center justify-center">Cargando...</div>;
-  // Acceso restringido: visitantes y jurados están bloqueados.
-  if (user && user.role === "admin") return <Navigate to="/admin/categorias-proyectos" replace />;
-  return <Navigate to="/login" replace />;
+  if (!user) return <Navigate to="/login" replace />;
+  if (user.role === "admin") return <Navigate to="/admin/categorias-proyectos" replace />;
+  if (user.role === "ayudante") return <Navigate to="/admin/registroLogin" replace />;
+  return children;
 }
 
 function AppContent() {
   const location = useLocation();
   const isGestionProyecto = location.pathname === "/alumno/proyecto";
 
-  // Feria cerrada: cualquier ruta muestra únicamente el mensaje de cierre.
-  if (FERIA_CONCLUIDA) {
+  // Feria cerrada: todo muestra el mensaje de cierre, EXCEPTO las rutas de
+  // admin (/login y /admin), que siguen habilitadas para el administrador.
+  if (FERIA_CONCLUIDA && !esRutaAdmin(location.pathname)) {
     return <FeriaConcluida />;
   }
 
@@ -123,8 +130,6 @@ function AppContent() {
         <Routes>
           <Route path="/" element={<RutaPublica><Home /></RutaPublica>} />
           <Route path="/login" element={<RutaPublica><Login /></RutaPublica>} />
-          {/* <Route path="/registro" element={<Registro />} /> */}
-          <Route path="/registro-participante" element={<RutaPublica><RegistroParticipantePage /></RutaPublica>} />
 
           {/* ── Rutas de visitante/jurado (protegidas) ── */}
           <Route

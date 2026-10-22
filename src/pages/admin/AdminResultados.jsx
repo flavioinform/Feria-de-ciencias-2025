@@ -1,11 +1,26 @@
 // src/pages/admin/AdminResultadosJurado.jsx
 import { useEffect, useState } from "react";
+import { promedioRecortado } from "../../lib/estadisticas";
 import { fetchAllRows } from "../../lib/supabase";
+import { exportarPublicoPorCategoria } from "../../lib/exportExcel";
 
 function AdminResultados() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [mensaje, setMensaje] = useState("");
+  const [exportando, setExportando] = useState(false);
+
+  const handleExportPublico = async () => {
+    setExportando(true);
+    try {
+      await exportarPublicoPorCategoria();
+    } catch (err) {
+      console.error(err);
+      setMensaje("Error al generar el Excel del público.");
+    } finally {
+      setExportando(false);
+    }
+  };
 
   useEffect(() => {
     async function fetchDatos() {
@@ -46,6 +61,9 @@ function AdminResultados() {
         };
         actual.sumaNotas += row.nota_final || 0;
         actual.cantidad += 1;
+        if (!esJurado) {
+          actual.notas = [...(actual.notas || []), row.nota_final || 0];
+        }
         mapaDestino.set(id, actual);
       });
 
@@ -61,7 +79,7 @@ function AdminResultados() {
       const listaPublico = Array.from(mapaPublico.values())
         .map((item) => ({
           ...item,
-          promedio: item.cantidad > 0 ? item.sumaNotas / item.cantidad : 0,
+          promedio: promedioRecortado(item.notas || []),
         }))
         .sort((a, b) => b.promedio - a.promedio);
 
@@ -118,7 +136,16 @@ function AdminResultados() {
 
           {/* TABLA PÚBLICO */}
           <section>
-            <h2 className="text-xl font-bold mb-4 text-emerald-600">Votación del Público General (Escala 1-4)</h2>
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+              <h2 className="text-xl font-bold text-emerald-600">Votación del Público General (Escala 1-4)</h2>
+              <button
+                onClick={handleExportPublico}
+                disabled={exportando || !items.publico || items.publico.length === 0}
+                className="px-4 py-2 rounded-lg text-sm font-semibold bg-green-600 text-white hover:bg-green-700 disabled:opacity-40 disabled:cursor-not-allowed shadow-sm"
+              >
+                {exportando ? "Generando..." : "Exportar público por categoría (Excel)"}
+              </button>
+            </div>
             {(!items.publico || items.publico.length === 0) ? (
               <p className="text-slate-500">No hay evaluaciones del público registradas aún.</p>
             ) : (

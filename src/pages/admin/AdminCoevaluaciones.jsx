@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase, fetchAllRows } from "../../lib/supabase";
+import { exportarCoevaluacionPorMiembro } from "../../lib/exportExcel";
 
 function AdminCoevaluaciones() {
   const [categorias, setCategorias] = useState([]);
@@ -11,7 +12,20 @@ function AdminCoevaluaciones() {
   const [filtros, setFiltros] = useState({ categoria: "", proyecto: "" });
   const [cargando, setCargando] = useState(true);
   const [exportando, setExportando] = useState(false);
+  const [exportandoNota, setExportandoNota] = useState(false);
   const [rehabilitandoId, setRehabilitandoId] = useState(null);
+
+  const handleExportNotaMiembro = async () => {
+    setExportandoNota(true);
+    try {
+      await exportarCoevaluacionPorMiembro();
+    } catch (err) {
+      console.error(err);
+      alert("Error al generar el Excel de promedios por miembro.");
+    } finally {
+      setExportandoNota(false);
+    }
+  };
 
   useEffect(() => {
     fetchData();
@@ -251,16 +265,29 @@ function AdminCoevaluaciones() {
         <p className="text-sm text-gray-500">
           <span className="font-bold text-gray-800">{coevaluacionesFilteradas.length}</span> evaluaciones encontradas
         </p>
-        <button
-          onClick={exportToCSV}
-          disabled={coevaluacionesFilteradas.length === 0 || exportando}
-          className="flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold rounded-lg hover:from-green-600 hover:to-emerald-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-          </svg>
-          {exportando ? "Exportando..." : "Exportar CSV"}
-        </button>
+        <div className="flex flex-col sm:flex-row gap-2">
+          <button
+            onClick={handleExportNotaMiembro}
+            disabled={exportandoNota}
+            className="flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[#db2777] to-rose-500 text-white font-bold rounded-lg hover:from-rose-600 hover:to-rose-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+            title="Promedio de coevaluación por cada miembro, una hoja por categoría"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            {exportandoNota ? "Generando..." : "Nota por miembro (Excel)"}
+          </button>
+          <button
+            onClick={exportToCSV}
+            disabled={coevaluacionesFilteradas.length === 0 || exportando}
+            className="flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold rounded-lg hover:from-green-600 hover:to-emerald-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            {exportando ? "Exportando..." : "Exportar CSV"}
+          </button>
+        </div>
       </div>
 
       {/* ── MOBILE: tarjetas ── */}
