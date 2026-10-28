@@ -103,7 +103,7 @@ function AdminResultados() {
         <div className="space-y-12">
           {/* TABLA JURADO */}
           <section>
-            <h2 className="text-xl font-bold mb-4 text-[#db2777]">Evaluaciones Oficiales del Jurado (Escala 1-7)</h2>
+            <h2 className="text-xl font-bold mb-4 text-[#0b6e99]">Evaluaciones Oficiales del Jurado (Escala 1-7)</h2>
             {(!items.jurado || items.jurado.length === 0) ? (
               <p className="text-slate-500">No hay evaluaciones del jurado registradas aún.</p>
             ) : (
@@ -123,7 +123,7 @@ function AdminResultados() {
                         <td className="px-4 py-2">{idx + 1}</td>
                         <td className="px-4 py-2 font-semibold text-slate-800">{row.titulo}</td>
                         <td className="px-4 py-2 text-right">{row.cantidad}</td>
-                        <td className="px-4 py-2 text-right font-bold text-[#db2777]">
+                        <td className="px-4 py-2 text-right font-bold text-[#0b6e99]">
                           {row.promedio.toFixed(2)}
                         </td>
                       </tr>

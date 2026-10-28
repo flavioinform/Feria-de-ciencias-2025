@@ -50,7 +50,7 @@ function AdminNavbar() {
 
   return (
     <>
-      <header className="bg-gradient-to-r from-pink-500 via-rose-400 to-pink-500 text-white shadow-lg sticky top-0 z-50">
+      <header className="bg-[#0b6e99] text-white sticky top-0 z-50">
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo / Brand */}
@@ -69,7 +69,6 @@ function AdminNavbar() {
               <NavLink to="/admin/registroLogin">Visitantes</NavLink>
               {user?.role === "admin" && (
                 <>
-                  <NavLink to="/admin/ayudantes">Ayudantes</NavLink>
                   <NavLink to="/admin/resultados">Resultados</NavLink>
                   <NavLink to="/admin/coevaluaciones">Coevaluaciones</NavLink>
                   <NavLink to="/admin/por-quien-vino">Búsquedas</NavLink>
@@ -126,7 +125,6 @@ function AdminNavbar() {
               <Link to="/admin/registroLogin" onClick={() => setMenuAbierto(false)} className="block px-3 py-2.5 rounded-lg text-base font-semibold text-white hover:bg-white/20">Registrar visitantes</Link>
               {user?.role === "admin" && (
                 <>
-                  <Link to="/admin/ayudantes" onClick={() => setMenuAbierto(false)} className="block px-3 py-2.5 rounded-lg text-base font-semibold text-white hover:bg-white/20">Gestionar ayudantes</Link>
                   <Link to="/admin/resultados" onClick={() => setMenuAbierto(false)} className="block px-3 py-2.5 rounded-lg text-base font-semibold text-white hover:bg-white/20">Resultados / votos</Link>
                   <Link to="/admin/coevaluaciones" onClick={() => setMenuAbierto(false)} className="block px-3 py-2.5 rounded-lg text-base font-semibold text-white hover:bg-white/20">Coevaluaciones</Link>
                   <Link to="/admin/por-quien-vino" onClick={() => setMenuAbierto(false)} className="block px-3 py-2.5 rounded-lg text-base font-semibold text-white hover:bg-white/20">¿Por quién vinieron?</Link>

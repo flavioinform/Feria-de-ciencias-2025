@@ -12,7 +12,7 @@ function HeroIllustration() {
 
       {/* Blob orgánico central */}
       <div
-        className="absolute inset-[8%] bg-gradient-to-br from-[#7C3AED] to-[#4C1D95] shadow-2xl shadow-[#4C1D95]/30 animate-[spin_22s_linear_infinite]"
+        className="absolute inset-[8%] bg-[#0b6e99] animate-[spin_22s_linear_infinite]"
         style={{ borderRadius: "48% 52% 62% 38% / 56% 44% 56% 44%" }}
       />
       <div
@@ -39,10 +39,10 @@ function HeroIllustration() {
 
         {/* Cuerpo */}
         <rect x="68" y="60" width="64" height="120" rx="32" fill="#FFFBEA" />
-        <path d="M100 8 L134 72 H66 Z" fill="#4C1D95" />
+        <path d="M100 8 L134 72 H66 Z" fill="#0b2a3c" />
 
         {/* Ventana */}
-        <circle cx="100" cy="108" r="19" fill="#4C1D95" />
+        <circle cx="100" cy="108" r="19" fill="#0b2a3c" />
         <circle cx="100" cy="108" r="12" fill="#22D3EE" />
       </svg>
 
@@ -50,9 +50,9 @@ function HeroIllustration() {
       <div className="absolute -top-2 -left-2 sm:top-0 sm:left-0 w-16 h-16 animate-float" style={{ animationDelay: "0.2s" }}>
         <svg viewBox="0 0 100 100" fill="none" className="w-full h-full">
           <circle cx="50" cy="50" r="7" fill="#FB923C" />
-          <ellipse cx="50" cy="50" rx="38" ry="14" stroke="#4C1D95" strokeWidth="4" />
-          <ellipse cx="50" cy="50" rx="38" ry="14" stroke="#4C1D95" strokeWidth="4" transform="rotate(60 50 50)" />
-          <ellipse cx="50" cy="50" rx="38" ry="14" stroke="#4C1D95" strokeWidth="4" transform="rotate(120 50 50)" />
+          <ellipse cx="50" cy="50" rx="38" ry="14" stroke="#0b2a3c" strokeWidth="4" />
+          <ellipse cx="50" cy="50" rx="38" ry="14" stroke="#0b2a3c" strokeWidth="4" transform="rotate(60 50 50)" />
+          <ellipse cx="50" cy="50" rx="38" ry="14" stroke="#0b2a3c" strokeWidth="4" transform="rotate(120 50 50)" />
         </svg>
       </div>
 
@@ -69,9 +69,9 @@ function HeroIllustration() {
       {/* Matraz burbujeante */}
       <div className="absolute bottom-4 -left-3 sm:-left-4 w-14 h-14 animate-float-slow" style={{ animationDelay: "0.4s" }}>
         <svg viewBox="0 0 100 100" className="w-full h-full">
-          <rect x="42" y="10" width="16" height="26" fill="#4C1D95" />
+          <rect x="42" y="10" width="16" height="26" fill="#0b2a3c" />
           <path d="M40 34 L20 82 Q18 90 28 90 H72 Q82 90 80 82 L60 34 Z" fill="#22D3EE" />
-          <path d="M32 66 Q50 56 68 66 L60 34 H40 Z" fill="#7C3AED" />
+          <path d="M32 66 Q50 56 68 66 L60 34 H40 Z" fill="#0b6e99" />
           <circle cx="45" cy="76" r="4" fill="#FFFBEA" />
           <circle cx="58" cy="70" r="3" fill="#FFFBEA" />
         </svg>
@@ -80,10 +80,10 @@ function HeroIllustration() {
       {/* Molécula */}
       <div className="absolute -bottom-2 right-2 sm:right-0 w-14 h-14 animate-float" style={{ animationDelay: "0.9s" }}>
         <svg viewBox="0 0 100 100" className="w-full h-full">
-          <line x1="25" y1="70" x2="55" y2="30" stroke="#4C1D95" strokeWidth="4" />
-          <line x1="55" y1="30" x2="85" y2="55" stroke="#4C1D95" strokeWidth="4" />
+          <line x1="25" y1="70" x2="55" y2="30" stroke="#0b2a3c" strokeWidth="4" />
+          <line x1="55" y1="30" x2="85" y2="55" stroke="#0b2a3c" strokeWidth="4" />
           <circle cx="25" cy="70" r="12" fill="#FB923C" />
-          <circle cx="55" cy="30" r="9" fill="#4C1D95" />
+          <circle cx="55" cy="30" r="9" fill="#0b2a3c" />
           <circle cx="85" cy="55" r="10" fill="#22D3EE" />
         </svg>
       </div>

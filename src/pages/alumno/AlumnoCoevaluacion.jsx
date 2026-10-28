@@ -198,7 +198,7 @@ function AlumnoCoevaluacion() {
   if (cargando) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#db2777]"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0b6e99]"></div>
       </div>
     );
   }
@@ -250,8 +250,8 @@ function AlumnoCoevaluacion() {
         ) : (
           <>
             {soloNuevos && (
-              <div className="mb-5 p-4 rounded-lg border-2 border-[#db2777]/30 bg-[#db2777]/5 text-sm text-slate-700 flex items-start gap-3">
-                <svg className="w-5 h-5 text-[#db2777] shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="mb-5 p-4 rounded-lg border-2 border-[#0b6e99]/30 bg-[#0b6e99]/5 text-sm text-slate-700 flex items-start gap-3">
+                <svg className="w-5 h-5 text-[#0b6e99] shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <p>
@@ -290,12 +290,12 @@ function AlumnoCoevaluacion() {
                         <div>
                           <p className="font-bold text-slate-900 text-sm">{comp.nombre}</p>
                           {comp.id === alumno.id && (
-                            <span className="text-[10px] bg-[#db2777]/10 text-[#db2777] px-2 py-0.5 rounded font-bold">TÚ</span>
+                            <span className="text-[10px] bg-[#0b6e99]/10 text-[#0b6e99] px-2 py-0.5 rounded font-bold">TÚ</span>
                           )}
                         </div>
                         <div className="text-right">
                           <p className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">Promedio</p>
-                          <p className="text-xl font-black text-[#db2777]">{promedio}</p>
+                          <p className="text-xl font-black text-[#0b6e99]">{promedio}</p>
                         </div>
                       </div>
 
@@ -308,7 +308,7 @@ function AlumnoCoevaluacion() {
                               onChange={(e) =>
                                 handleCalificacion(comp.id, crit.id, e.target.value !== "" ? parseInt(e.target.value) : null)
                               }
-                              className="px-2 py-1.5 border border-slate-300 rounded-md text-xs font-medium focus:ring-2 focus:ring-[#db2777] focus:border-transparent outline-none bg-white min-w-[120px]"
+                              className="px-2 py-1.5 border border-slate-300 rounded-md text-xs font-medium focus:ring-2 focus:ring-[#0b6e99] focus:border-transparent outline-none bg-white min-w-[120px]"
                             >
                               <option value="">— Seleccionar —</option>
                               <option value="7">7 - Excelente</option>
@@ -352,7 +352,7 @@ function AlumnoCoevaluacion() {
                           <td className="px-4 py-3 font-medium text-slate-900">
                             {comp.nombre}
                             {comp.id === alumno.id && (
-                              <span className="ml-2 text-[10px] bg-[#db2777]/10 text-[#db2777] px-2 py-0.5 rounded font-bold">TÚ</span>
+                              <span className="ml-2 text-[10px] bg-[#0b6e99]/10 text-[#0b6e99] px-2 py-0.5 rounded font-bold">TÚ</span>
                             )}
                           </td>
                           {CRITERIOS.map((crit) => (
@@ -362,7 +362,7 @@ function AlumnoCoevaluacion() {
                                 onChange={(e) =>
                                   handleCalificacion(comp.id, crit.id, e.target.value !== "" ? parseInt(e.target.value) : null)
                                 }
-                                className="px-2 py-1 border border-slate-300 rounded-md text-xs font-medium focus:ring-2 focus:ring-[#db2777] focus:border-transparent outline-none"
+                                className="px-2 py-1 border border-slate-300 rounded-md text-xs font-medium focus:ring-2 focus:ring-[#0b6e99] focus:border-transparent outline-none"
                               >
                                 <option value="">-</option>
                                 <option value="7">7 - Excelente</option>
@@ -372,7 +372,7 @@ function AlumnoCoevaluacion() {
                               </select>
                             </td>
                           ))}
-                          <td className="px-4 py-3 text-center font-bold text-[#db2777]">
+                          <td className="px-4 py-3 text-center font-bold text-[#0b6e99]">
                             {promedio}
                           </td>
                         </tr>
@@ -394,7 +394,7 @@ function AlumnoCoevaluacion() {
                 <button
                   type="submit"
                   disabled={enviando || !formularioCompleto}
-                  className="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-[#db2777] to-rose-500 text-white font-bold rounded-lg hover:from-rose-600 hover:to-rose-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                  className="w-full sm:w-auto px-6 py-3 bg-[#0b6e99] hover:bg-[#095a7e] text-white font-bold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                   title={!formularioCompleto ? "⚠️ Completa todas las evaluaciones" : ""}
                 >
                   {enviando ? "Guardando..." : formularioCompleto ? "Guardar Evaluaciones" : "Guardar (Incompleto)"}

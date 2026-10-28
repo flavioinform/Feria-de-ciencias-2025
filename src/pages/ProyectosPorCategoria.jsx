@@ -98,7 +98,7 @@ function ProyectosPorCategoria() {
     },
     [normalizeName("Física contemporánea")]: {
       accent: "text-violet-600", border: "border-violet-400 group-hover:border-violet-600",
-      glow: "shadow-[6px_6px_0px_#a78bfa] group-hover:shadow-[6px_6px_0px_#7c3aed]",
+      glow: "shadow-[6px_6px_0px_#a78bfa] group-hover:shadow-[6px_6px_0px_#0b6e99]",
       badge: "bg-violet-600 text-white", btn: "bg-violet-600 hover:bg-violet-700 text-white shadow-[4px_4px_0px_#a78bfa]",
     },
   };
@@ -106,9 +106,9 @@ function ProyectosPorCategoria() {
   const getColors = (nombre) => {
     const key = normalizeName(nombre);
     return colorMap[key] || {
-      accent: "text-[#db2777]", border: "border-[#db2777]/50 group-hover:border-[#db2777]",
-      glow: "shadow-[6px_6px_0px_#fbcfe8] group-hover:shadow-[6px_6px_0px_#db2777]",
-      badge: "bg-[#db2777] text-white", btn: "bg-[#db2777] hover:bg-pink-700 text-white shadow-[4px_4px_0px_#fbcfe8]",
+      accent: "text-[#0b6e99]", border: "border-[#0b6e99]/50 group-hover:border-[#0b6e99]",
+      glow: "shadow-[6px_6px_0px_#a9d6ea] group-hover:shadow-[6px_6px_0px_#0b6e99]",
+      badge: "bg-[#0b6e99] text-white", btn: "bg-[#0b6e99] hover:bg-pink-700 text-white shadow-[4px_4px_0px_#a9d6ea]",
     };
   };
 

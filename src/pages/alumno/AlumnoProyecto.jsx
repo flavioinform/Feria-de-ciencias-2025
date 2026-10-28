@@ -210,7 +210,7 @@ export default function AlumnoProyecto() {
   }
 
   return (
-    <div className="min-h-[85vh] px-4 py-10 sm:py-16 max-w-2xl mx-auto text-slate-100 relative border-b border-[#db2777]/10">
+    <div className="min-h-[85vh] px-4 py-10 sm:py-16 max-w-2xl mx-auto text-slate-100 relative border-b border-[#0b6e99]/10">
       
       {/* Dialog Material UI para Cerrar Sesión */}
       <Dialog
@@ -223,8 +223,8 @@ export default function AlumnoProyecto() {
             backgroundColor: "#ffffff",
             color: "#0f172a",
             borderRadius: "16px",
-            border: "2px solid rgba(219,39,119,0.15)",
-            boxShadow: "8px 8px 0px rgba(219,39,119,0.06)",
+            border: "2px solid rgba(11,110,153,0.15)",
+            boxShadow: "8px 8px 0px rgba(11,110,153,0.06)",
           }
         }}
       >
@@ -252,11 +252,11 @@ export default function AlumnoProyecto() {
             onClick={confirmLogout} 
             autoFocus 
             sx={{ 
-              backgroundColor: "#db2777", 
+              backgroundColor: "#0b6e99", 
               color: "#ffffff", 
               fontFamily: "var(--font-tech), monospace", 
               fontWeight: 700,
-              "&:hover": { backgroundColor: "#be185d" }
+              "&:hover": { backgroundColor: "#095a7e" }
             }}
             variant="contained"
           >
@@ -268,15 +268,15 @@ export default function AlumnoProyecto() {
       {/* Dynamic Futuristic Scientific Backdrop specifically for Gestión de Proyecto */}
       <div className="fixed inset-0 bg-white pointer-events-none" style={{ zIndex: -1 }}>
         {/* Subtle grid pattern */}
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(219,39,119,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(219,39,119,0.05)_1px,transparent_1px)] bg-[size:40px_40px]"></div>
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(11,110,153,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(11,110,153,0.05)_1px,transparent_1px)] bg-[size:40px_40px]"></div>
         {/* Radial ambient glow circles */}
-        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-[#db2777]/5 rounded-full blur-[140px]"></div>
-        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-[#db2777]/3 rounded-full blur-[140px]"></div>
+        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-[#0b6e99]/5 rounded-full blur-[140px]"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-[#0b6e99]/3 rounded-full blur-[140px]"></div>
       </div>
 
       {/* Glows de fondo */}
-      <div className="absolute top-10 left-10 w-64 h-64 bg-[#db2777]/5 rounded-full blur-[100px] pointer-events-none" />
-      <div className="absolute bottom-20 right-10 w-80 h-80 bg-[#db2777]/3 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-10 left-10 w-64 h-64 bg-[#0b6e99]/5 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute bottom-20 right-10 w-80 h-80 bg-[#0b6e99]/3 rounded-full blur-[120px] pointer-events-none" />
 
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-6 gap-4 relative z-10 w-full">
@@ -285,7 +285,7 @@ export default function AlumnoProyecto() {
             Gestión de Proyecto
           </h1>
           <p className="text-slate-500 text-xs font-tech mt-0.5 tracking-wide">
-            <span className="font-bold text-[#db2777]">{alumno.nombre}</span>
+            <span className="font-bold text-[#0b6e99]">{alumno.nombre}</span>
           </p>
 
           {/* Equipo Pills - Grid de 2 columnas */}
@@ -302,12 +302,12 @@ export default function AlumnoProyecto() {
                   title={i.nombre}
                   className={`flex items-center gap-1 px-2 py-1 rounded-lg border text-[9px] font-tech font-bold uppercase transition-all duration-300 select-none cursor-help group relative
                     ${i.rut === alumno.rut
-                      ? "bg-[#db2777]/10 border-[#db2777]/45 text-[#db2777]"
+                      ? "bg-[#0b6e99]/10 border-[#0b6e99]/45 text-[#0b6e99]"
                       : "bg-slate-50 border-slate-200 text-slate-600"}`}
                 >
-                  <span className={`w-1 h-1 rounded-full flex-shrink-0 ${i.rut === alumno.rut ? "bg-[#db2777]" : "bg-slate-400"}`}></span>
+                  <span className={`w-1 h-1 rounded-full flex-shrink-0 ${i.rut === alumno.rut ? "bg-[#0b6e99]" : "bg-slate-400"}`}></span>
                   <span className="truncate">{i.nombre}</span>
-                  {i.rut === alumno.rut && <span className="text-[7px] bg-[#db2777]/20 px-1 py-0.5 rounded text-[#db2777] ml-auto flex-shrink-0">TÚ</span>}
+                  {i.rut === alumno.rut && <span className="text-[7px] bg-[#0b6e99]/20 px-1 py-0.5 rounded text-[#0b6e99] ml-auto flex-shrink-0">TÚ</span>}
 
                   {/* Tooltip personalizado */}
                   <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-2 py-1 bg-slate-900 text-white text-[8px] rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
@@ -321,7 +321,7 @@ export default function AlumnoProyecto() {
         <div className="flex gap-3 flex-shrink-0">
           <button
             onClick={() => navigate("/alumno/coevaluacion")}
-            className="flex items-center justify-center gap-2 text-xs font-bold text-[#db2777] border-2 border-[#db2777] bg-transparent hover:bg-[#db2777] hover:text-white font-tech transition-all duration-300 px-5 py-2.5 rounded-xl shadow-[3px_3px_0px_rgba(219,39,119,0.2)] hover:shadow-[0px_0px_0px_transparent] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer"
+            className="flex items-center justify-center gap-2 text-xs font-bold text-[#0b6e99] border-2 border-[#0b6e99] bg-transparent hover:bg-[#0b6e99] hover:text-white font-tech transition-all duration-300 px-5 py-2.5 rounded-xl shadow-[3px_3px_0px_rgba(11,110,153,0.2)] hover:shadow-[0px_0px_0px_transparent] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
@@ -342,12 +342,12 @@ export default function AlumnoProyecto() {
 
       <div className="space-y-6 relative z-10">
         {/* ── Detalles Generales ── */}
-        <div className="bg-[#0d0d0d]/85 backdrop-blur-xl rounded-3xl border-2 border-[#db2777]/15 p-6 shadow-[8px_8px_0px_rgba(219,39,119,0.06)] relative overflow-hidden">
+        <div className="bg-[#0d0d0d]/85 backdrop-blur-xl rounded-3xl border-2 border-[#0b6e99]/15 p-6 shadow-[8px_8px_0px_rgba(11,110,153,0.06)] relative overflow-hidden">
           {/* Subtle top stripe */}
-          <div className="absolute top-0 left-0 w-full h-[3px] bg-[#db2777]"></div>
+          <div className="absolute top-0 left-0 w-full h-[3px] bg-[#0b6e99]"></div>
 
           <h2 className="text-xs font-bold text-slate-300 font-tech uppercase tracking-widest mb-6 flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#db2777] shadow-[0_0_8px_#db2777]"></span>
+            <span className="w-2.5 h-2.5 rounded-full bg-[#0b6e99] shadow-[0_0_8px_#0b6e99]"></span>
             Detalles Generales
           </h2>
           <div className="space-y-6">
@@ -362,7 +362,7 @@ export default function AlumnoProyecto() {
             {/* Asignatura / Categoría */}
             <div>
               <p className="text-[10px] font-bold text-slate-500 font-tech uppercase tracking-wider mb-2">Asignatura / Categoría</p>
-              <span className="inline-flex px-3.5 py-1.5 bg-[#db2777]/10 border border-[#db2777]/30 text-[#db2777] rounded-lg text-xs font-tech font-bold tracking-wide">
+              <span className="inline-flex px-3.5 py-1.5 bg-[#0b6e99]/10 border border-[#0b6e99]/30 text-[#0b6e99] rounded-lg text-xs font-tech font-bold tracking-wide">
                 {categoriaNombre}
               </span>
             </div>
@@ -372,17 +372,17 @@ export default function AlumnoProyecto() {
 
 
         {/* ── Imagen (Editable) ── */}
-        <div className="bg-[#0d0d0d]/85 backdrop-blur-xl rounded-3xl border-2 border-[#db2777]/15 p-6 shadow-[8px_8px_0px_rgba(219,39,119,0.06)] relative overflow-hidden">
+        <div className="bg-[#0d0d0d]/85 backdrop-blur-xl rounded-3xl border-2 border-[#0b6e99]/15 p-6 shadow-[8px_8px_0px_rgba(11,110,153,0.06)] relative overflow-hidden">
           {/* Subtle top stripe */}
-          <div className="absolute top-0 left-0 w-full h-[3px] bg-[#db2777]"></div>
+          <div className="absolute top-0 left-0 w-full h-[3px] bg-[#0b6e99]"></div>
 
           <h2 className="text-xs font-bold text-slate-300 font-tech uppercase tracking-widest mb-6 flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#db2777] shadow-[0_0_8px_#db2777]"></span>
+            <span className="w-2.5 h-2.5 rounded-full bg-[#0b6e99] shadow-[0_0_8px_#0b6e99]"></span>
             Imágenes de Demostración
           </h2>
 
           {/* Vista previa */}
-          <div className="relative w-full aspect-video rounded-2xl overflow-hidden bg-black/60 mb-4 border border-[#db2777]/10 flex items-center justify-center">
+          <div className="relative w-full aspect-video rounded-2xl overflow-hidden bg-black/60 mb-4 border border-[#0b6e99]/10 flex items-center justify-center">
             {imagenUrl ? (
               <img
                 src={imagenUrl}
@@ -391,7 +391,7 @@ export default function AlumnoProyecto() {
               />
             ) : (
               <div className="flex flex-col items-center justify-center h-full text-slate-500 gap-2 p-6 text-center">
-                <svg className="w-12 h-12 text-[#db2777]/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-12 h-12 text-[#0b6e99]/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
                 <p className="text-xs font-bold font-tech uppercase text-slate-400">No se ha cargado ninguna imagen</p>
@@ -399,7 +399,7 @@ export default function AlumnoProyecto() {
               </div>
             )}
             {guardandoImg && (
-              <div className="absolute inset-0 bg-black/90 backdrop-blur-sm flex flex-col items-center justify-center gap-3 text-[#db2777] font-tech font-bold text-xs">
+              <div className="absolute inset-0 bg-black/90 backdrop-blur-sm flex flex-col items-center justify-center gap-3 text-[#0b6e99] font-tech font-bold text-xs">
                 <Spinner />
                 <span className="tracking-widest uppercase">Paciencia...</span>
               </div>
@@ -412,7 +412,7 @@ export default function AlumnoProyecto() {
             className={`flex items-center justify-center gap-3 w-full px-4 py-3.5 rounded-2xl border-2 border-dashed transition-all duration-300 cursor-pointer text-xs font-tech font-black uppercase tracking-wider
               ${guardandoImg
                 ? "border-slate-800 text-slate-600 cursor-not-allowed bg-black/10"
-                : "border-[#db2777]/20 hover:border-[#db2777] text-[#db2777] hover:bg-[#db2777]/5 bg-black/40"}`}
+                : "border-[#0b6e99]/20 hover:border-[#0b6e99] text-[#0b6e99] hover:bg-[#0b6e99]/5 bg-black/40"}`}
           >
             <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
@@ -430,13 +430,13 @@ export default function AlumnoProyecto() {
         </div>
 
         {/* ── Descripción (Editable) ── */}
-        <div className="bg-[#0d0d0d]/85 backdrop-blur-xl rounded-3xl border-2 border-[#db2777]/15 p-6 shadow-[8px_8px_0px_rgba(219,39,119,0.06)] relative overflow-hidden">
+        <div className="bg-[#0d0d0d]/85 backdrop-blur-xl rounded-3xl border-2 border-[#0b6e99]/15 p-6 shadow-[8px_8px_0px_rgba(11,110,153,0.06)] relative overflow-hidden">
           {/* Subtle top stripe */}
-          <div className="absolute top-0 left-0 w-full h-[3px] bg-[#db2777]"></div>
+          <div className="absolute top-0 left-0 w-full h-[3px] bg-[#0b6e99]"></div>
 
           <div className="flex items-center justify-between mb-4 gap-4">
             <h2 className="text-xs font-bold text-slate-300 font-tech uppercase tracking-widest flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#db2777] shadow-[0_0_8px_#db2777]"></span>
+              <span className="w-2.5 h-2.5 rounded-full bg-[#0b6e99] shadow-[0_0_8px_#0b6e99]"></span>
               Descripción del Proyecto
             </h2>
             {!isEditing ? (
@@ -445,7 +445,7 @@ export default function AlumnoProyecto() {
                   setDescripcionText(proyecto?.descripcion || "");
                   setIsEditing(true);
                 }}
-                className="text-[10px] font-bold font-tech uppercase text-[#db2777] hover:text-white bg-[#db2777]/10 hover:bg-[#db2777]/20 border border-[#db2777]/30 hover:border-[#db2777] px-3 py-1.5 rounded-lg transition-all duration-300 cursor-pointer flex items-center gap-1.5"
+                className="text-[10px] font-bold font-tech uppercase text-[#0b6e99] hover:text-white bg-[#0b6e99]/10 hover:bg-[#0b6e99]/20 border border-[#0b6e99]/30 hover:border-[#0b6e99] px-3 py-1.5 rounded-lg transition-all duration-300 cursor-pointer flex items-center gap-1.5"
               >
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
@@ -485,7 +485,7 @@ export default function AlumnoProyecto() {
           </div>
 
           {!isEditing ? (
-            <div className="w-full px-4 py-4 rounded-2xl border border-[#db2777]/10 bg-black/40 text-slate-300 font-tech text-sm leading-relaxed whitespace-pre-wrap">
+            <div className="w-full px-4 py-4 rounded-2xl border border-[#0b6e99]/10 bg-black/40 text-slate-300 font-tech text-sm leading-relaxed whitespace-pre-wrap">
               {proyecto.descripcion || "No se ha ingresado una descripción para este proyecto."}
             </div>
           ) : (
@@ -495,9 +495,9 @@ export default function AlumnoProyecto() {
                 onChange={(e) => setDescripcionText(e.target.value)}
                 maxLength={200}
                 placeholder="Ingresa una breve descripción de tu proyecto (máx. 200 caracteres)..."
-                className="w-full min-h-[120px] px-4 py-4 pb-10 rounded-2xl border border-[#db2777]/30 focus:border-[#db2777] bg-black/60 text-slate-200 font-tech text-sm leading-relaxed focus:outline-none focus:ring-1 focus:ring-[#db2777]/30 resize-none transition-all duration-300"
+                className="w-full min-h-[120px] px-4 py-4 pb-10 rounded-2xl border border-[#0b6e99]/30 focus:border-[#0b6e99] bg-black/60 text-slate-200 font-tech text-sm leading-relaxed focus:outline-none focus:ring-1 focus:ring-[#0b6e99]/30 resize-none transition-all duration-300"
               />
-              <div className={`absolute bottom-3 right-4 text-[10px] font-tech font-bold ${descripcionText.length >= 180 ? "text-[#db2777]" : "text-slate-500"
+              <div className={`absolute bottom-3 right-4 text-[10px] font-tech font-bold ${descripcionText.length >= 180 ? "text-[#0b6e99]" : "text-slate-500"
                 }`}>
                 {descripcionText.length}/200
               </div>

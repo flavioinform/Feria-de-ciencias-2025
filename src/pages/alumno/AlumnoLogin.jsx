@@ -6,7 +6,7 @@ import CompletarPerfilAlumno from "./CompletarPerfilAlumno";
 
 // ── Helpers UI ────────────────────────────────────────────────────────────────
 const Spinner = () => (
-  <svg className="animate-spin h-5 w-5 text-[#db2777]" viewBox="0 0 24 24">
+  <svg className="animate-spin h-5 w-5 text-[#0b6e99]" viewBox="0 0 24 24">
     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
   </svg>
@@ -39,10 +39,10 @@ export default function AlumnoLogin() {
   }
 
   return (
-    <div className="min-h-[85vh] flex items-center justify-center px-4 py-16 relative overflow-hidden bg-white bg-brutalist-noise border-b border-[#db2777]/10">
+    <div className="min-h-[85vh] flex items-center justify-center px-4 py-16 relative overflow-hidden bg-white bg-brutalist-noise border-b border-[#0b6e99]/10">
       {/* Elementos decorativos de fondo (Glows) */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[#db2777]/5 rounded-full blur-[110px] pointer-events-none" />
-      <div className="absolute bottom-10 right-10 w-72 h-72 bg-[#db2777]/3 rounded-full blur-[130px] pointer-events-none" />
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[#0b6e99]/5 rounded-full blur-[110px] pointer-events-none" />
+      <div className="absolute bottom-10 right-10 w-72 h-72 bg-[#0b6e99]/3 rounded-full blur-[130px] pointer-events-none" />
 
       <div className="max-w-md w-full relative z-10">
         {/* Header */}
@@ -50,14 +50,14 @@ export default function AlumnoLogin() {
           <h1 className="text-4xl font-display font-black text-slate-900 tracking-tight uppercase">
             Portal del Alumno
           </h1>
-          <p className="text-[#db2777] font-tech font-bold mt-1 text-xs tracking-[0.2em] uppercase">Feria de Ciencias 2026</p>
+          <p className="text-[#0b6e99] font-tech font-bold mt-1 text-xs tracking-[0.2em] uppercase">Feria de Ciencias 2026</p>
         </div>
 
         {/* Card */}
-        <div className="bg-white/90 backdrop-blur-xl rounded-3xl p-8 border-2 border-[#db2777]/15 shadow-sm shadow-[#db2777]/10 relative overflow-hidden">
+        <div className="bg-white/90 backdrop-blur-xl rounded-3xl p-8 border-2 border-[#0b6e99]/15 shadow-sm shadow-[#0b6e99]/10 relative overflow-hidden">
 
           {/* Subtle top stripe */}
-          <div className="absolute top-0 left-0 w-full h-[3px] bg-[#db2777]"></div>
+          <div className="absolute top-0 left-0 w-full h-[3px] bg-[#0b6e99]"></div>
 
           {errorGoogle && (
             <div className="mb-6 p-4 bg-rose-50 border-2 border-rose-500/30 rounded-2xl text-rose-600 text-xs font-tech">
@@ -69,7 +69,7 @@ export default function AlumnoLogin() {
             type="button"
             onClick={handleGoogleLogin}
             disabled={cargandoGoogle}
-            className="w-full py-4 flex items-center justify-center gap-3 bg-white border-2 border-slate-200 text-slate-700 hover:border-[#db2777]/40 font-tech text-xs font-bold uppercase tracking-widest rounded-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            className="w-full py-4 flex items-center justify-center gap-3 bg-white border-2 border-slate-200 text-slate-700 hover:border-[#0b6e99]/40 font-tech text-xs font-bold uppercase tracking-widest rounded-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
             {cargandoGoogle ? (
               <Spinner />

@@ -253,7 +253,7 @@ function EvaluarProyecto() {
         {/* Volver */}
         <button
           onClick={() => navigate(-1)}
-          className="mb-8 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-600 hover:text-[#db2777] bg-white hover:bg-rose-50 border border-rose-200 px-4 py-2.5 rounded-xl cursor-pointer transition-all duration-300"
+          className="mb-8 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-600 hover:text-[#0b6e99] bg-white hover:bg-rose-50 border border-rose-200 px-4 py-2.5 rounded-xl cursor-pointer transition-all duration-300"
         >
           ← Volver a Proyectos
         </button>
@@ -262,11 +262,11 @@ function EvaluarProyecto() {
         {proyecto && (
           <div className="mb-8 bg-white rounded-3xl p-6 border border-rose-200 shadow-xl shadow-rose-500/10 relative overflow-hidden">
             {/* Decoración lateral */}
-            <div className="absolute left-0 top-0 h-full w-1.5 bg-gradient-to-b from-[#db2777] to-rose-400" />
+            <div className="absolute left-0 top-0 h-full w-1.5 bg-[#0b6e99]" />
 
             <div className="flex items-center gap-2 mb-2.5">
               {proyecto.stand_num && (
-                <span className="inline-flex px-3 py-1 bg-rose-50 border border-rose-300 text-[#db2777] rounded-full text-[10px] font-bold uppercase tracking-wider">
+                <span className="inline-flex px-3 py-1 bg-rose-50 border border-rose-300 text-[#0b6e99] rounded-full text-[10px] font-bold uppercase tracking-wider">
                   Stand #{proyecto.stand_num}
                 </span>
               )}
@@ -290,7 +290,7 @@ function EvaluarProyecto() {
         {/* Loading */}
         {loading && (
           <div className="flex justify-center items-center py-20">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#db2777]"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0b6e99]"></div>
           </div>
         )}
 
@@ -314,11 +314,11 @@ function EvaluarProyecto() {
           >
             <div>
               <h2 className="text-xl font-extrabold text-slate-900 mb-1.5 tracking-tight flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-[#db2777] animate-pulse"></span>
+                <span className="w-2 h-2 rounded-full bg-[#0b6e99] animate-pulse"></span>
                 {user?.rut?.startsWith("JUR") || user?.role === "jurado" ? "Evaluación Oficial del Jurado" : "Presentación del Proyecto"}
               </h2>
               <p className="text-xs text-slate-500 leading-relaxed font-semibold">
-                Califica cada criterio del <span className="text-[#db2777]">1 al {user?.rut?.startsWith("JUR") || user?.role === "jurado" ? "7" : "4"}</span>.
+                Califica cada criterio del <span className="text-[#0b6e99]">1 al {user?.rut?.startsWith("JUR") || user?.role === "jurado" ? "7" : "4"}</span>.
               </p>
             </div>
 
@@ -329,7 +329,7 @@ function EvaluarProyecto() {
                   className="border border-rose-200 rounded-2xl p-5 bg-white hover:bg-rose-50/50 transition-colors"
                 >
                   <div className="flex items-start gap-3 mb-4">
-                    <span className="flex-shrink-0 flex items-center justify-center w-6 h-6 bg-rose-50 border border-rose-200 rounded-lg text-[#db2777] font-bold text-xs">
+                    <span className="flex-shrink-0 flex items-center justify-center w-6 h-6 bg-rose-50 border border-rose-200 rounded-lg text-[#0b6e99] font-bold text-xs">
                       {index + 1}
                     </span>
                     <p className="font-extrabold text-slate-800 text-sm pt-0.5 tracking-tight">{c.nombre}</p>
@@ -343,8 +343,8 @@ function EvaluarProyecto() {
                           key={val}
                           className={`flex-1 flex items-center justify-center cursor-pointer rounded-lg border py-3 transition-all duration-300 select-none text-center font-bold text-sm sm:text-base
                             ${isSelected
-                              ? "bg-[#db2777]/10 border-[#db2777] text-[#db2777] scale-105 shadow-md shadow-rose-500/20"
-                              : "bg-white border-rose-200 text-slate-500 hover:border-[#db2777]/50 hover:bg-rose-50"}`}
+                              ? "bg-[#0b6e99]/10 border-[#0b6e99] text-[#0b6e99] scale-105 shadow-md shadow-rose-500/20"
+                              : "bg-white border-rose-200 text-slate-500 hover:border-[#0b6e99]/50 hover:bg-rose-50"}`}
                         >
                           <input
                             type="radio"
@@ -391,7 +391,7 @@ function EvaluarProyecto() {
             <button
               type="submit"
               disabled={enviando}
-              className="w-full bg-gradient-to-r from-white to-[#db2777] hover:from-rose-50 hover:to-rose-500 text-slate-900 font-bold py-4 px-6 rounded-2xl active:scale-[0.98] transition-all duration-300 shadow-md shadow-rose-500/10 disabled:opacity-50 disabled:cursor-not-allowed text-xs uppercase tracking-widest"
+              className="w-full bg-[#0b6e99] hover:bg-[#095a7e] text-white font-bold py-4 px-6 rounded-lg active:scale-[0.98] transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-xs uppercase tracking-widest"
             >
               {enviando ? (
                 <span className="flex items-center justify-center gap-2">

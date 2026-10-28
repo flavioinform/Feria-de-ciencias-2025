@@ -322,7 +322,7 @@ function AdminPorQuienVino() {
                                       ({pt.rut})
                                     </span>
                                   </div>
-                                  <span className="text-xs font-bold text-[#db2777] shrink-0">
+                                  <span className="text-xs font-bold text-[#0b6e99] shrink-0">
                                     {pt.total} {pt.total === 1 ? "persona" : "personas"}
                                   </span>
                                 </button>
@@ -379,7 +379,7 @@ function AdminPorQuienVino() {
                             <Chevron abierto={abiertoP} />
                             <span className="text-sm font-medium truncate">{o.key}</span>
                           </div>
-                          <span className="text-xs font-bold text-[#db2777] shrink-0">
+                          <span className="text-xs font-bold text-[#0b6e99] shrink-0">
                             {o.total} {o.total === 1 ? "persona" : "personas"}
                           </span>
                         </button>
