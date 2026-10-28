@@ -60,11 +60,11 @@ function cls(error, valid) {
     return `${base} border-rose-500/50 focus:border-rose-500 focus:ring-rose-500/10`;
   if (valid)
     return `${base} border-emerald-500/50 focus:border-emerald-500 focus:ring-emerald-500/10`;
-  return `${base} border-[#db2777]/15 focus:border-[#db2777] focus:ring-[#db2777]/10`;
+  return `${base} border-[#0b6e99]/15 focus:border-[#0b6e99] focus:ring-[#0b6e99]/10`;
 }
 
 const Spinner = () => (
-  <svg className="animate-spin h-5 w-5 text-[#db2777]" viewBox="0 0 24 24">
+  <svg className="animate-spin h-5 w-5 text-[#0b6e99]" viewBox="0 0 24 24">
     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
   </svg>
@@ -241,21 +241,21 @@ export default function CompletarPerfilAlumno() {
   };
 
   return (
-    <div className="min-h-[85vh] flex items-center justify-center px-4 py-16 relative overflow-hidden bg-white bg-brutalist-noise border-b border-[#db2777]/10">
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[#db2777]/5 rounded-full blur-[110px] pointer-events-none" />
+    <div className="min-h-[85vh] flex items-center justify-center px-4 py-16 relative overflow-hidden bg-white bg-brutalist-noise border-b border-[#0b6e99]/10">
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[#0b6e99]/5 rounded-full blur-[110px] pointer-events-none" />
 
       <div className="max-w-lg w-full relative z-10">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-display font-black text-slate-900 tracking-tight uppercase">
             Completa tu Perfil
           </h1>
-          <p className="text-[#db2777] font-tech font-bold mt-1 text-xs tracking-[0.2em] uppercase">
+          <p className="text-[#0b6e99] font-tech font-bold mt-1 text-xs tracking-[0.2em] uppercase">
             Feria de Ciencias 2026
           </p>
         </div>
 
-        <div className="bg-white/90 backdrop-blur-xl rounded-3xl p-8 border-2 border-[#db2777]/15 shadow-sm shadow-[#db2777]/10 relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-[3px] bg-[#db2777]"></div>
+        <div className="bg-white/90 backdrop-blur-xl rounded-3xl p-8 border-2 border-[#0b6e99]/15 shadow-sm shadow-[#0b6e99]/10 relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-[3px] bg-[#0b6e99]"></div>
 
           <p className="text-slate-500 text-xs font-tech mb-6">
             Ingresaste con <span className="font-bold text-slate-700">{googlePendiente?.email}</span>.
@@ -316,7 +316,7 @@ export default function CompletarPerfilAlumno() {
                   />
                   <FieldError msg={tocados.rutNumero && errores.rutNumero} />
                 </div>
-                <span className="pt-3 text-[#db2777] font-black text-lg select-none">–</span>
+                <span className="pt-3 text-[#0b6e99] font-black text-lg select-none">–</span>
                 <div className="w-24">
                   <input
                     id="rutDV"
@@ -326,7 +326,7 @@ export default function CompletarPerfilAlumno() {
                     value={form.rutDV}
                     onChange={(e) => handleChange("rutDV", e.target.value)}
                     onBlur={() => handleBlur("rutDV")}
-                    className={`${cls(tocados.rutDV && errores.rutDV, isValid("rutDV"))} text-center font-mono font-bold uppercase tracking-widest text-[#db2777]`}
+                    className={`${cls(tocados.rutDV && errores.rutDV, isValid("rutDV"))} text-center font-mono font-bold uppercase tracking-widest text-[#0b6e99]`}
                     aria-label="Dígito verificador (0-9 o K)"
                   />
                   <FieldError msg={tocados.rutDV && errores.rutDV} />
@@ -359,7 +359,7 @@ export default function CompletarPerfilAlumno() {
               <label htmlFor="proyectoId" className="block text-xs font-bold text-slate-600 font-tech uppercase tracking-widest mb-2 flex items-center">
                 Proyecto <span className="text-rose-500 mr-1" aria-hidden>*</span>
                 {cargandoProyectos && (
-                  <span className="ml-2.5 inline-flex align-middle text-[#db2777]">
+                  <span className="ml-2.5 inline-flex align-middle text-[#0b6e99]">
                     <Spinner />
                   </span>
                 )}
@@ -397,7 +397,7 @@ export default function CompletarPerfilAlumno() {
             <button
               type="submit"
               disabled={cargando}
-              className="w-full py-4 bg-transparent border-2 border-[#db2777] text-slate-900 hover:bg-[#db2777] hover:text-white font-tech text-xs font-black uppercase tracking-widest rounded-xl transition-all duration-300 shadow-[4px_4px_0px_#db2777] hover:shadow-[0px_0px_0px_transparent] active:translate-x-1 active:translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-4 cursor-pointer"
+              className="w-full py-4 bg-transparent border-2 border-[#0b6e99] text-slate-900 hover:bg-[#0b6e99] hover:text-white font-tech text-xs font-black uppercase tracking-widest rounded-xl transition-all duration-300 shadow-[4px_4px_0px_#0b6e99] hover:shadow-[0px_0px_0px_transparent] active:translate-x-1 active:translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-4 cursor-pointer"
             >
               {cargando ? (
                 <>

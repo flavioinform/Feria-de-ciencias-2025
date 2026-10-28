@@ -142,7 +142,7 @@ function AdminResultadosJurado() {
         <select
           value={categoriaActiva}
           onChange={(e) => setCategoriaActiva(e.target.value)}
-          className="bg-white border-2 border-slate-200 text-black px-4 py-2 rounded-lg font-tech focus:ring-2 focus:ring-[#db2777] outline-none"
+          className="bg-white border-2 border-slate-200 text-black px-4 py-2 rounded-lg font-tech focus:ring-2 focus:ring-[#0b6e99] outline-none"
         >
           <option value="todas">Todas las categorías</option>
           {categorias.map((c) => (
@@ -164,7 +164,7 @@ function AdminResultadosJurado() {
               onClick={() => setVistaActiva("jurado")}
               className={`px-6 py-3 text-sm font-bold uppercase transition-colors ${
                 vistaActiva === "jurado"
-                  ? "border-b-4 border-[#db2777] text-[#db2777]"
+                  ? "border-b-4 border-[#0b6e99] text-[#0b6e99]"
                   : "text-slate-500 hover:text-slate-800"
               }`}
             >
@@ -207,10 +207,10 @@ function AdminResultadosJurado() {
             {vistaActiva === "jurado" && (
               <section className="animate-fade-in">
                 <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-xl font-bold text-[#db2777]">
+                  <h2 className="text-xl font-bold text-[#0b6e99]">
                     Resultados del Jurado {categoriaActiva !== "todas" && "- Filtrado"}
                   </h2>
-                  <BotonDescargarExcel items={datosFiltradosJurado} className="bg-[#db2777] hover:bg-pink-700 text-white" />
+                  <BotonDescargarExcel items={datosFiltradosJurado} className="bg-[#0b6e99] hover:bg-pink-700 text-white" />
                 </div>
                 {(!datosFiltradosJurado || datosFiltradosJurado.length === 0) ? (
                   <p className="text-slate-500 bg-white p-6 rounded-xl border border-slate-200 text-center">
@@ -219,12 +219,12 @@ function AdminResultadosJurado() {
                 ) : (
                   <div className="bg-white rounded-xl shadow border border-slate-200 overflow-hidden text-black">
                     <table className="w-full text-sm">
-                      <thead className="bg-[#db2777]/10">
+                      <thead className="bg-[#0b6e99]/10">
                         <tr>
-                          <th className="px-4 py-3 text-left font-bold text-[#db2777]">#</th>
-                          <th className="px-4 py-3 text-left font-bold text-[#db2777]">Proyecto</th>
-                          <th className="px-4 py-3 text-right font-bold text-[#db2777]">Cant. Evaluaciones</th>
-                          <th className="px-4 py-3 text-right font-bold text-[#db2777]">Promedio Final</th>
+                          <th className="px-4 py-3 text-left font-bold text-[#0b6e99]">#</th>
+                          <th className="px-4 py-3 text-left font-bold text-[#0b6e99]">Proyecto</th>
+                          <th className="px-4 py-3 text-right font-bold text-[#0b6e99]">Cant. Evaluaciones</th>
+                          <th className="px-4 py-3 text-right font-bold text-[#0b6e99]">Promedio Final</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -233,7 +233,7 @@ function AdminResultadosJurado() {
                             <td className="px-4 py-3">{idx + 1}</td>
                             <td className="px-4 py-3 font-semibold text-slate-800">{row.titulo}</td>
                             <td className="px-4 py-3 text-right">{row.cantidad}</td>
-                            <td className="px-4 py-3 text-right font-black text-[#db2777] text-lg">
+                            <td className="px-4 py-3 text-right font-black text-[#0b6e99] text-lg">
                               {row.promedio.toFixed(2)}
                             </td>
                           </tr>

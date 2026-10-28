@@ -19,54 +19,42 @@ function AdminCategorias() {
       .toLowerCase()
       .trim();
 
-  // Mapeo de colores según la tabla de Banderines (Kinesiología, Introducción a la Física, etc.)
+  // Colores de los banderines: secuencia del arcoíris
   const colorMap = {
-    [normalizeName("Kinesiología")]: {
+    [normalizeName("Introducción a la física")]: {
       colorName: "Rojo",
       bgClass: "bg-red-500",
       textClass: "text-red-500",
       borderClass: "border-red-500",
     },
-    [normalizeName("Introducción a la Física")]: {
-      colorName: "Amarillo",
-      bgClass: "bg-yellow-400",
-      textClass: "text-yellow-400",
-      borderClass: "border-yellow-400",
-    },
-    [normalizeName("Introducción a la formulación de proyectos")]: {
-      colorName: "Turquesa",
-      bgClass: "bg-teal-500",
-      textClass: "text-teal-500",
-      borderClass: "border-teal-500",
-    },
-    [normalizeName("Mecánica Clásica")]: {
-      colorName: "Verde",
-      bgClass: "bg-green-500",
-      textClass: "text-green-500",
-      borderClass: "border-green-500",
-    },
-    [normalizeName("Mecánica")]: { // Alias
-      colorName: "Verde",
-      bgClass: "bg-green-500",
-      textClass: "text-green-500",
-      borderClass: "border-green-500",
+    [normalizeName("Mecánica")]: {
+      colorName: "Naranja",
+      bgClass: "bg-orange-500",
+      textClass: "text-orange-500",
+      borderClass: "border-orange-500",
     },
     [normalizeName("Electromagnetismo")]: {
+      colorName: "Amarillo",
+      bgClass: "bg-yellow-500",
+      textClass: "text-yellow-500",
+      borderClass: "border-yellow-500",
+    },
+    [normalizeName("Física contemporánea")]: {
+      colorName: "Verde",
+      bgClass: "bg-green-500",
+      textClass: "text-green-500",
+      borderClass: "border-green-500",
+    },
+    [normalizeName("Introducción a la formulación de proyectos")]: {
       colorName: "Azul",
       bgClass: "bg-blue-500",
       textClass: "text-blue-500",
       borderClass: "border-blue-500",
     },
-    [normalizeName("Física Contemporánea")]: {
-      colorName: "Violeta",
-      bgClass: "bg-purple-500",
-      textClass: "text-purple-500",
-      borderClass: "border-purple-500",
-    },
     [normalizeName("Invitados Especiales")]: {
       colorName: "Blanco",
       bgClass: "bg-white",
-      textClass: "text-gray-100", // To ensure it's visible against white if needed
+      textClass: "text-gray-100",
       borderClass: "border-white",
     },
   };

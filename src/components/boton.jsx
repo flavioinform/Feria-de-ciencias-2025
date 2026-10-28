@@ -39,9 +39,9 @@ function boton({ items }) {
   onClick={handleDownloadExcel}
   disabled={!items || items.length === 0}
   className="px-4 py-2 rounded-lg text-sm font-semibold 
-             bg-green-600 text-white hover:bg-green-700
+             bg-[#0b6e99] text-white hover:bg-[#095a7e]
              disabled:opacity-20 disabled:cursor-not-allowed
-             shadow-sm transition"
+             transition-colors"
 >
   Descargar en Excel
 </button>

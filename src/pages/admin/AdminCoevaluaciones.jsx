@@ -269,7 +269,7 @@ function AdminCoevaluaciones() {
           <button
             onClick={handleExportNotaMiembro}
             disabled={exportandoNota}
-            className="flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[#db2777] to-rose-500 text-white font-bold rounded-lg hover:from-rose-600 hover:to-rose-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+            className="flex items-center justify-center gap-2 px-5 py-2.5 bg-[#0b6e99] hover:bg-[#095a7e] text-white font-bold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
             title="Promedio de coevaluación por cada miembro, una hoja por categoría"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -280,7 +280,7 @@ function AdminCoevaluaciones() {
           <button
             onClick={exportToCSV}
             disabled={coevaluacionesFilteradas.length === 0 || exportando}
-            className="flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold rounded-lg hover:from-green-600 hover:to-emerald-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+            className="flex items-center justify-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />

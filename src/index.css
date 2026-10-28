@@ -1,5 +1,15 @@
 @import "tailwindcss";
 
+/* Paleta "Pacífico": reemplaza la escala rose/pink de Tailwind por el azul del mar de Arica */
+@theme {
+  --color-rose-50: #eaf5fa;  --color-rose-100: #d3ebf5; --color-rose-200: #a9d6ea;
+  --color-rose-300: #74bad8; --color-rose-400: #3d98c0; --color-rose-500: #0b6e99;
+  --color-rose-600: #095a7e; --color-rose-700: #074863; --color-rose-800: #063a50; --color-rose-900: #052c3d;
+  --color-pink-50: #eaf5fa;  --color-pink-100: #d3ebf5; --color-pink-200: #a9d6ea;
+  --color-pink-300: #74bad8; --color-pink-400: #3d98c0; --color-pink-500: #0b6e99;
+  --color-pink-600: #095a7e; --color-pink-700: #074863; --color-pink-800: #063a50; --color-pink-900: #052c3d;
+}
+
 :root {
   color-scheme: light;
   color: #1e293b;
@@ -47,10 +57,10 @@ body {
 .pattern-checkerboard {
   background-color: #ffffff;
   background-image: 
-    linear-gradient(45deg, #db2777 25%, transparent 25%), 
-    linear-gradient(-45deg, #db2777 25%, transparent 25%), 
-    linear-gradient(45deg, transparent 75%, #db2777 75%), 
-    linear-gradient(-45deg, transparent 75%, #db2777 75%);
+    linear-gradient(45deg, #0b6e99 25%, transparent 25%), 
+    linear-gradient(-45deg, #0b6e99 25%, transparent 25%), 
+    linear-gradient(45deg, transparent 75%, #0b6e99 75%), 
+    linear-gradient(-45deg, transparent 75%, #0b6e99 75%);
   background-size: 16px 16px;
   background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
 }
@@ -81,9 +91,9 @@ a {
   background: #f1f5f9;
 }
 ::-webkit-scrollbar-thumb {
-  background: #db2777;
+  background: #0b6e99;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #ff7396;
+  background: #3d98c0;
 }

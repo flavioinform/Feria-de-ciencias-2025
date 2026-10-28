@@ -6,7 +6,7 @@ export const AppContext = createContext();
 // Quién es el usuario de la sesión, sin confiar en nada que el cliente pueda
 // escribir:
 //  - jurado / visitante: el rol viaja en app_metadata (lo fija solo el servidor).
-//  - admin / ayudante: cuenta de Google cuyo correo está en `staff_google`;
+//  - admin: cuenta de Google cuyo correo está en `staff_google`;
 //    el rol lo resuelve la base de datos (jwt_role) y es el mismo que usan
 //    las políticas RLS.
 async function resolverUsuario(session) {
@@ -19,8 +19,12 @@ async function resolverUsuario(session) {
   }
 
   if (m.provider === "google") {
-    const { data: role } = await supabase.rpc("jwt_role");
-    if (role === "admin" || role === "ayudante") {
+    const { data: role, error } = await supabase.rpc("jwt_role");
+    if (error) {
+      console.error("No se pudo resolver el rol (jwt_role):", error);
+      return undefined; // fallo transitorio: no cambia al usuario actual
+    }
+    if (role === "admin") {
       return {
         id: u.id,
         nombre: u.user_metadata?.full_name ?? u.user_metadata?.name ?? u.email,
@@ -40,13 +44,16 @@ export function AppProvider({ children }) {
 
   useEffect(() => {
     let activo = true;
-    const aplicar = (session) =>
-      resolverUsuario(session).then((u) => {
-        if (activo) {
-          setUser(u);
-          setLoading(false);
-        }
+    let ultima = 0;
+    const aplicar = (session) => {
+      const n = ++ultima;
+      return resolverUsuario(session).then((u) => {
+        // Descarta resultados viejos que llegan después de uno más reciente
+        if (!activo || n !== ultima) return;
+        if (u !== undefined) setUser(u);
+        setLoading(false);
       });
+    };
 
     supabase.auth.getSession().then(({ data }) => aplicar(data.session));
 

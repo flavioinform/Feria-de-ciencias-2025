@@ -25,36 +25,16 @@ function Categorias() {
 
   // ORDEN FIJO usando nombres NORMALIZADOS
   const ordenCategorias = [
-    normalizeName("Introducción a la física"),   // verde
-    normalizeName("Introducción a la formulación de proyectos"),   // teal
-    normalizeName("Mecánica"),                   // naranjo
-    normalizeName("Electromagnetismo"),          // rojo
-    normalizeName("Física contemporánea"),       // azul
+    normalizeName("Introducción a la física"),                    // rojo
+    normalizeName("Mecánica"),                                    // naranja
+    normalizeName("Electromagnetismo"),                           // amarillo
+    normalizeName("Física contemporánea"),                        // verde
+    normalizeName("Introducción a la formulación de proyectos"),  // azul
   ];
 
   // Mapeo de colores basado en los Banderines del sistema (Light Theme - Colores Fuertes)
   const colorMap = {
-    [normalizeName("Intro física")]: {
-      accent: "text-amber-500",
-      bg: "bg-white",
-      border: "border-amber-400 group-hover:border-amber-500",
-      glow: "shadow-[6px_6px_0px_#fbbf24] group-hover:shadow-[6px_6px_0px_#d97706]",
-      badge: "bg-amber-500 text-white border-amber-600",
-      grid: "bg-[linear-gradient(to_right,#fbbf24_1px,transparent_1px),linear-gradient(to_bottom,#fbbf24_1px,transparent_1px)]",
-      bgHeader: "bg-amber-50",
-      titleHover: "group-hover:text-amber-600",
-    },
-    [normalizeName("Introducción a la formulación de proyectos")]: {
-      accent: "text-teal-600",
-      bg: "bg-white",
-      border: "border-teal-400 group-hover:border-teal-600",
-      glow: "shadow-[6px_6px_0px_#2dd4bf] group-hover:shadow-[6px_6px_0px_#0d9488]",
-      badge: "bg-teal-600 text-white border-teal-700",
-      grid: "bg-[linear-gradient(to_right,#2dd4bf_1px,transparent_1px),linear-gradient(to_bottom,#2dd4bf_1px,transparent_1px)]",
-      bgHeader: "bg-teal-50",
-      titleHover: "group-hover:text-teal-700",
-    },
-    [normalizeName("Kinesiología")]: {
+    [normalizeName("Introducción a la física")]: {
       accent: "text-red-600",
       bg: "bg-white",
       border: "border-red-400 group-hover:border-red-600",
@@ -64,7 +44,27 @@ function Categorias() {
       bgHeader: "bg-red-50",
       titleHover: "group-hover:text-red-700",
     },
-    [normalizeName("Mecánica clásica")]: {
+    [normalizeName("Mecánica")]: {
+      accent: "text-orange-600",
+      bg: "bg-white",
+      border: "border-orange-400 group-hover:border-orange-600",
+      glow: "shadow-[6px_6px_0px_#fb923c] group-hover:shadow-[6px_6px_0px_#ea580c]",
+      badge: "bg-orange-600 text-white border-orange-700",
+      grid: "bg-[linear-gradient(to_right,#fb923c_1px,transparent_1px),linear-gradient(to_bottom,#fb923c_1px,transparent_1px)]",
+      bgHeader: "bg-orange-50",
+      titleHover: "group-hover:text-orange-700",
+    },
+    [normalizeName("Electromagnetismo")]: {
+      accent: "text-yellow-600",
+      bg: "bg-white",
+      border: "border-yellow-400 group-hover:border-yellow-600",
+      glow: "shadow-[6px_6px_0px_#facc15] group-hover:shadow-[6px_6px_0px_#ca8a04]",
+      badge: "bg-yellow-600 text-white border-yellow-700",
+      grid: "bg-[linear-gradient(to_right,#facc15_1px,transparent_1px),linear-gradient(to_bottom,#facc15_1px,transparent_1px)]",
+      bgHeader: "bg-yellow-50",
+      titleHover: "group-hover:text-yellow-700",
+    },
+    [normalizeName("Física contemporánea")]: {
       accent: "text-green-600",
       bg: "bg-white",
       border: "border-green-400 group-hover:border-green-600",
@@ -74,7 +74,7 @@ function Categorias() {
       bgHeader: "bg-green-50",
       titleHover: "group-hover:text-green-700",
     },
-    [normalizeName("Electromagnetismo")]: {
+    [normalizeName("Introducción a la formulación de proyectos")]: {
       accent: "text-blue-600",
       bg: "bg-white",
       border: "border-blue-400 group-hover:border-blue-600",
@@ -84,30 +84,20 @@ function Categorias() {
       bgHeader: "bg-blue-50",
       titleHover: "group-hover:text-blue-700",
     },
-    [normalizeName("Física contemporánea")]: {
-      accent: "text-violet-600",
-      bg: "bg-white",
-      border: "border-violet-400 group-hover:border-violet-600",
-      glow: "shadow-[6px_6px_0px_#a78bfa] group-hover:shadow-[6px_6px_0px_#7c3aed]",
-      badge: "bg-violet-600 text-white border-violet-700",
-      grid: "bg-[linear-gradient(to_right,#a78bfa_1px,transparent_1px),linear-gradient(to_bottom,#a78bfa_1px,transparent_1px)]",
-      bgHeader: "bg-violet-50",
-      titleHover: "group-hover:text-violet-700",
-    },
   };
 
   const getColors = (nombre) => {
     const key = normalizeName(nombre);
     return (
       colorMap[key] || {
-        accent: "text-[#db2777]",
+        accent: "text-[#0b6e99]",
         bg: "bg-white",
-        border: "border-[#db2777]/50 group-hover:border-[#db2777]",
-        glow: "shadow-[6px_6px_0px_#fbcfe8] group-hover:shadow-[6px_6px_0px_#db2777]",
-        badge: "bg-[#db2777] text-white border-[#be185d]",
-        grid: "bg-[linear-gradient(to_right,#fbcfe8_1px,transparent_1px),linear-gradient(to_bottom,#fbcfe8_1px,transparent_1px)]",
+        border: "border-[#0b6e99]/50 group-hover:border-[#0b6e99]",
+        glow: "shadow-[6px_6px_0px_#a9d6ea] group-hover:shadow-[6px_6px_0px_#0b6e99]",
+        badge: "bg-[#0b6e99] text-white border-[#095a7e]",
+        grid: "bg-[linear-gradient(to_right,#a9d6ea_1px,transparent_1px),linear-gradient(to_bottom,#a9d6ea_1px,transparent_1px)]",
         bgHeader: "bg-pink-50",
-        titleHover: "group-hover:text-[#db2777]",
+        titleHover: "group-hover:text-[#0b6e99]",
       }
     );
   };
@@ -152,7 +142,7 @@ function Categorias() {
       <div className="mx-auto max-w-6xl relative z-10">
         {/* Título */}
         <div className="text-center mb-16">
-          <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-none bg-[#db2777]/10 border-2 border-[#db2777] text-[#db2777] text-xs font-bold uppercase tracking-widest mb-4">
+          <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-none bg-[#0b6e99]/10 border-2 border-[#0b6e99] text-[#0b6e99] text-xs font-bold uppercase tracking-widest mb-4">
             Explorar Ciencia
           </span>
           <h1 className="text-4xl md:text-5xl font-black text-slate-900 uppercase tracking-tighter mb-4">
@@ -165,9 +155,9 @@ function Categorias() {
 
         {/* Pauta de Evaluación para Jurados */}
         {esJurado && (
-          <div className="mb-12 bg-white border-2 border-[#db2777] p-6 rounded-lg shadow-lg">
+          <div className="mb-12 bg-white border-2 border-[#0b6e99] p-6 rounded-lg shadow-lg">
             <h2 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
-              <svg className="w-6 h-6 text-[#db2777]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-6 h-6 text-[#0b6e99]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               Pauta de Evaluación del Jurado
@@ -176,8 +166,8 @@ function Categorias() {
               <table className="w-full text-sm border-collapse">
                 <thead>
                   <tr>
-                    <th className="border-b-2 border-[#db2777] bg-slate-50 px-4 py-3 text-left font-bold text-slate-900">Criterio</th>
-                    <th className="border-b-2 border-[#db2777] bg-slate-50 px-4 py-3 text-left font-bold text-slate-900">Descripción del criterio a evaluar</th>
+                    <th className="border-b-2 border-[#0b6e99] bg-slate-50 px-4 py-3 text-left font-bold text-slate-900">Criterio</th>
+                    <th className="border-b-2 border-[#0b6e99] bg-slate-50 px-4 py-3 text-left font-bold text-slate-900">Descripción del criterio a evaluar</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -219,7 +209,7 @@ function Categorias() {
         {/* Loading */}
         {loading && (
           <div className="flex justify-center items-center py-20">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-[#db2777]"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-[#0b6e99]"></div>
           </div>
         )}
 

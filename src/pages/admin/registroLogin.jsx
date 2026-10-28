@@ -29,7 +29,7 @@ const validarRut = (rut) => {
 
   // ❌ limitar a un rango razonable de RUTs de personas naturales
   const num = parseInt(cuerpo, 10);
-  if (num < 1000000 || num > 27000000) return false;
+  if (num < 1000000 || num > 100000000) return false;
 
   // ✅ cálculo módulo 11
   let suma = 0;
@@ -245,7 +245,7 @@ function RegistroLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 flex items-center justify-center px-4 py-8 sm:py-12">
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4 py-8 sm:py-12">
       <div className="max-w-lg w-full">
         <div className="bg-white rounded-2xl shadow-xl p-5 sm:p-8 border border-gray-100">
           <div className="text-center mb-6 sm:mb-8">
