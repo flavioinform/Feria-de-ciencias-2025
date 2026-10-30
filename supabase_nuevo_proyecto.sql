@@ -401,8 +401,8 @@ DECLARE
     v_ex public.participantes%ROWTYPE;
     v_id UUID;
 BEGIN
-    IF v_uid IS NULL OR v_email NOT LIKE '%@alumnos.uta.cl' THEN
-        RAISE EXCEPTION 'Debes ingresar con tu cuenta institucional @alumnos.uta.cl';
+    IF v_uid IS NULL OR (v_email NOT LIKE '%@alumnos.uta.cl' AND v_email NOT LIKE '%@estudiantes.uta.cl') THEN
+        RAISE EXCEPTION 'Debes ingresar con tu cuenta institucional (@alumnos.uta.cl o @estudiantes.uta.cl)';
     END IF;
     IF public.jwt_role() IS NOT NULL THEN
         RAISE EXCEPTION 'Esta cuenta no puede registrarse como alumno';

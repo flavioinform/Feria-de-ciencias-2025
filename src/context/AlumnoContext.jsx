@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 
-const DOMINIO_PERMITIDO = "@alumnos.uta.cl";
+const DOMINIOS_PERMITIDOS = ["@alumnos.uta.cl", "@estudiantes.uta.cl"];
 
 const AlumnoContext = createContext(null);
 
@@ -43,9 +43,9 @@ export function AlumnoProvider({ children }) {
         if (!window.location.pathname.startsWith("/alumno")) return;
 
         const email = session.user.email ?? "";
-        if (!email.toLowerCase().endsWith(DOMINIO_PERMITIDO)) {
+        if (!DOMINIOS_PERMITIDOS.some((d) => email.toLowerCase().endsWith(d))) {
           setErrorGoogle(
-            `Debes ingresar con tu cuenta institucional ${DOMINIO_PERMITIDO}`
+            `Debes ingresar con tu cuenta institucional (${DOMINIOS_PERMITIDOS.join(" o ")})`
           );
           await supabase.auth.signOut();
           return;
