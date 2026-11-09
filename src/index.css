@@ -97,3 +97,22 @@ a {
 ::-webkit-scrollbar-thumb:hover {
   background: #3d98c0;
 }
+
+/* ── Splash de bienvenida ── */
+.splash { transition: transform 0.7s cubic-bezier(0.76, 0, 0.24, 1); }
+.splash-salida { transform: translateY(-100%); }
+.splash-item {
+  opacity: 0;
+  animation: splash-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: calc(var(--i, 0) * 0.18s + 0.15s);
+}
+@keyframes splash-in {
+  from { opacity: 0; transform: translateY(28px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .splash { transition: opacity 0.3s linear; }
+  .splash-salida { transform: none; opacity: 0; }
+  .splash-item { animation: splash-fade 0.3s linear forwards; animation-delay: 0s; }
+  @keyframes splash-fade { to { opacity: 1; } }
+}
