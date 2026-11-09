@@ -2,6 +2,7 @@ import { useEffect, useContext } from "react";
 import { AppContext } from "../context/AppContext";
 import { useAlumno } from "../context/AlumnoContext";
 import Hero from "../components/hero";
+import Splash from "../components/Splash";
 
 function home(){
     const { logout } = useContext(AppContext);
@@ -15,6 +16,7 @@ function home(){
 
     return (
         <>
+        <Splash />
         <Hero></Hero>
         </>
     )

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { LOGOS } from "./Splash";
 import { Link } from "react-router-dom";
 
 function Hero() {
@@ -35,7 +36,19 @@ function Hero() {
   }, []);
 
   return (
-    <section className="relative flex items-center justify-center min-h-[85vh] w-full overflow-hidden bg-white px-6 py-20 border-b border-[#0b6e99]/15">
+    <section className="relative flex flex-col items-center justify-center gap-10 sm:gap-14 min-h-[85vh] w-full overflow-hidden bg-white px-6 py-12 sm:py-16 border-b border-[#0b6e99]/15">
+
+      {/* Logos institucionales, en lo alto de la primera pantalla */}
+      <div className="relative z-10 flex flex-wrap items-end justify-center gap-x-10 sm:gap-x-16 gap-y-5">
+        {LOGOS.map((l) => (
+          <img
+            key={l.src}
+            src={l.src}
+            alt={l.alt}
+            className={`w-auto object-contain ${l.hero}`}
+          />
+        ))}
+      </div>
 
       <div className="relative z-10 max-w-5xl w-full flex flex-col md:flex-row items-center justify-between gap-12 select-none">
 
