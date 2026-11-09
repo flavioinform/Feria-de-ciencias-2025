@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 function Footer() {
   return (
     <footer className="bg-white text-slate-900 border-t border-[#0b6e99]/15 py-10 px-6 text-center relative z-10 bg-brutalist-noise select-none">
@@ -16,10 +18,17 @@ function Footer() {
           </p>
         </div>
 
-        {/* Copyright */}
-        <p className="text-[10px] font-tech font-bold text-slate-500 uppercase tracking-widest">
-          © {new Date().getFullYear()} flavioInform · Todos los derechos reservados.
-        </p>
+        <div className="flex flex-col items-center sm:items-end gap-2">
+          <Link
+            to="/staff"
+            className="text-[10px] font-tech font-bold text-[#0b6e99] hover:underline uppercase tracking-widest"
+          >
+            Acceso administración y logística
+          </Link>
+          <p className="text-[10px] font-tech font-bold text-slate-500 uppercase tracking-widest">
+            © {new Date().getFullYear()} flavioInform · Todos los derechos reservados.
+          </p>
+        </div>
       </div>
     </footer>
   );

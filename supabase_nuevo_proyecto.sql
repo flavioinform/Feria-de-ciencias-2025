@@ -468,11 +468,14 @@ DECLARE v_cuerpo TEXT;
 BEGIN
     IF p_pwd IS NULL THEN RETURN false; END IF;
     IF p_role = 'visitante' THEN
-        IF p_pwd !~ '^\d{6}$' THEN RETURN false; END IF;
-        IF p_pwd ~ '^(\d)\1{5}$' THEN RETURN false; END IF;
-        IF p_pwd IN ('123456', '654321', '012345', '123123', '112233', '121212', '123321') THEN RETURN false; END IF;
+        -- 4 a 8 caracteres, solo letras (sin ñ ni tildes) y números
+        IF p_pwd !~ '^[A-Za-z0-9]{4,8}$' THEN RETURN false; END IF;
+        IF p_pwd ~ '^(.)\1+$' THEN RETURN false; END IF;               -- 1111, aaaa
+        IF lower(p_pwd) IN ('1234', '12345', '123456', '1234567', '12345678', '4321', '54321', '654321',
+                            '0123', '01234', '012345', '1212', '123123', '1122', '112233',
+                            'abcd', 'abcde', 'abc123', 'qwerty', 'clave', 'pass') THEN RETURN false; END IF;
         v_cuerpo := left(p_rut, length(p_rut) - 1);
-        IF right(v_cuerpo, 6) = p_pwd THEN RETURN false; END IF;
+        IF right(v_cuerpo, length(p_pwd)) = p_pwd THEN RETURN false; END IF;   -- parte final del RUT
         RETURN true;
     END IF;
     RETURN length(p_pwd) >= 8;

@@ -8,10 +8,26 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import Button from "@mui/material/Button";
 
+function NavLink({ to, children }) {
+  const { pathname } = useLocation();
+  const isActive = pathname.startsWith(to);
+  return (
+    <Link
+      to={to}
+      className={`px-2.5 py-2 rounded-lg text-[13px] font-semibold whitespace-nowrap normal-case transition-all duration-200 ${
+        isActive
+          ? "bg-white/25 text-white shadow-sm"
+          : "text-sky-50 hover:bg-white/15 hover:text-white"
+      }`}
+    >
+      {children}
+    </Link>
+  );
+}
+
 function AdminNavbar() {
   const { user, logout } = useContext(AppContext);
   const navigate = useNavigate();
-  const location = useLocation();
   const [menuAbierto, setMenuAbierto] = useState(false);
   
   // Estado para el Dialog de Material UI
@@ -31,44 +47,28 @@ function AdminNavbar() {
     setOpenLogoutDialog(false);
   };
 
-  // Componente interno para enlaces de navegación con estado activo
-  const NavLink = ({ to, children }) => {
-    const isActive = location.pathname.startsWith(to);
-    return (
-      <Link
-        to={to}
-        className={`px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
-          isActive 
-            ? "bg-white/25 text-white shadow-sm" 
-            : "text-pink-50 hover:bg-white/15 hover:text-white"
-        }`}
-      >
-        {children}
-      </Link>
-    );
-  };
-
   return (
     <>
       <header className="bg-[#0b6e99] text-white sticky top-0 z-50">
-        <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+        <nav className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between gap-6 h-16">
             {/* Logo / Brand */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 shrink-0">
               <div className="bg-white/20 p-2 rounded-lg backdrop-blur-sm shadow-sm">
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                 </svg>
               </div>
-              <span className="font-black text-xl tracking-wide hidden sm:block">FeriaAdmin</span>
+              <span className="font-black text-lg tracking-wide hidden 2xl:block whitespace-nowrap">FeriaAdmin</span>
             </div>
 
             {/* Desktop Nav */}
-            <div className="hidden lg:flex items-center gap-1.5">
-              <NavLink to="/admin/registroLogin">Visitantes</NavLink>
+            <div className="hidden xl:flex items-center gap-1 flex-1 justify-center min-w-0 overflow-hidden">
+              <NavLink to="/admin/registroLogin">Registro de logística</NavLink>
               {user?.role === "admin" && (
                 <>
+                  <NavLink to="/admin/logistica">Equipo logística</NavLink>
                   <NavLink to="/admin/resultados">Resultados</NavLink>
                   <NavLink to="/admin/coevaluaciones">Coevaluaciones</NavLink>
                   <NavLink to="/admin/por-quien-vino">Búsquedas</NavLink>
@@ -80,18 +80,18 @@ function AdminNavbar() {
             </div>
 
             {/* User & Logout (Desktop) */}
-            <div className="hidden lg:flex items-center gap-5">
+            <div className="hidden xl:flex items-center gap-4 shrink-0">
               {user && (
-                <div className="flex flex-col items-end">
-                  <span className="text-sm font-bold text-white leading-tight">{user.nombre || "Admin"}</span>
-                  <span className="text-xs font-medium text-pink-100">
-                    {user.role === "admin" ? "Administrador" : user.role === "ayudante" ? "Ayudante" : "Usuario"}
+                <div className="hidden 2xl:flex flex-col items-end max-w-[220px]">
+                  <span className="text-sm font-bold text-white leading-tight truncate max-w-full normal-case" title={user.nombre}>{user.nombre || "Admin"}</span>
+                  <span className="text-xs font-medium text-sky-100 normal-case">
+                    {user.role === "admin" ? "Administrador" : user.role === "ayudante" ? "Logística" : "Usuario"}
                   </span>
                 </div>
               )}
               <button
                 onClick={handleLogoutClick}
-                className="bg-white text-pink-600 hover:bg-pink-50 font-bold text-sm px-4 py-2 rounded-xl transition-colors shadow-sm flex items-center gap-2"
+                className="bg-white text-[#0b6e99] hover:bg-sky-50 font-bold text-sm px-4 py-2 rounded-xl transition-colors shadow-sm flex items-center gap-2"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
@@ -101,10 +101,10 @@ function AdminNavbar() {
             </div>
 
             {/* Mobile menu button */}
-            <div className="lg:hidden flex items-center">
+            <div className="xl:hidden flex items-center">
               <button
                 onClick={() => setMenuAbierto(!menuAbierto)}
-                className="p-2 rounded-lg text-pink-50 hover:text-white hover:bg-white/20 transition-colors"
+                className="p-2 rounded-lg text-sky-50 hover:text-white hover:bg-white/20 transition-colors"
               >
                 <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   {menuAbierto ? (
@@ -119,12 +119,13 @@ function AdminNavbar() {
         </nav>
 
         {/* Mobile Menu Dropdown */}
-        <div className={`lg:hidden transition-all duration-300 overflow-hidden ${menuAbierto ? "max-h-96" : "max-h-0"}`}>
-          <div className="bg-pink-700/60 backdrop-blur-md shadow-inner">
+        <div className={`xl:hidden transition-all duration-300 overflow-hidden ${menuAbierto ? "max-h-[32rem]" : "max-h-0"}`}>
+          <div className="bg-[#095a7d] backdrop-blur-md shadow-inner">
             <div className="px-4 pt-3 pb-3 space-y-1">
-              <Link to="/admin/registroLogin" onClick={() => setMenuAbierto(false)} className="block px-3 py-2.5 rounded-lg text-base font-semibold text-white hover:bg-white/20">Registrar visitantes</Link>
+              <Link to="/admin/registroLogin" onClick={() => setMenuAbierto(false)} className="block px-3 py-2.5 rounded-lg text-base font-semibold text-white hover:bg-white/20">Registro de logística</Link>
               {user?.role === "admin" && (
                 <>
+                  <Link to="/admin/logistica" onClick={() => setMenuAbierto(false)} className="block px-3 py-2.5 rounded-lg text-base font-semibold text-white hover:bg-white/20">Equipo de logística</Link>
                   <Link to="/admin/resultados" onClick={() => setMenuAbierto(false)} className="block px-3 py-2.5 rounded-lg text-base font-semibold text-white hover:bg-white/20">Resultados / votos</Link>
                   <Link to="/admin/coevaluaciones" onClick={() => setMenuAbierto(false)} className="block px-3 py-2.5 rounded-lg text-base font-semibold text-white hover:bg-white/20">Coevaluaciones</Link>
                   <Link to="/admin/por-quien-vino" onClick={() => setMenuAbierto(false)} className="block px-3 py-2.5 rounded-lg text-base font-semibold text-white hover:bg-white/20">¿Por quién vinieron?</Link>
@@ -134,7 +135,7 @@ function AdminNavbar() {
                 </>
               )}
             </div>
-            <div className="pt-4 pb-4 border-t border-pink-500/50">
+            <div className="pt-4 pb-4 border-t border-white/20">
               <div className="flex items-center px-6 gap-3">
                 <div className="flex-shrink-0 bg-white/20 p-2 rounded-full">
                   <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -143,15 +144,15 @@ function AdminNavbar() {
                 </div>
                 <div className="ml-3">
                   <div className="text-base font-bold text-white">{user?.nombre || "Administrador"}</div>
-                  <div className="text-sm font-medium text-pink-200 mt-0.5">
-                    {user?.role === "admin" ? "Administrador" : user?.role === "ayudante" ? "Ayudante" : "Gestión Feria"}
+                  <div className="text-sm font-medium text-sky-200 mt-0.5">
+                    {user?.role === "admin" ? "Administrador" : user?.role === "ayudante" ? "Logística" : "Gestión Feria"}
                   </div>
                 </div>
               </div>
               <div className="mt-4 px-4">
                 <button
                   onClick={handleLogoutClick}
-                  className="w-full flex justify-center items-center gap-2 px-4 py-3 bg-white text-pink-600 rounded-xl text-base font-bold shadow-sm hover:bg-pink-50 transition-colors"
+                  className="w-full flex justify-center items-center gap-2 px-4 py-3 bg-white text-[#0b6e99] rounded-xl text-base font-bold shadow-sm hover:bg-sky-50 transition-colors"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>

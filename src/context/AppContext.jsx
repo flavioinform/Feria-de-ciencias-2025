@@ -24,7 +24,7 @@ async function resolverUsuario(session) {
       console.error("No se pudo resolver el rol (jwt_role):", error);
       return undefined; // fallo transitorio: no cambia al usuario actual
     }
-    if (role === "admin") {
+    if (role === "admin" || role === "ayudante") {
       return {
         id: u.id,
         nombre: u.user_metadata?.full_name ?? u.user_metadata?.name ?? u.email,

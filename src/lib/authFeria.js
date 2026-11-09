@@ -42,7 +42,7 @@ export const MENSAJES_ERROR = {
   credenciales: "Contraseña incorrecta.",
   pendiente_vencido: "Tu registro venció. Pide en el mesón que te vuelvan a habilitar.",
   password_invalida:
-    "Contraseña no válida. Usa 6 números que no sean repetidos, consecutivos ni parte de tu RUT.",
+    "Contraseña no válida. Usa de 4 a 8 letras o números, sin repetidos (1111), secuencias (1234) ni parte de tu RUT.",
   no_pendiente: "Esta cuenta ya tiene contraseña.",
   rut_invalido: "RUT inválido. Revisa el número y el dígito verificador.",
   rut_existente: "Este RUT ya está registrado.",

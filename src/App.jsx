@@ -16,6 +16,8 @@ import AdminConfiguracion from "./pages/admin/AdminConfiguracion";
 import AlumnoCoevaluacion from "./pages/alumno/AlumnoCoevaluacion";
 import AdminCategorias from "./pages/admin/AdminCategorias";
 import AdminProyectosPorCategoria from "./pages/admin/AdminProyectosPorCategoria";
+import StaffLogin from "./pages/StaffLogin";
+import AdminLogistica from "./pages/admin/AdminLogistica";
 import AdminJurados from "./pages/admin/AdminJurados";
 import AlumnoLogin from "./pages/alumno/AlumnoLogin";
 import AlumnoProyecto from "./pages/alumno/AlumnoProyecto";
@@ -37,7 +39,7 @@ const FERIA_CONCLUIDA = false;
 
 /** Rutas que siguen disponibles para el admin aunque la feria esté cerrada */
 function esRutaAdmin(pathname) {
-  return pathname === "/login" || pathname.startsWith("/admin");
+  return pathname === "/login" || pathname === "/staff" || pathname.startsWith("/admin");
 }
 
 /** Pantalla de cierre que se muestra en cualquier ruta cuando la feria terminó */
@@ -129,6 +131,7 @@ function AppContent() {
         <Routes>
           <Route path="/" element={<RutaPublica><Home /></RutaPublica>} />
           <Route path="/login" element={<RutaPublica><Login /></RutaPublica>} />
+          <Route path="/staff" element={<RutaPublica><StaffLogin /></RutaPublica>} />
 
           {/* ── Rutas de visitante/jurado (protegidas) ── */}
           <Route
@@ -189,6 +192,14 @@ function AppContent() {
             }
           >
             <Route path="registroLogin" element={<RegistroLogin />} />
+            <Route
+              path="logistica"
+              element={
+                <RutaAdmin>
+                  <AdminLogistica />
+                </RutaAdmin>
+              }
+            />
             <Route
               path="resultados"
               element={
