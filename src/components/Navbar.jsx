@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useContext, useState, useRef, useEffect } from "react";
 import { AppContext } from "../context/AppContext";
 import { useAlumno } from "../context/AlumnoContext";
@@ -7,6 +7,7 @@ function Navbar() {
   const { user, logout } = useContext(AppContext);
   const { alumno, logoutAlumno } = useAlumno();
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -32,6 +33,8 @@ function Navbar() {
 
   // Ocultar Navbar si el alumno ha iniciado sesión
   if (alumno) return null;
+  // El panel de administración trae su propia barra
+  if (pathname.startsWith("/admin")) return null;
 
   return (
     <header className="bg-white border-b border-[#0b6e99]/15 sticky top-0 z-50 backdrop-blur-md bg-opacity-95 bg-brutalist-noise select-none">

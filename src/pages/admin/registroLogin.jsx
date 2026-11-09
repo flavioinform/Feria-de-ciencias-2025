@@ -250,7 +250,7 @@ function RegistroLogin() {
         <div className="bg-white rounded-2xl shadow-xl p-5 sm:p-8 border border-gray-100">
           <div className="text-center mb-6 sm:mb-8">
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">
-              Registro de visitantes
+              Registro de logística
             </h1>
             <p className="text-gray-500 text-sm sm:text-base">
               Ingresa los datos del visitante. Él mismo definirá su contraseña al entrar por primera vez.
@@ -377,7 +377,7 @@ function RegistroLogin() {
                 <p className="font-semibold">{registrado.nombre} ({registrado.rutFmt})</p>
                 <p className="text-sm mt-1">
                   {segundos > 0
-                    ? "Pídele que escanee este código y defina su contraseña (6 números)."
+                    ? "Pídele que escanee este código y defina su contraseña (4 a 8 letras o números)."
                     : "El tiempo venció. Si aún no definió su contraseña, vuelve a habilitarlo."}
                 </p>
                 {segundos > 0 && (
@@ -406,7 +406,179 @@ function RegistroLogin() {
             </button>
           </form>
         </div>
+
+        <RestablecerContrasena />
       </div>
+    </div>
+  );
+}
+
+// Permite que un visitante que olvidó su contraseña defina una nueva:
+// el RUT vuelve a quedar "pendiente" 15 min y, al ingresarlo en /login,
+// el sistema le pide crear su contraseña de nuevo.
+function RestablecerContrasena() {
+  const [busqueda, setBusqueda] = useState("");
+  const [coincidencias, setCoincidencias] = useState([]);
+  const [buscando, setBuscando] = useState(false);
+  const [elegido, setElegido] = useState(null); // { id, nombre, rut }
+  const [cargando, setCargando] = useState(false);
+  const [resultado, setResultado] = useState(null); // { tipo, texto, hasta?, rutNorm? }
+  const [segundos, setSegundos] = useState(0);
+
+  useEffect(() => {
+    if (!resultado?.hasta) return;
+    const tick = () => setSegundos(Math.max(0, Math.round((resultado.hasta - Date.now()) / 1000)));
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [resultado]);
+
+  // Busca visitantes por nombre o por RUT (con o sin puntos y guion)
+  useEffect(() => {
+    // Quita caracteres que rompen el filtro de la API
+    const termino = busqueda.replace(/[,()%*\\]/g, " ").trim();
+    if (elegido || termino.length < 3) return;
+    const rutTermino = termino.replace(/[.\-\s]/g, "").toUpperCase();
+    const filtro = [`nombre.ilike.%${termino}%`];
+    if (rutTermino.length >= 3) filtro.push(`rut.ilike.%${rutTermino}%`);
+
+    let vigente = true;
+    const t = setTimeout(async () => {
+      setBuscando(true);
+      const { data } = await supabase
+        .from("usuarios")
+        .select("id, nombre, rut")
+        .eq("role", "visitante")
+        .or(filtro.join(","))
+        .order("nombre")
+        .limit(8);
+      if (vigente) {
+        setCoincidencias(data || []);
+        setBuscando(false);
+      }
+    }, 250);
+    return () => {
+      vigente = false;
+      clearTimeout(t);
+    };
+  }, [busqueda, elegido]);
+
+  const formatearRutVista = (rutNorm) => {
+    if (!rutNorm || rutNorm.length < 2) return rutNorm || "";
+    const cuerpo = rutNorm.slice(0, -1).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    return `${cuerpo}-${rutNorm.slice(-1)}`;
+  };
+
+  const elegir = (u) => {
+    setElegido(u);
+    setBusqueda(`${u.nombre} (${formatearRutVista(u.rut)})`);
+    setCoincidencias([]);
+    setResultado(null);
+  };
+
+  const cambiarBusqueda = (e) => {
+    setBusqueda(e.target.value);
+    setElegido(null);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!elegido) return;
+    setResultado(null);
+    setCargando(true);
+
+    const r = await authFeria("habilitar_visitante", { usuario_id: elegido.id });
+    setCargando(false);
+    if (!r.ok) {
+      setResultado({ tipo: "error", texto: mensajeError(r.error) });
+      return;
+    }
+    setResultado({
+      tipo: "ok",
+      texto: `${elegido.nombre} (${formatearRutVista(elegido.rut)}) ya puede definir una contraseña nueva.`,
+      hasta: Date.now() + 15 * 60 * 1000,
+      rutNorm: elegido.rut,
+    });
+    setElegido(null);
+    setBusqueda("");
+  };
+
+  return (
+    <div className="mt-6 bg-white rounded-2xl shadow-xl p-5 sm:p-8 border border-gray-100">
+      <h2 className="text-xl font-bold text-gray-800 mb-1">Restablecer contraseña</h2>
+      <p className="text-gray-500 text-sm mb-4">
+        Busca al visitante por nombre o RUT y elígelo de la lista. Al ingresar su RUT de nuevo en el
+        sistema podrá crear una contraseña nueva (tiene 15 minutos).
+      </p>
+
+      <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
+        <div className="relative flex-1">
+          <input
+            type="text"
+            value={busqueda}
+            onChange={cambiarBusqueda}
+            placeholder="Nombre o RUT del visitante"
+            autoComplete="off"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-gray-50 text-black"
+          />
+
+          {!elegido && busqueda.trim().length >= 3 && (
+            <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-xl max-h-64 overflow-y-auto">
+              {buscando ? (
+                <div className="p-4 text-sm text-gray-500 text-center">Buscando...</div>
+              ) : coincidencias.length > 0 ? (
+                coincidencias.map((u) => (
+                  <button
+                    type="button"
+                    key={u.id}
+                    onClick={() => elegir(u)}
+                    className="w-full text-left p-3 hover:bg-emerald-50 border-b border-gray-100 last:border-0 transition-colors"
+                  >
+                    <div className="font-semibold text-gray-800 text-sm">{u.nombre}</div>
+                    <div className="text-xs text-emerald-700 mt-0.5">{formatearRutVista(u.rut)}</div>
+                  </button>
+                ))
+              ) : (
+                <div className="p-4 text-sm text-gray-500 text-center">No se encontraron visitantes</div>
+              )}
+            </div>
+          )}
+        </div>
+
+        <button
+          type="submit"
+          disabled={cargando || !elegido}
+          className="px-6 py-3 bg-black text-white font-semibold rounded-lg hover:bg-emerald-700 disabled:opacity-50"
+        >
+          {cargando ? "Restableciendo..." : "Restablecer"}
+        </button>
+      </form>
+
+      {resultado && (
+        <div
+          className={`mt-4 p-4 rounded-lg border text-center ${
+            resultado.tipo === "error"
+              ? "bg-red-50 border-red-200 text-red-700"
+              : "bg-green-50 border-green-200 text-green-800"
+          }`}
+        >
+          <p className="font-medium">{resultado.texto}</p>
+          {resultado.hasta && segundos > 0 && (
+            <>
+              <div className="inline-block bg-white p-3 rounded-xl border border-green-200 mt-3">
+                <QRCodeSVG value={`${window.location.origin}/login?rut=${resultado.rutNorm}`} size={170} />
+              </div>
+              <p className="text-sm mt-2">Que escanee el código o escriba su RUT en el sistema.</p>
+              <p className="text-xl font-bold tabular-nums">
+                {String(Math.floor(segundos / 60)).padStart(2, "0")}:{String(segundos % 60).padStart(2, "0")}
+              </p>
+            </>
+          )}
+          {resultado.hasta && segundos === 0 && (
+            <p className="text-sm mt-2">El tiempo venció. Vuelve a restablecer si aún no cambió su contraseña.</p>
+          )}
+        </div>
+      )}
     </div>
   );
 }
