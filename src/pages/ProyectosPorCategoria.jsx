@@ -46,11 +46,25 @@ function ProyectosPorCategoria() {
           return;
         }
 
-        setProyectos(proyData || []);
+        // El jurado solo ve los proyectos que se le asignaron (si no tiene
+        // ninguno asignado todavía, ve todos como antes).
+        let lista = proyData || [];
+        const esJurado = user?.rut?.startsWith("JUR") || user?.role === "jurado";
+        if (esJurado && user?.id) {
+          const { data: asig } = await supabase
+            .from("jurado_proyectos")
+            .select("proyecto_id")
+            .eq("jurado_id", user.id);
+          if (asig && asig.length > 0) {
+            const permitidos = new Set(asig.map((a) => a.proyecto_id));
+            lista = lista.filter((p) => permitidos.has(p.id));
+          }
+        }
+        setProyectos(lista);
 
         // Obtener proyectos ya evaluados por este usuario
-        if (user?.id && proyData?.length > 0) {
-          const proyIds = proyData.map((p) => p.id);
+        if (user?.id && lista.length > 0) {
+          const proyIds = lista.map((p) => p.id);
           const { data: evalsData } = await supabase
             .from("evaluaciones")
             .select("proyecto_id")

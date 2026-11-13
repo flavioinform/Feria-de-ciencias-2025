@@ -19,10 +19,11 @@ function Login() {
   const [paso, setPaso] = useState("rut");
   const [rut, setRut] = useState(() => {
     const r = new URLSearchParams(window.location.search).get("rut") ?? "";
-    return /^JUR/i.test(r) ? r.toUpperCase() : formatearRut(r);
+    return /^(JUR|EXT)/i.test(r) ? r.toUpperCase() : formatearRut(r);
   });
   const [rol, setRol] = useState(null);
   const [password, setPassword] = useState("");
+  const [verPass, setVerPass] = useState(false);
   const [confirmar, setConfirmar] = useState("");
   const [mensaje, setMensaje] = useState("");
   const [cargando, setCargando] = useState(false);
@@ -91,7 +92,7 @@ function Login() {
     // Saca las credenciales de la barra de direcciones / historial
     window.history.replaceState({}, "", "/login");
 
-    const rutFmt = /^JUR/i.test(r) ? r.toUpperCase() : formatearRut(r);
+    const rutFmt = /^(JUR|EXT)/i.test(r) ? r.toUpperCase() : formatearRut(r);
     if (code) {
       setCargando(true);
       authFeria("login", { rut: rutFmt, password: code }).then(entrar);
@@ -103,7 +104,7 @@ function Login() {
 
   const handleRutChange = (e) => {
     const v = e.target.value;
-    setRut(/^JUR/i.test(v) ? v.toUpperCase() : formatearRut(v));
+    setRut(/^(JUR|EXT)/i.test(v) ? v.toUpperCase() : formatearRut(v));
   };
 
   const submitRut = (e) => {
@@ -144,7 +145,7 @@ function Login() {
 
   const esVisitante = rol === "visitante";
   const campoPass = {
-    type: "password",
+    type: verPass ? "text" : "password",
     inputMode: "text",
     autoComplete: "off",
     maxLength: esVisitante ? 8 : 100,
@@ -162,7 +163,7 @@ function Login() {
         <div className="text-center mb-8">
           <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Ingreso a la Feria</h1>
           <p className="text-slate-500 mt-2 text-base">
-            {paso === "rut" && "Escribe tu RUT para comenzar"}
+            {paso === "rut" && "Escribe tu RUT o tu código EXT para comenzar"}
             {paso === "password" && "Escribe tu contraseña"}
             {paso === "definir" && "Es tu primera vez: crea tu contraseña"}
           </p>
@@ -211,6 +212,15 @@ function Login() {
                   required
                 />
               </div>
+              <label className="flex items-center gap-2 text-sm text-slate-600 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={verPass}
+                  onChange={(e) => setVerPass(e.target.checked)}
+                  className="h-4 w-4"
+                />
+                Mostrar contraseña
+              </label>
               <button type="submit" disabled={cargando || !password} className={btnCls}>
                 {cargando ? "Ingresando..." : "Ingresar"}
               </button>
@@ -257,6 +267,15 @@ function Login() {
                   required
                 />
               </div>
+              <label className="flex items-center gap-2 text-sm text-slate-600 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={verPass}
+                  onChange={(e) => setVerPass(e.target.checked)}
+                  className="h-4 w-4"
+                />
+                Mostrar contraseña
+              </label>
               <button type="submit" disabled={cargando || !password || !confirmar} className={btnCls}>
                 {cargando ? "Guardando..." : "Guardar y entrar"}
               </button>

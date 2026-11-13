@@ -74,6 +74,7 @@ function AdminNavbar() {
                   <NavLink to="/admin/por-quien-vino">Búsquedas</NavLink>
                   <NavLink to="/admin/categorias-proyectos">Proyectos</NavLink>
                   <NavLink to="/admin/jurados">Jurados</NavLink>
+                  <NavLink to="/admin/reportes">Reportes</NavLink>
                   <NavLink to="/admin/configuracion">Configuración</NavLink>
                 </>
               )}
@@ -131,6 +132,7 @@ function AdminNavbar() {
                   <Link to="/admin/por-quien-vino" onClick={() => setMenuAbierto(false)} className="block px-3 py-2.5 rounded-lg text-base font-semibold text-white hover:bg-white/20">¿Por quién vinieron?</Link>
                   <Link to="/admin/categorias-proyectos" onClick={() => setMenuAbierto(false)} className="block px-3 py-2.5 rounded-lg text-base font-semibold text-white hover:bg-white/20">Categorías y Proyectos</Link>
                   <Link to="/admin/jurados" onClick={() => setMenuAbierto(false)} className="block px-3 py-2.5 rounded-lg text-base font-semibold text-white hover:bg-white/20">Jurados y Códigos QR</Link>
+                  <Link to="/admin/reportes" onClick={() => setMenuAbierto(false)} className="block px-3 py-2.5 rounded-lg text-base font-semibold text-white hover:bg-white/20">Reportes y correos</Link>
                   <Link to="/admin/configuracion" onClick={() => setMenuAbierto(false)} className="block px-3 py-2.5 rounded-lg text-base font-semibold text-white hover:bg-white/20">Configuración</Link>
                 </>
               )}

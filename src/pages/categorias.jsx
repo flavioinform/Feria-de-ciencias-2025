@@ -128,14 +128,25 @@ function Categorias() {
           return posA - posB;
         });
 
-        setCategorias(ordenadas);
+        // El jurado solo ve las asignaturas donde tiene proyectos asignados
+        // (si aún no tiene asignaciones, ve todas como antes).
+        let visibles = ordenadas;
+        if (esJurado && user?.id) {
+          const { data: asig } = await supabase
+            .from("jurado_proyectos")
+            .select("proyectos(categorias_id)")
+            .eq("jurado_id", user.id);
+          const ids = new Set((asig ?? []).map((a) => a.proyectos?.categorias_id));
+          if (ids.size > 0) visibles = ordenadas.filter((c) => ids.has(c.id));
+        }
+        setCategorias(visibles);
       }
 
       setLoading(false);
     }
 
     fetchCategorias();
-  }, []);
+  }, [esJurado, user?.id]);
 
   return (
     <div className="min-h-screen bg-slate-50 py-16 px-4 relative overflow-hidden bg-brutalist-noise font-tech">

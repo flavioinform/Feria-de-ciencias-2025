@@ -58,6 +58,7 @@ function RegistroLogin() {
     vienePorAlguien: false,
     por_quien_vino: "",
   });
+  const [esTurista, setEsTurista] = useState(false); // sin RUT: se genera un código EXT
 
   const [mensaje, setMensaje] = useState("");
   const [tipo, setTipo] = useState(""); // "ok" | "error"
@@ -165,7 +166,7 @@ function RegistroLogin() {
       const rutIngresado = form.rut.trim();
 
       // Validación rápida en el cliente (el servidor vuelve a validar)
-      if (!validarRut(rutIngresado)) {
+      if (!esTurista && !validarRut(rutIngresado)) {
         setMensaje(
           "RUT inválido. Verifica el número, el dígito verificador y que sea un RUT real."
         );
@@ -173,7 +174,7 @@ function RegistroLogin() {
         return;
       }
 
-      const r = await authFeria("registrar_visitante", {
+      const r = await authFeria(esTurista ? "registrar_turista" : "registrar_visitante", {
         nombre: form.nombre,
         rut: rutIngresado,
         viene_por_alguien: form.vienePorAlguien,
@@ -191,7 +192,7 @@ function RegistroLogin() {
       setTipo("ok");
       setRegistrado({
         rut: r.rut,
-        rutFmt: rutIngresado,
+        rutFmt: esTurista ? r.rut : rutIngresado,
         nombre: form.nombre,
         hasta: Date.now() + 15 * 60 * 1000,
       });
@@ -204,6 +205,7 @@ function RegistroLogin() {
       });
       setBusquedaEstudiante("");
       setMostrarResultados(false);
+      setEsTurista(false);
     } catch (err) {
       console.error("Error inesperado en registroLogin:", err);
       setMensaje("Error inesperado del servidor");
@@ -246,7 +248,7 @@ function RegistroLogin() {
 
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4 py-8 sm:py-12">
-      <div className="max-w-lg w-full">
+      <div className="max-w-lg lg:max-w-5xl w-full">
         <div className="bg-white rounded-2xl shadow-xl p-5 sm:p-8 border border-gray-100">
           <div className="text-center mb-6 sm:mb-8">
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">
@@ -257,7 +259,8 @@ function RegistroLogin() {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-5 lg:space-y-0 lg:grid lg:grid-cols-2 lg:gap-x-10 lg:gap-y-5 lg:items-start">
+            <div className="space-y-5 lg:col-start-1 lg:row-start-1">
             {/* Nombre */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -273,22 +276,42 @@ function RegistroLogin() {
               />
             </div>
 
-            {/* RUT */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                RUT
-              </label>
+            {/* Turista / sin RUT */}
+            <div className="flex items-center gap-2">
               <input
-                type="text"
-                name="rut"
-                value={form.rut}
-                onChange={handleRutChange}
-                placeholder="12.345.678-9"
-                maxLength={12}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none bg-gray-50 text-black"
-                required
+                id="esTurista"
+                type="checkbox"
+                checked={esTurista}
+                onChange={(e) => setEsTurista(e.target.checked)}
+                className="h-4 w-4 text-emerald-600 border-gray-300 rounded"
               />
+              <label htmlFor="esTurista" className="text-sm text-gray-700">
+                Turista o persona sin RUT
+              </label>
             </div>
+
+            {/* RUT */}
+            {esTurista ? (
+              <p className="text-sm text-gray-600 bg-emerald-50 border border-emerald-200 rounded-lg px-4 py-3">
+                Se generará un código <strong>EXT-######</strong>. Entrégaselo al visitante: lo usará en lugar del RUT para entrar a votar.
+              </p>
+            ) : (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  RUT
+                </label>
+                <input
+                  type="text"
+                  name="rut"
+                  value={form.rut}
+                  onChange={handleRutChange}
+                  placeholder="12.345.678-9"
+                  maxLength={12}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none bg-gray-50 text-black"
+                  required
+                />
+              </div>
+            )}
 
             {/* Viene por alguien */}
             <div className="flex items-center gap-2">
@@ -348,6 +371,9 @@ function RegistroLogin() {
               </div>
             )}
 
+            </div>
+
+            <div className="space-y-5 lg:col-start-2 lg:row-start-1 lg:row-span-2">
             {/* Mensajes */}
             {mensaje && (
               <div
@@ -396,11 +422,12 @@ function RegistroLogin() {
                 )}
               </div>
             )}
+            </div>
 
             <button
               type="submit"
               disabled={cargando}
-              className="w-full bg-black text-white font-semibold py-3 px-6 rounded-lg hover:bg-emerald-700 focus:outline-none focus:ring-4 focus:ring-emerald-300 transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full lg:col-start-1 lg:row-start-2 bg-black text-white font-semibold py-3 px-6 rounded-lg hover:bg-emerald-700 focus:outline-none focus:ring-4 focus:ring-emerald-300 transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {cargando ? "Registrando..." : "Registrar visitante"}
             </button>
