@@ -19,6 +19,7 @@ import AdminProyectosPorCategoria from "./pages/admin/AdminProyectosPorCategoria
 import StaffLogin from "./pages/StaffLogin";
 import AdminLogistica from "./pages/admin/AdminLogistica";
 import AdminJurados from "./pages/admin/AdminJurados";
+import AdminReportes from "./pages/admin/AdminReportes";
 import AlumnoLogin from "./pages/alumno/AlumnoLogin";
 import AlumnoProyecto from "./pages/alumno/AlumnoProyecto";
 import Categorias from "./pages/categorias";
@@ -237,6 +238,14 @@ function AppContent() {
               element={
                 <RutaAdmin>
                   <AdminJurados />
+                </RutaAdmin>
+              }
+            />
+            <Route
+              path="reportes"
+              element={
+                <RutaAdmin>
+                  <AdminReportes />
                 </RutaAdmin>
               }
             />

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "../../lib/supabase";
 import { authFeria, mensajeError } from "../../lib/authFeria";
 import { QRCodeSVG } from "qrcode.react";
+import { PLAN_JURADOS, MOTIVO_INCLUSIVO } from "../../lib/asignacionJurados";
 
 function AdminJurados() {
   const [jurados, setJurados] = useState([]);
@@ -14,6 +15,12 @@ function AdminJurados() {
   // después de crearlos o regenerarlos. { [usuario_id]: codigo }
   const [codigos, setCodigos] = useState({});
   const [qrGrande, setQrGrande] = useState(null); // jurado con QR ampliado
+
+  // Asignación de proyectos: { [jurado_id]: [proyecto_id] } y catálogo de proyectos
+  const [asignaciones, setAsignaciones] = useState({});
+  const [proyectos, setProyectos] = useState([]);
+  const [asignando, setAsignando] = useState(false);
+  const [errorAsignaciones, setErrorAsignaciones] = useState("");
 
   const baseUrl = window.location.origin;
   const urlLogin = (jurado) => `${baseUrl}/login?rut=${jurado.rut}&code=${codigos[jurado.id]}`;
@@ -32,9 +39,110 @@ function AdminJurados() {
     setCargando(false);
   };
 
+  const cargarAsignaciones = async () => {
+    const [{ data: proy }, { data: filas, error }] = await Promise.all([
+      supabase.from("proyectos").select("id, titulo, categorias(nombre)").order("id"),
+      supabase.from("jurado_proyectos").select("jurado_id, proyecto_id"),
+    ]);
+    setProyectos(proy ?? []);
+    if (error) {
+      setErrorAsignaciones(
+        "No se pudo leer la tabla jurado_proyectos. ¿Ejecutaste supabase/jurado_asignaciones.sql?"
+      );
+      return;
+    }
+    setErrorAsignaciones("");
+    const mapa = {};
+    for (const f of filas ?? []) (mapa[f.jurado_id] ??= []).push(f.proyecto_id);
+    setAsignaciones(mapa);
+  };
+
   useEffect(() => {
     cargarJurados();
+    cargarAsignaciones();
   }, []);
+
+  const tituloProyecto = (id) => proyectos.find((p) => p.id === id);
+
+  const quitarProyecto = async (jurado, proyectoId) => {
+    const { error } = await supabase
+      .from("jurado_proyectos")
+      .delete()
+      .eq("jurado_id", jurado.id)
+      .eq("proyecto_id", proyectoId);
+    if (error) {
+      setMensaje("No se pudo quitar el proyecto: " + error.message);
+      setTipo("error");
+      return;
+    }
+    cargarAsignaciones();
+  };
+
+  const agregarProyecto = async (jurado, proyectoId) => {
+    if (!proyectoId) return;
+    const { error } = await supabase
+      .from("jurado_proyectos")
+      .insert({ jurado_id: jurado.id, proyecto_id: Number(proyectoId) });
+    if (error) {
+      setMensaje("No se pudo asignar el proyecto: " + error.message);
+      setTipo("error");
+      return;
+    }
+    cargarAsignaciones();
+  };
+
+  // Crea (si faltan) los 5 jurados del plan y les asigna sus 4 proyectos.
+  const handleCrearYAsignar = async () => {
+    const hayCambios = Object.keys(asignaciones).length > 0;
+    if (
+      hayCambios &&
+      !window.confirm("Ya hay asignaciones guardadas. Se reemplazarán por el plan de 5 jurados x 4 proyectos. ¿Continuar?")
+    ) {
+      return;
+    }
+    setAsignando(true);
+    setMensaje("");
+    try {
+      const { data: existentes } = await supabase
+        .from("usuarios")
+        .select("id, nombre")
+        .eq("role", "jurado");
+      const nuevosCodigos = {};
+      let creados = 0;
+
+      for (const plan of PLAN_JURADOS) {
+        let id = existentes?.find((j) => j.nombre === plan.nombre)?.id;
+        if (!id) {
+          const r = await authFeria("crear_jurado", { nombre: plan.nombre });
+          if (!r.ok) throw new Error(`${plan.nombre}: ${mensajeError(r.error)}`);
+          id = r.id;
+          nuevosCodigos[r.id] = r.codigo;
+          creados++;
+        }
+        const { error: eDel } = await supabase.from("jurado_proyectos").delete().eq("jurado_id", id);
+        if (eDel) throw new Error(eDel.message);
+        const { error: eIns } = await supabase
+          .from("jurado_proyectos")
+          .insert(plan.proyectos.map((proyecto_id) => ({ jurado_id: id, proyecto_id })));
+        if (eIns) throw new Error(eIns.message);
+      }
+
+      setCodigos((prev) => ({ ...prev, ...nuevosCodigos }));
+      setMensaje(
+        creados > 0
+          ? `Listo: ${creados} jurado(s) creado(s) y proyectos asignados. Guarda o imprime los QR ahora: no se podrán volver a ver.`
+          : "Proyectos reasignados. Los jurados ya existían: si necesitas su QR, usa «Generar QR nuevo»."
+      );
+      setTipo("ok");
+      await cargarJurados();
+      await cargarAsignaciones();
+    } catch (err) {
+      setMensaje("No se pudo completar: " + err.message);
+      setTipo("error");
+    } finally {
+      setAsignando(false);
+    }
+  };
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -118,6 +226,20 @@ function AdminJurados() {
               />
             </div>
 
+            <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-900 space-y-2">
+              <p>
+                <strong>Plan de la feria:</strong> 5 jurados, 4 proyectos cada uno. El jurado 5 es inclusivo y recibe proyectos accesibles para una persona ciega.
+              </p>
+              <button
+                type="button"
+                onClick={handleCrearYAsignar}
+                disabled={asignando}
+                className="w-full bg-emerald-700 text-white font-semibold py-2 px-4 rounded-lg hover:bg-emerald-800 transition-colors disabled:opacity-50"
+              >
+                {asignando ? "Creando..." : "Crear los 5 jurados y asignar proyectos"}
+              </button>
+            </div>
+
             {mensaje && (
               <div className={`p-3 rounded text-sm ${tipo === "error" ? "bg-red-50 text-red-700" : "bg-green-50 text-green-700"}`}>
                 {mensaje}
@@ -194,6 +316,57 @@ function AdminJurados() {
                       >
                         Eliminar
                       </button>
+                    </div>
+
+                    <div className="mt-5 w-full border-t border-gray-100 pt-4 text-left">
+                      <p className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">
+                        Proyectos que evalúa ({(asignaciones[jurado.id] ?? []).length})
+                      </p>
+                      {errorAsignaciones ? (
+                        <p className="text-xs text-red-600">{errorAsignaciones}</p>
+                      ) : (
+                        <>
+                          <ul className="space-y-1.5">
+                            {(asignaciones[jurado.id] ?? []).map((pid) => {
+                              const pr = tituloProyecto(pid);
+                              return (
+                                <li key={pid} className="flex items-start justify-between gap-2 text-sm text-gray-800">
+                                  <span>
+                                    <span className="font-semibold">{pr?.titulo ?? `Proyecto ${pid}`}</span>
+                                    {pr?.categorias?.nombre && (
+                                      <span className="block text-xs text-gray-400">{pr.categorias.nombre}</span>
+                                    )}
+                                    {jurado.nombre.includes("inclusivo") && MOTIVO_INCLUSIVO[pid] && (
+                                      <span className="block text-xs text-emerald-700">{MOTIVO_INCLUSIVO[pid]}</span>
+                                    )}
+                                  </span>
+                                  <button
+                                    type="button"
+                                    onClick={() => quitarProyecto(jurado, pid)}
+                                    className="text-red-500 hover:text-red-700 font-bold leading-none"
+                                    title="Quitar este proyecto"
+                                    aria-label={`Quitar ${pr?.titulo ?? pid}`}
+                                  >
+                                    ×
+                                  </button>
+                                </li>
+                              );
+                            })}
+                          </ul>
+                          <select
+                            value=""
+                            onChange={(e) => agregarProyecto(jurado, e.target.value)}
+                            className="mt-2 w-full text-sm border rounded-lg px-2 py-1.5 text-gray-700 bg-white"
+                          >
+                            <option value="">+ Asignar otro proyecto…</option>
+                            {proyectos
+                              .filter((p) => !(asignaciones[jurado.id] ?? []).includes(p.id))
+                              .map((p) => (
+                                <option key={p.id} value={p.id}>{p.titulo}</option>
+                              ))}
+                          </select>
+                        </>
+                      )}
                     </div>
                   </div>
                 );

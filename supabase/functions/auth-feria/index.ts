@@ -150,6 +150,25 @@ Deno.serve(async (req) => {
       );
     }
 
+    if (action === "registrar_turista") {
+      if (!esStaff) return json({ ok: false, error: "no_autorizado" }, 403);
+      const viene = body.viene_por_alguien === true;
+      for (let intento = 0; intento < 5; intento++) {
+        const rut = "EXT" + digitos(6);
+        const r = await rpc("fn_crear_usuario", {
+          p_nombre: str(body.nombre, 120),
+          p_rut: rut,
+          p_role: "visitante",
+          p_viene: viene,
+          p_por_quien: viene ? str(body.por_quien_vino, 200) : null,
+          p_password: null,
+        });
+        if (r.ok) return json({ ...r, rut });
+        if (r.error !== "rut_existente") return json(r);
+      }
+      return json({ ok: false, error: "reintentar" });
+    }
+
     if (action === "habilitar_visitante") {
       if (!esStaff) return json({ ok: false, error: "no_autorizado" }, 403);
       return json(await rpc("fn_habilitar_visitante", { p_id: str(body.usuario_id, 50) }));

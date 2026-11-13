@@ -207,3 +207,30 @@ export async function exportarCoevaluacionPorMiembro() {
 
   await guardar(wb, "coevaluacion_promedio_por_miembro.xlsx");
 }
+
+// Reporte de completitud de proyectos (imagen, descripción, integrantes).
+// `filas`: [{ titulo, asignatura, tieneImagen, tieneDescripcion, integrantes: [{nombre, correo}] }]
+export async function exportarReporteProyectos(filas) {
+  const wb = new ExcelJS.Workbook();
+  const ws = wb.addWorksheet("Proyectos");
+  ws.columns = [
+    { header: "Proyecto", key: "titulo", width: 38 },
+    { header: "Asignatura", key: "asignatura", width: 38 },
+    { header: "Imagen", key: "imagen", width: 10 },
+    { header: "Descripción", key: "descripcion", width: 14 },
+    { header: "N° integrantes", key: "n", width: 14 },
+    { header: "Integrantes", key: "integrantes", width: 60 },
+  ];
+  for (const f of filas) {
+    ws.addRow({
+      titulo: f.titulo,
+      asignatura: f.asignatura,
+      imagen: f.tieneImagen ? "Sí" : "FALTA",
+      descripcion: f.tieneDescripcion ? "Sí" : "FALTA",
+      n: f.integrantes.length,
+      integrantes: f.integrantes.map((i) => i.nombre).join(", ") || "Sin integrantes",
+    });
+  }
+  estilizarEncabezado(ws);
+  await guardar(wb, "reporte-proyectos.xlsx");
+}
