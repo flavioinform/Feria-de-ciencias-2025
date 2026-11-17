@@ -149,12 +149,14 @@ function AdminReportes() {
     } else if (r?.enviados > 0) {
       setResultado({
         tipo: "error",
-        texto: `Se enviaron ${r.enviados}, pero fallaron: ${r.fallidos.join(", ")}`,
+        texto: `Se enviaron ${r.enviados}, pero fallaron: ${r.fallidos.join(", ")}. ${r.detalle ?? ""}`,
       });
     } else {
       setResultado({
         tipo: "error",
-        texto: ERRORES_CORREO[r?.error] ?? "No se pudo enviar el correo.",
+        texto:
+          ERRORES_CORREO[r?.error] ??
+          (r?.detalle ? `Resend rechazó el envío: ${r.detalle}` : "No se pudo enviar el correo."),
       });
     }
   };

@@ -37,7 +37,8 @@ CREATE TABLE IF NOT EXISTS public.usuarios (
     pendiente_hasta TIMESTAMPTZ,            -- ventana para definir la contraseña por primera vez
     intentos_fallidos INTEGER NOT NULL DEFAULT 0,
     bloqueado_hasta TIMESTAMPTZ,
-    auth_user_id UUID UNIQUE REFERENCES auth.users(id) ON DELETE SET NULL
+    auth_user_id UUID UNIQUE REFERENCES auth.users(id) ON DELETE SET NULL,
+    consentimiento_datos_at TIMESTAMPTZ     -- cuándo el visitante aceptó el uso de sus datos (Ley 21.719)
 );
 
 -- ---------- categorias ----------
@@ -530,7 +531,9 @@ BEGIN
     RETURN jsonb_build_object('ok', false, 'error', 'credenciales');
 END $$;
 
-CREATE OR REPLACE FUNCTION public.fn_definir_password(p_rut TEXT, p_password TEXT) RETURNS JSONB
+CREATE OR REPLACE FUNCTION public.fn_definir_password(
+    p_rut TEXT, p_password TEXT, p_acepta_datos BOOLEAN DEFAULT false
+) RETURNS JSONB
 LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, extensions AS $$
 DECLARE u public.usuarios%ROWTYPE; v_rut TEXT := upper(regexp_replace(coalesce(p_rut, ''), '[.\-\s]', '', 'g'));
 BEGIN
@@ -540,12 +543,16 @@ BEGIN
     IF u.pendiente_hasta IS NULL OR u.pendiente_hasta <= now() THEN
         RETURN jsonb_build_object('ok', false, 'error', 'pendiente_vencido');
     END IF;
+    IF u.role = 'visitante' AND NOT coalesce(p_acepta_datos, false) THEN
+        RETURN jsonb_build_object('ok', false, 'error', 'consentimiento_requerido');
+    END IF;
     IF NOT public.fn_password_valida(u.role, u.rut, p_password) THEN
         RETURN jsonb_build_object('ok', false, 'error', 'password_invalida');
     END IF;
     UPDATE public.usuarios
        SET password_hash = crypt(p_password, gen_salt('bf', 8)), estado = 'activo',
-           pendiente_hasta = NULL, intentos_fallidos = 0, bloqueado_hasta = NULL
+           pendiente_hasta = NULL, intentos_fallidos = 0, bloqueado_hasta = NULL,
+           consentimiento_datos_at = CASE WHEN u.role = 'visitante' THEN now() ELSE consentimiento_datos_at END
      WHERE id = u.id;
     RETURN jsonb_build_object('ok', true, 'usuario', jsonb_build_object(
         'id', u.id, 'nombre', u.nombre, 'rut', u.rut, 'role', u.role, 'auth_user_id', u.auth_user_id));
@@ -623,7 +630,7 @@ DO $$
 DECLARE f TEXT;
 BEGIN
   FOREACH f IN ARRAY ARRAY[
-    'fn_estado_rut(text)', 'fn_login(text,text)', 'fn_definir_password(text,text)',
+    'fn_estado_rut(text)', 'fn_login(text,text)', 'fn_definir_password(text,text,boolean)',
     'fn_crear_usuario(text,text,text,boolean,text,text)', 'fn_habilitar_visitante(uuid)',
     'fn_asignar_password(uuid,text)'
   ] LOOP

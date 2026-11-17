@@ -15,7 +15,7 @@ function destinoPorRol(role) {
 }
 
 function Login() {
-  // paso: "rut" | "password" | "definir"
+  // paso: "rut" | "password" | "consentimiento" | "definir"
   const [paso, setPaso] = useState("rut");
   const [rut, setRut] = useState(() => {
     const r = new URLSearchParams(window.location.search).get("rut") ?? "";
@@ -27,6 +27,7 @@ function Login() {
   const [confirmar, setConfirmar] = useState("");
   const [mensaje, setMensaje] = useState("");
   const [cargando, setCargando] = useState(false);
+  const [aceptaDatos, setAceptaDatos] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const procesado = useRef(false);
@@ -65,7 +66,8 @@ function Login() {
         break;
       case "pendiente":
         setRol(r.role);
-        setPaso("definir");
+        // Los visitantes deben aceptar el uso de sus datos antes de crear la contraseña
+        setPaso(r.role === "visitante" ? "consentimiento" : "definir");
         break;
       case "no_registrado":
       case "pendiente_vencido":
@@ -132,7 +134,7 @@ function Login() {
       return;
     }
     setCargando(true);
-    const r = await authFeria("definir_password", { rut, password });
+    const r = await authFeria("definir_password", { rut, password, acepta_datos: aceptaDatos });
     await entrar(r);
   };
 
@@ -140,6 +142,7 @@ function Login() {
     setPaso("rut");
     setPassword("");
     setConfirmar("");
+    setAceptaDatos(false);
     setMensaje("");
   };
 
@@ -165,6 +168,7 @@ function Login() {
           <p className="text-slate-500 mt-2 text-base">
             {paso === "rut" && "Escribe tu RUT o tu código EXT para comenzar"}
             {paso === "password" && "Escribe tu contraseña"}
+            {paso === "consentimiento" && "Antes de continuar, lee y acepta el uso de tus datos"}
             {paso === "definir" && "Es tu primera vez: crea tu contraseña"}
           </p>
         </div>
@@ -226,6 +230,55 @@ function Login() {
               </button>
               <button type="button" onClick={volver} className="w-full text-slate-500 text-sm underline">
                 Cambiar RUT
+              </button>
+            </form>
+          )}
+
+          {paso === "consentimiento" && (
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (aceptaDatos) setPaso("definir");
+              }}
+              className="space-y-6"
+            >
+              <p className="text-slate-600 text-center font-semibold">{rut}</p>
+              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5 text-sm text-slate-700 space-y-3 max-h-72 overflow-y-auto">
+                <h2 className="text-base font-bold text-slate-900">Protección de datos personales</h2>
+                <p>
+                  En cumplimiento de la Ley N° 21.719 sobre Protección de Datos Personales, te informamos
+                  cómo usaremos tu información:
+                </p>
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>
+                    Tu <strong>RUT</strong> se usará <strong>solo con fines académicos</strong>: identificarte
+                    como visitante y registrar tu participación en la Feria de Ciencias.
+                  </li>
+                  <li>No será compartido con terceros ni usado con fines comerciales.</li>
+                  <li>
+                    Tus datos <strong>serán eliminados dentro de 20 días hábiles</strong> después
+                    de finalizada la feria.
+                  </li>
+                  <li>
+                    Puedes solicitar acceso, corrección o eliminación de tus datos en cualquier momento
+                    a la organización de la feria.
+                  </li>
+                </ul>
+              </div>
+              <label className="flex items-start gap-3 text-sm text-slate-700 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={aceptaDatos}
+                  onChange={(e) => setAceptaDatos(e.target.checked)}
+                  className="h-5 w-5 mt-0.5 shrink-0"
+                />
+                Acepto que mi RUT sea utilizado únicamente con fines académicos y que sea eliminado dentro de 20 días hábiles después de finalizada la feria.
+              </label>
+              <button type="submit" disabled={!aceptaDatos} className={btnCls}>
+                Aceptar y continuar
+              </button>
+              <button type="button" onClick={volver} className="w-full text-slate-500 text-sm underline">
+                No acepto / Cambiar RUT
               </button>
             </form>
           )}

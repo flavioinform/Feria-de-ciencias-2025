@@ -76,6 +76,7 @@ Deno.serve(async (req) => {
 
     let enviados = 0;
     const fallidos: string[] = [];
+    let detalle = "";
     for (let i = 0; i < destinatarios.length; i += 100) {
       const lote = destinatarios.slice(i, i + 100);
       const resp = await fetch("https://api.resend.com/emails/batch", {
@@ -84,9 +85,17 @@ Deno.serve(async (req) => {
         body: JSON.stringify(lote.map((to) => ({ from: MAIL_FROM, to: [to], subject: asunto, html, text: mensaje, ...(REPLY_TO ? { reply_to: REPLY_TO } : {}) }))),
       });
       if (resp.ok) enviados += lote.length;
-      else fallidos.push(...lote);
+      else {
+        fallidos.push(...lote);
+        try {
+          const e = await resp.json();
+          detalle = e?.message ?? JSON.stringify(e);
+        } catch {
+          detalle = `Resend respondió ${resp.status}`;
+        }
+      }
     }
-    return json({ ok: fallidos.length === 0, enviados, fallidos });
+    return json({ ok: fallidos.length === 0, enviados, fallidos, detalle });
   } catch (err) {
     console.error(err);
     return json({ ok: false, error: "error_servidor" }, 500);
