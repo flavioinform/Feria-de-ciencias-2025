@@ -44,6 +44,7 @@ export const MENSAJES_ERROR = {
   password_invalida:
     "Contraseña no válida. Usa de 4 a 8 letras o números, sin repetidos (1111), secuencias (1234) ni parte de tu RUT.",
   no_pendiente: "Esta cuenta ya tiene contraseña.",
+  consentimiento_requerido: "Debes aceptar el uso de tus datos personales para continuar.",
   rut_invalido: "RUT inválido. Revisa el número y el dígito verificador.",
   rut_existente: "Este RUT ya está registrado.",
   nombre_invalido: "El nombre es demasiado corto.",

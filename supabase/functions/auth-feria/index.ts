@@ -125,7 +125,11 @@ Deno.serve(async (req) => {
     }
 
     if (action === "definir_password") {
-      const r = await rpc("fn_definir_password", { p_rut: str(body.rut, 20), p_password: str(body.password, 100) });
+      const r = await rpc("fn_definir_password", {
+        p_rut: str(body.rut, 20),
+        p_password: str(body.password, 100),
+        p_acepta_datos: body.acepta_datos === true, // obligatorio para visitantes (Ley 21.719)
+      });
       if (!r.ok) return json(r);
       return json({ ok: true, ...(await crearSesion(r.usuario as Usuario)) });
     }
