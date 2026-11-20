@@ -22,6 +22,7 @@ import AdminJurados from "./pages/admin/AdminJurados";
 import AdminReportes from "./pages/admin/AdminReportes";
 import AlumnoLogin from "./pages/alumno/AlumnoLogin";
 import AlumnoProyecto from "./pages/alumno/AlumnoProyecto";
+import { PORTAL_ALUMNO_VISIBLE } from "./lib/feria";
 import Categorias from "./pages/categorias";
 import Home from "./pages/home";
 import Login from "./pages/login";
@@ -65,6 +66,11 @@ function FeriaConcluida() {
       </div>
     </div>
   );
+}
+
+/** Portal de alumnos cerrado (ver src/lib/feria.js): toda ruta /alumno/* vuelve a la portada */
+function PortalAlumno({ children }) {
+  return PORTAL_ALUMNO_VISIBLE ? children : <Navigate to="/" replace />;
 }
 
 /** Ruta protegida: redirige a login si no hay sesión de alumno */
@@ -161,25 +167,29 @@ function AppContent() {
           />
 
           {/* ── Rutas del alumno ── */}
-          <Route path="/alumno/login" element={<RutaPublica><AlumnoLogin /></RutaPublica>} />
+          <Route path="/alumno/login" element={<PortalAlumno><RutaPublica><AlumnoLogin /></RutaPublica></PortalAlumno>} />
           <Route
             path="/alumno/proyecto"
             element={
-              <RutaPublica>
-                <RutaAlumno>
-                  <AlumnoProyecto />
-                </RutaAlumno>
-              </RutaPublica>
+              <PortalAlumno>
+                <RutaPublica>
+                  <RutaAlumno>
+                    <AlumnoProyecto />
+                  </RutaAlumno>
+                </RutaPublica>
+              </PortalAlumno>
             }
           />
           <Route
             path="/alumno/coevaluacion"
             element={
-              <RutaPublica>
-                <RutaAlumno>
-                  <AlumnoCoevaluacion />
-                </RutaAlumno>
-              </RutaPublica>
+              <PortalAlumno>
+                <RutaPublica>
+                  <RutaAlumno>
+                    <AlumnoCoevaluacion />
+                  </RutaAlumno>
+                </RutaPublica>
+              </PortalAlumno>
             }
           />
 

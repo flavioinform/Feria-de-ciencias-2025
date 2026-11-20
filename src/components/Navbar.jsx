@@ -2,6 +2,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useContext, useState, useRef, useEffect } from "react";
 import { AppContext } from "../context/AppContext";
 import { useAlumno } from "../context/AlumnoContext";
+import { PORTAL_ALUMNO_VISIBLE } from "../lib/feria";
 
 function Navbar() {
   const { user, logout } = useContext(AppContext);
@@ -102,6 +103,8 @@ function Navbar() {
                       <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">¿Quién eres?</p>
                     </div>
 
+                    {PORTAL_ALUMNO_VISIBLE && (
+                      <>
                     <Link
                       to="/alumno/login"
                       onClick={() => setDropdownOpen(false)}
@@ -119,6 +122,8 @@ function Navbar() {
                     </Link>
 
                     <div className="border-t border-rose-100" />
+                      </>
+                    )}
 
                     <Link
                       to="/login"

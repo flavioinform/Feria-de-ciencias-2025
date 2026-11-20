@@ -1,40 +1,8 @@
-import { useState, useEffect } from "react";
 import { LOGOS } from "./Splash";
 import { Link } from "react-router-dom";
+import { PORTAL_ALUMNO_VISIBLE } from "../lib/feria";
 
 function Hero() {
-  const [timeLeft, setTimeLeft] = useState({
-    days: 0,
-    hours: 0,
-    minutes: 0,
-    seconds: 0,
-  });
-
-  useEffect(() => {
-    const targetDate = new Date("2026-11-20T09:00:00");
-
-    const updateTimer = () => {
-      const now = new Date();
-      const difference = targetDate.getTime() - now.getTime();
-
-      if (difference <= 0) {
-        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-        return;
-      }
-
-      const days = Math.floor(difference / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((difference % (1000 * 60)) / 1000);
-
-      setTimeLeft({ days, hours, minutes, seconds });
-    };
-
-    updateTimer();
-    const interval = setInterval(updateTimer, 1000);
-    return () => clearInterval(interval);
-  }, []);
-
   return (
     <section className="relative flex flex-col items-center justify-center gap-10 sm:gap-14 min-h-[85vh] w-full overflow-hidden bg-white px-6 py-12 sm:py-16 border-b border-[#0b6e99]/15">
 
@@ -52,8 +20,8 @@ function Hero() {
 
       <div className="relative z-10 max-w-5xl w-full flex flex-col md:flex-row items-center justify-between gap-12 select-none">
 
-        {/* ── COLUMNA IZQUIERDA: Cuenta Regresiva ── */}
-        <div className="flex flex-col gap-6 max-w-[420px] w-full text-left order-2 md:order-1">
+        {/* ── COLUMNA IZQUIERDA: Bienvenida ── */}
+        <div className="flex flex-col items-center md:items-start gap-6 w-full md:max-w-[420px] text-center md:text-left order-2 md:order-1">
           <div className="flex items-center gap-4">
             <div className="w-10 h-10 flex items-center justify-center relative select-none">
               <svg className="w-9 h-9 text-[#0b6e99]" viewBox="0 0 100 100" fill="none" stroke="currentColor">
@@ -82,37 +50,18 @@ function Hero() {
               20 de noviembre
             </p>
             <p className="text-base font-semibold text-slate-700">
-              Cuenta regresiva oficial
+              ¡La feria ya comenzó!
             </p>
           </div>
 
-          {/* Cuenta regresiva: bloques planos, el número manda */}
-          <div
-            role="timer"
-            aria-label={`Faltan ${timeLeft.days} días, ${timeLeft.hours} horas, ${timeLeft.minutes} minutos y ${timeLeft.seconds} segundos para la feria`}
-            className="grid grid-cols-4 gap-3 select-none"
-          >
-            {[
-              { label: "Días", value: timeLeft.days },
-              { label: "Horas", value: timeLeft.hours },
-              { label: "Minutos", value: timeLeft.minutes },
-              { label: "Segundos", value: timeLeft.seconds },
-            ].map((unit) => (
-              <div
-                key={unit.label}
-                className="bg-[#0b6e99]/10 hover:bg-[#0b6e99]/15 rounded-xl px-1 py-4 flex flex-col items-center justify-center transition-colors duration-300"
-              >
-                <span
-                  aria-hidden="true"
-                  className="text-4xl sm:text-5xl font-display font-black text-slate-900 leading-none tabular-nums"
-                >
-                  {String(unit.value).padStart(2, "0")}
-                </span>
-                <span className="text-sm font-bold text-[#095a7e] mt-2">
-                  {unit.label}
-                </span>
-              </div>
-            ))}
+          {/* Bienvenida */}
+          <div className="w-full bg-[#0b6e99]/10 rounded-xl px-6 py-6 flex flex-col gap-2">
+            <p className="text-4xl sm:text-5xl font-display font-black text-slate-900 leading-none">
+              ¡Bienvenidos!
+            </p>
+            <p className="text-base font-semibold text-[#095a7e]">
+              Recorre los proyectos y vota por tus favoritos.
+            </p>
           </div>
 
         </div>
@@ -148,10 +97,10 @@ function Hero() {
           {/* Botones de acción Brutalistas */}
           <div className="flex flex-col sm:flex-row gap-5 w-full sm:w-auto z-20">
             <Link
-              to="/alumno/login"
+              to={PORTAL_ALUMNO_VISIBLE ? "/alumno/login" : "/login"}
               className="w-full sm:w-auto px-8 py-4 bg-transparent border-2 border-[#0b6e99] text-slate-900 hover:bg-[#0b6e99] hover:text-white font-tech text-sm font-bold uppercase tracking-widest rounded-xl transition-all duration-300 shadow-[4px_4px_0px_#0b6e99] hover:shadow-[0px_0px_0px_transparent] active:translate-x-1 active:translate-y-1 text-center"
             >
-              Portal del Alumno
+              {PORTAL_ALUMNO_VISIBLE ? "Portal del Alumno" : "Ingresar a votar"}
             </Link>
 
             {/* <Link
