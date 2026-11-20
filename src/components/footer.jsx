@@ -28,6 +28,14 @@ function Footer() {
           <p className="text-[10px] font-tech font-bold text-slate-500 uppercase tracking-widest">
             © {new Date().getFullYear()} flavioInform · Todos los derechos reservados.
           </p>
+          <a
+            href="https://www.linkedin.com/in/flavio-ocampo-713385381/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[10px] font-tech font-bold text-[#0b6e99] hover:underline uppercase tracking-widest"
+          >
+            Creado por Flavio Ocampo
+          </a>
         </div>
       </div>
     </footer>
