@@ -6,4 +6,4 @@
  * Durante la feria va en `false` para que los votantes no se confundan y
  * no haya alumnos dentro de la plataforma.
  */
-export const PORTAL_ALUMNO_VISIBLE = false;
+export const PORTAL_ALUMNO_VISIBLE = true;
