@@ -1,6 +1,5 @@
 import { LOGOS } from "./Splash";
 import { Link } from "react-router-dom";
-import { PORTAL_ALUMNO_VISIBLE } from "../lib/feria";
 
 function Hero() {
   return (
@@ -60,7 +59,7 @@ function Hero() {
               ¡Bienvenidos!
             </p>
             <p className="text-base font-semibold text-[#095a7e]">
-              Recorre los proyectos y vota por tus favoritos.
+              Ingresa al portal para ver tu proyecto y realizar tu coevaluación.
             </p>
           </div>
 
@@ -97,10 +96,10 @@ function Hero() {
           {/* Botones de acción Brutalistas */}
           <div className="flex flex-col sm:flex-row gap-5 w-full sm:w-auto z-20">
             <Link
-              to={PORTAL_ALUMNO_VISIBLE ? "/alumno/login" : "/login"}
+              to="/alumno/login"
               className="w-full sm:w-auto px-8 py-4 bg-transparent border-2 border-[#0b6e99] text-slate-900 hover:bg-[#0b6e99] hover:text-white font-tech text-sm font-bold uppercase tracking-widest rounded-xl transition-all duration-300 shadow-[4px_4px_0px_#0b6e99] hover:shadow-[0px_0px_0px_transparent] active:translate-x-1 active:translate-y-1 text-center"
             >
-              {PORTAL_ALUMNO_VISIBLE ? "Portal del Alumno" : "Ingresar a votar"}
+              Portal del Alumno
             </Link>
 
             {/* <Link
