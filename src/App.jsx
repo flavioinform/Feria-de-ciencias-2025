@@ -37,7 +37,7 @@ import Login from "./pages/login";
  *  Para reabrir la feria por completo el próximo semestre: cambiar a `false`.
  * ─────────────────────────────────────────────────────────────────────────
  */
-const FERIA_CONCLUIDA = false;
+const FERIA_CONCLUIDA = true;
 
 /** Rutas que siguen disponibles para el admin aunque la feria esté cerrada */
 function esRutaAdmin(pathname) {
@@ -57,7 +57,7 @@ function FeriaConcluida() {
           Feria de Ciencias
         </p>
         <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight uppercase leading-tight mb-4">
-          La Feria de Ciencias ha concluido
+          La feria ha finalizado
         </h1>
         <div className="w-16 h-[3px] bg-[#0b6e99] mx-auto mb-5" />
         <p className="text-slate-600 text-base sm:text-lg">

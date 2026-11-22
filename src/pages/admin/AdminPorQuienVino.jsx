@@ -1,8 +1,7 @@
 // src/pages/admin/AdminPorQuienVino.jsx
 import { useEffect, useState } from "react";
-import ExcelJS from "exceljs";
-import { saveAs } from "file-saver";
 import { fetchAllRows } from "../../lib/supabase";
+import { exportarPorQuienVino } from "../../lib/exportExcel";
 
 // Normaliza un RUT para comparar (sin puntos, guión ni espacios, DV en mayúscula)
 const normRut = (r) => (r || "").toString().replace(/[.\-\s]/g, "").toUpperCase();
@@ -152,88 +151,7 @@ function AdminPorQuienVino() {
     if (!categorias.length && !otros.length) return;
     setDescargando(true);
     try {
-      const wb = new ExcelJS.Workbook();
-
-      // Nombres de hoja válidos: máx 31 chars, sin \ / ? * [ ] :
-      const usados = new Set();
-      const nombreHoja = (base) => {
-        const limpio = (base || "Hoja").replace(/[\\/?*[\]:]/g, "").slice(0, 31) || "Hoja";
-        let n = limpio;
-        let i = 2;
-        while (usados.has(n.toLowerCase())) {
-          n = limpio.slice(0, 28) + " " + i;
-          i++;
-        }
-        usados.add(n.toLowerCase());
-        return n;
-      };
-
-      const estiloHoja = (ws, header) => {
-        ws.properties.outlineProperties = { summaryBelow: false, summaryRight: false };
-        ws.columns = [
-          { header, width: 48 },
-          { header: "RUT", width: 16 },
-          { header: "Vinieron", width: 10 },
-        ];
-        ws.getRow(1).font = { bold: true };
-        ws.getRow(1).fill = {
-          type: "pattern",
-          pattern: "solid",
-          fgColor: { argb: "FFF3F4F6" },
-        };
-        ws.views = [{ state: "frozen", ySplit: 1 }];
-      };
-
-      // Una hoja por categoría: Proyecto (nivel 0) -> Participante (nivel 1) -> Visitante (nivel 2)
-      for (const cat of categorias) {
-        const ws = wb.addWorksheet(nombreHoja(cat.nombre));
-        ws.properties.outlineLevelRow = 2;
-        estiloHoja(ws, "Proyecto / Participante / Visitante");
-
-        for (const proy of cat.proyectos) {
-          const rProy = ws.addRow([proy.titulo, "", proy.total]);
-          rProy.outlineLevel = 0;
-          rProy.font = { bold: true };
-
-          for (const pt of proy.participantes) {
-            const rPart = ws.addRow([pt.nombre, pt.rut, pt.total]);
-            rPart.outlineLevel = 1;
-            rPart.font = { bold: true, color: { argb: "FFDB2777" } };
-
-            for (const v of pt.visitantes) {
-              const rVis = ws.addRow([v.nombre, v.rut, ""]);
-              rVis.outlineLevel = 2;
-              rVis.hidden = true; // se abre con el botón "+" del grupo
-            }
-          }
-        }
-      }
-
-      // Hoja "Otros / Sin especificar"
-      if (otros.length) {
-        const ws = wb.addWorksheet(nombreHoja("Otros - Sin especificar"));
-        ws.properties.outlineLevelRow = 1;
-        estiloHoja(ws, "Por quién vino / Visitante");
-
-        for (const o of otros) {
-          const r = ws.addRow([o.key, "", o.total]);
-          r.outlineLevel = 0;
-          r.font = { bold: true };
-          for (const v of o.visitantes) {
-            const rVis = ws.addRow([v.nombre, v.rut, ""]);
-            rVis.outlineLevel = 1;
-            rVis.hidden = true;
-          }
-        }
-      }
-
-      const buffer = await wb.xlsx.writeBuffer();
-      saveAs(
-        new Blob([buffer], {
-          type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        }),
-        "por_quien_vino.xlsx"
-      );
+      await exportarPorQuienVino(categorias, otros);
     } catch (err) {
       console.error(err);
       setMensaje("Error al generar el Excel.");
@@ -262,7 +180,7 @@ function AdminPorQuienVino() {
       </div>
       <p className="text-slate-500 text-sm mb-4">
         Una hoja por categoría. Dentro de cada hoja se puede abrir cada proyecto y participante
-        para ver quiénes vinieron por ellos.
+        para ver quiénes vinieron por ellos. El Excel trae logos, resumen y todo el detalle a la vista.
       </p>
 
       {loading && <p>Cargando...</p>}
