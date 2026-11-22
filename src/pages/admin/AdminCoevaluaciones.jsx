@@ -44,7 +44,14 @@ function AdminCoevaluaciones() {
       setParticipantes(parts);
 
       const coeval = await fetchAllRows("coevaluaciones", "*, proyectos(id, titulo, categorias_id)");
-      setCoevaluaciones(coeval);
+      // La tabla no trae columna "promedio": se calcula con los 5 criterios
+      const CRITS = ["tiempo_actividades", "asistencia", "motivacion_equipo", "apoyo_informe", "presentacion"];
+      setCoevaluaciones(
+        coeval.map((c) => ({
+          ...c,
+          promedio: CRITS.reduce((s, k) => s + (Number(c[k]) || 0), 0) / CRITS.length,
+        }))
+      );
 
       const { data: proy } = await supabase.from("proyectos").select("id, titulo, categorias_id");
       setProyectos(proy || []);
@@ -270,12 +277,12 @@ function AdminCoevaluaciones() {
             onClick={handleExportNotaMiembro}
             disabled={exportandoNota}
             className="flex items-center justify-center gap-2 px-5 py-2.5 bg-[#0b6e99] hover:bg-[#095a7e] text-white font-bold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
-            title="Promedio de coevaluación por cada miembro, una hoja por categoría"
+            title="Excel con una hoja por categoría, los grupos y el promedio final de cada estudiante"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
             </svg>
-            {exportandoNota ? "Generando..." : "Nota por miembro (Excel)"}
+            {exportandoNota ? "Generando..." : "Exportar Excel por categoría"}
           </button>
           <button
             onClick={exportToCSV}
